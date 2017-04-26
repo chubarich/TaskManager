@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_input"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/drawer_input"/>
+        <item
+            android:id="@+id/navigation_day"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/drawer_day"/>
+        <item
+            android:id="@+id/navigation_week"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/drawer_week"/>
+        <item
+            android:id="@+id/navigation_month"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/drawer_month"/>
+    </group>
+
+</menu>

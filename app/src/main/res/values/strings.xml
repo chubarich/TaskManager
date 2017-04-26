@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TaskOrganiser</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="drawer_input">Input</string>
+    <string name="drawer_day">Day</string>
+    <string name="drawer_week">Week</string>
+    <string name="drawer_month">Month</string>
+
+
+
+</resources>
