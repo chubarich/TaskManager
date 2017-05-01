@@ -12,8 +12,6 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_NOTE = "note";
 
-  String COLUMN_NAME_GLOBAL_TASK_ID = "global_task_id";
-
   // -------------------------------- synchronization ---------------------------------------------
 
   String COLUMN_NAME_UNIQUE_ID = "unique_id";
