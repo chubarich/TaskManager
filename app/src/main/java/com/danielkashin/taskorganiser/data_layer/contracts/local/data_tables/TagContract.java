@@ -1,4 +1,4 @@
-package com.danielkashin.taskorganiser.data_layer.contracts.local.tables;
+package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
 
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;

@@ -1,7 +1,8 @@
-package com.danielkashin.taskorganiser.data_layer.contracts.local.tables;
+package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
 
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
+
 
 public class TaskMonthContract implements TaskContract {
 
@@ -17,8 +18,9 @@ public class TaskMonthContract implements TaskContract {
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
       + COLUMN_NAME_MAIN_TIMESTAMP + " INTEGER NOT NULL, "
       + COLUMN_NAME_NOTE + " TEXT, "
-      + COLUMN_NAME_UNIQUE_ID + " INTEGER NOT NULL UNIQUE, "
+      + COLUMN_NAME_UUID + " STRING NOT NULL UNIQUE, "
       + COLUMN_NAME_DURATION + " INTEGER, "
+      + COLUMN_NAME_DONE + " INTEGER, "
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "

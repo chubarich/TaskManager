@@ -1,11 +1,11 @@
-package com.danielkashin.taskorganiser.data_layer.contracts.local.additional_tables;
+package com.danielkashin.taskorganiser.data_layer.contracts.local.connections_tables;
 
 
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;
 
-public class MonthTaskToWeekTaskContract implements IdContract {
+public class MonthToWeekContract implements IdContract {
 
-  private MonthTaskToWeekTaskContract(){
+  private MonthToWeekContract(){
   }
 
   // -------------------------------------- constants ---------------------------------------------

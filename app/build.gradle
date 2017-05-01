@@ -6,7 +6,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "com.danielkashin.taskorganiser"
         minSdkVersion 17
@@ -24,6 +24,8 @@ android {
     buildTypes.each {
         it.buildConfigField 'String', 'DATABASE_NAME', keystoreProperties['DatabaseName'];
         it.buildConfigField 'Integer', 'DATABASE_BUILD_NUMBER', keystoreProperties['DatabaseBuildNumber'];
+    }
+    productFlavors {
     }
 }
 

@@ -1,6 +1,6 @@
 package com.danielkashin.taskorganiser.data_layer.contracts.local.base;
 
-import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;
+
 
 public interface TaskContract extends IdContract {
 
@@ -12,9 +12,11 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_NOTE = "note";
 
+  String COLUMN_NAME_DONE = "done";
+
   // -------------------------------- synchronization ---------------------------------------------
 
-  String COLUMN_NAME_UNIQUE_ID = "unique_id";
+  String COLUMN_NAME_UUID = "uuid";
 
   String COLUMN_NAME_CHANGED_LOCAL = "changed_local";
 
