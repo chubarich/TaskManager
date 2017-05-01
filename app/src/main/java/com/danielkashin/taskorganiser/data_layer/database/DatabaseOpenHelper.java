@@ -5,9 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.danielkashin.taskorganiser.BuildConfig;
-import com.danielkashin.taskorganiser.data_layer.contracts.local.TaskDayContract;
-import com.danielkashin.taskorganiser.data_layer.contracts.local.TaskMonthContract;
-import com.danielkashin.taskorganiser.data_layer.contracts.local.TaskWeekContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.tables.TaskDayContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.tables.TaskMonthContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.tables.TaskWeekContract;
 
 
 public class DatabaseOpenHelper extends SQLiteOpenHelper {

@@ -1,5 +1,7 @@
-package com.danielkashin.taskorganiser.data_layer.contracts.local;
+package com.danielkashin.taskorganiser.data_layer.contracts.local.tables;
 
+
+import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
 
 public class TaskDayContract implements TaskContract {
 
@@ -20,11 +22,15 @@ public class TaskDayContract implements TaskContract {
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
       + COLUMN_NAME_MAIN_TIMESTAMP + " INTEGER NOT NULL, "
       + COLUMN_NAME_NOTE + " TEXT, "
-      + COLUMN_NAME_SUBTASKS + " INTEGER, "
-      + COLUMN_NAME_TAGS + " INTEGER, "
+      + COLUMN_NAME_GLOBAL_TASK_ID + " INTEGER, "
       + COLUMN_NAME_DURATION + " INTEGER, "
       + COLUMN_NAME_MINUTE_START + " INTEGER, "
-      + COLUMN_NAME_MINUTE_END + " INTEGER "
+      + COLUMN_NAME_MINUTE_END + " INTEGER, "
+      // synchronization
+      + COLUMN_NAME_UNIQUE_ID + " INTEGER NOT NULL UNIQUE, "
+      + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
+      + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
+      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " INTEGER "
       + ");";
 
   public static String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
