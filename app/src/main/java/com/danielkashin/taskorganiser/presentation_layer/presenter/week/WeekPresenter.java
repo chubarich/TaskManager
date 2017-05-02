@@ -1,7 +1,5 @@
 package com.danielkashin.taskorganiser.presentation_layer.presenter.week;
 
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.presentation_layer.helper.NonNullHelper;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.Presenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.week.IWeekView;

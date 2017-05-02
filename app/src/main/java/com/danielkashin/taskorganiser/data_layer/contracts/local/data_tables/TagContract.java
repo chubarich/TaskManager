@@ -15,8 +15,13 @@ public class TagContract implements IdContract {
   public static final String COLUMN_NAME_LABEL = "label";
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
+      // id
+      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
+
+      // TagContract
       + COLUMN_NAME_LABEL + " INTEGER NOT NULL UNIQUE "
+
+      + "PRIMARY KEY (" + COLUMN_NAME_ID + ") "
       + ");";
 
   public static String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

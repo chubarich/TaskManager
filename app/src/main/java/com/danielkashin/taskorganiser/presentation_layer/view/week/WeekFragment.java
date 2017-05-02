@@ -11,6 +11,9 @@ public class WeekFragment extends PresenterFragment<WeekPresenter, IWeekView> im
 
 
 
+
+
+
   // ------------------------------------- PresenterFragment --------------------------------------
 
   @Override
@@ -37,4 +40,6 @@ public class WeekFragment extends PresenterFragment<WeekPresenter, IWeekView> im
   protected void initializeView(View view) {
 
   }
+
+  // ---------------------------------------- inner types -----------------------------------------
 }

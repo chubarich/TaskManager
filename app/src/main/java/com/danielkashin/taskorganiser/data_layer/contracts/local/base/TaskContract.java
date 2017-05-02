@@ -6,13 +6,15 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_NAME = "name";
 
-  String COLUMN_NAME_MAIN_TIMESTAMP = "main_timestamp";
+  String COLUMN_NAME_DATE = "date_id";
 
   String COLUMN_NAME_DURATION = "duration";
 
   String COLUMN_NAME_NOTE = "note";
 
   String COLUMN_NAME_DONE = "done";
+
+  String COLUMN_NAME_IMPORTANT = "important";
 
   // -------------------------------- synchronization ---------------------------------------------
 
@@ -22,6 +24,6 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_DELETED_LOCAL = "deleted_local";
 
-  String COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP = "change_or_delete_timestamp";
+  String COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE = "change_or_delete_date";
 
 }
