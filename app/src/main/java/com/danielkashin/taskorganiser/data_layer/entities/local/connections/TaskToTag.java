@@ -12,7 +12,7 @@ import static com.danielkashin.taskorganiser.data_layer.contracts.local.connecti
 @StorIOSQLiteType(table = TaskToTagContract.TABLE_NAME)
 public class TaskToTag {
 
-  @StorIOSQLiteColumn(name = COLUMN_NAME_ID)
+  @StorIOSQLiteColumn(name = COLUMN_NAME_ID, key = true)
   Long id;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_TASK_UUID)

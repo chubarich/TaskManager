@@ -33,7 +33,7 @@ public class WeekPresenter extends Presenter<IWeekView> {
 
   // --------------------------------------- inner types ------------------------------------------
 
-  public class Factory implements IPresenterFactory<WeekPresenter, IWeekView> {
+  public static class Factory implements IPresenterFactory<WeekPresenter, IWeekView> {
 
 
     public Factory() {

@@ -2,6 +2,10 @@ package com.danielkashin.taskorganiser.data_layer.database;
 
 import android.content.Context;
 
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTagStorIOSQLiteDeleteResolver;
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTagStorIOSQLiteGetResolver;
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTagStorIOSQLitePutResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TagStorIOSQLiteDeleteResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TagStorIOSQLiteGetResolver;
@@ -59,6 +63,11 @@ public class SQLiteFactory {
             .putResolver(new TagStorIOSQLitePutResolver())
             .getResolver(new TagStorIOSQLiteGetResolver())
             .deleteResolver(new TagStorIOSQLiteDeleteResolver())
+            .build())
+        .addTypeMapping(TaskToTag.class, SQLiteTypeMapping.<TaskToTag>builder()
+            .putResolver(new TaskToTagStorIOSQLitePutResolver())
+            .getResolver(new TaskToTagStorIOSQLiteGetResolver())
+            .deleteResolver(new TaskToTagStorIOSQLiteDeleteResolver())
             .build())
         .build();
   }

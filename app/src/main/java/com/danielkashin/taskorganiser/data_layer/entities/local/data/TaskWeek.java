@@ -60,7 +60,7 @@ public class TaskWeek {
   @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_DELETED_LOCAL)
   Boolean deletedLocal;
 
-  @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP)
+  @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE)
   Long changeOrDeleteLocalTimestamp;
 
 

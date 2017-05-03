@@ -4,14 +4,20 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterActivity;
+import com.danielkashin.taskorganiser.presentation_layer.view.week.WeekFragment;
 
 public class MainDrawerActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
@@ -20,6 +26,7 @@ public class MainDrawerActivity extends AppCompatActivity
   private DrawerLayout mDrawerLayout;
   private ActionBarDrawerToggle mDrawerToggle;
   private NavigationView mNavigationView;
+  private FrameLayout mFragmentContainer;
 
 
   // --------------------------------------- lifecycle --------------------------------------------
@@ -42,6 +49,7 @@ public class MainDrawerActivity extends AppCompatActivity
   protected void onStart() {
     super.onStart();
 
+    addFragment(WeekFragment.getInstance(), false);
     setListeners();
   }
 
@@ -75,11 +83,11 @@ public class MainDrawerActivity extends AppCompatActivity
 
     if (id == R.id.navigation_input) {
 
-    } else if (id == R.id.navigation_day) {
-
     } else if (id == R.id.navigation_week) {
 
     } else if (id == R.id.navigation_month) {
+
+    } else if (id == R.id.navigation_year) {
 
     }
 
@@ -90,18 +98,46 @@ public class MainDrawerActivity extends AppCompatActivity
 
   // --------------------------------------- private ----------------------------------------------
 
+  private void addFragment(Fragment fragment, boolean addToBackStack) {
+    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+    transaction.replace(R.id.fragment_container, fragment);
+
+    if (addToBackStack) {
+      transaction.addToBackStack(null);
+    } else if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
+      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    transaction.commit();
+  }
+
   private void initializeView() {
     mToolbar = (Toolbar) findViewById(R.id.toolbar);
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
         R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+    mFragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
   }
 
   private void setListeners() {
     setSupportActionBar(mToolbar);
     mDrawerLayout.addDrawerListener(mDrawerToggle);
     mNavigationView.setNavigationItemSelectedListener(this);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+      @Override
+      public void onBackStackChanged() {
+        setCurrentNavIcon();
+      }
+    });
+    setCurrentNavIcon();
+  }
+
+  private void setCurrentNavIcon() {
+    int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+    mDrawerToggle.setDrawerIndicatorEnabled(backStackEntryCount == 0);
   }
 
 }

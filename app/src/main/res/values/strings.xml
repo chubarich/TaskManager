@@ -4,11 +4,40 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="drawer_input">Input</string>
-    <string name="drawer_day">Day</string>
-    <string name="drawer_week">Week</string>
-    <string name="drawer_month">Month</string>
+    <string name="drawer_input">Входящие</string>
+    <string name="drawer_week">Неделя</string>
+    <string name="drawer_month">Месяц</string>
+    <string name="drawer_year">Год</string>
 
+    <string name="tasks_for_week">Задачи на неделю</string>
+    <string name="tasks_for_month">Задачи на месяц</string>
+    <string name="tasks_for_year">Задачи на год</string>
 
+    <string name="new_task">Новая задача</string>
+
+    <array name="days">
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+        <item>Воскресенье</item>
+    </array>
+
+    <array name="months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </array>
 
 </resources>

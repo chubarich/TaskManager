@@ -54,6 +54,13 @@ public class Task {
     this.UUID = UUID;
     this.type = type;
     this.date = date;
+
+    this.done = false;
+    this.important = false;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public Long getDuration() {
