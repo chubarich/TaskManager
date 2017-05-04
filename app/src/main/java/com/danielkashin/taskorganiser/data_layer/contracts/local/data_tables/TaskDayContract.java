@@ -45,7 +45,7 @@ public class TaskDayContract implements TaskContract {
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE + " DATETIME, "
+      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
 
       + "PRIMARY KEY (" + COLUMN_NAME_ID + "), "
       + "FOREIGN KEY (" + COLUMN_NAME_TASK_WEEK_ID + ") REFERENCES "

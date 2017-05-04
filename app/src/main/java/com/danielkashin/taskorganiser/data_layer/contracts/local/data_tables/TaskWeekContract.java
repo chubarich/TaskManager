@@ -32,7 +32,7 @@ public class TaskWeekContract implements TaskContract {
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE + " DATETIME, "
+      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
 
       // connections
       + COLUMN_NAME_TASK_MONTH_ID + " INTEGER, "

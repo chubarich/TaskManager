@@ -1,5 +1,6 @@
 package com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups;
 
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,170 +8,154 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.presentation_layer.adapter.tasks_without_time.TasksWithoutTimeAdapter;
+import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tasks_group.ITaskGroupAdapter;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tasks_group.TaskGroupAdapter;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-
-import static android.view.Gravity.TOP;
-import static com.beloo.widget.chipslayoutmanager.ChipsLayoutManager.HORIZONTAL;
 
 
 public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.TaskGroupHolder>
-    implements ITaskGroupsAdapter {
+    implements ITaskGroupsAdapter, ITaskGroupAdapter.Callbacks {
 
-  private ArrayList<ArrayList<Task>> mTaskLists;
+  private ArrayList<TaskGroup> mTaskGroups;
   private ArrayList<String> mLabels;
-  private Task.Type mTaskGroupType;
+  private ITaskGroupsAdapter.Callbacks mCallbacks;
 
+  public TaskGroupsAdapter(ArrayList<TaskGroup> taskGroups, ArrayList<String> labels) {
+    ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null", taskGroups, labels);
+    ExceptionHelper.assertTrue("Labels and groups sizes must be equal", taskGroups.size() == labels.size());
 
-  public TaskGroupsAdapter(ArrayList<ArrayList<Task>> taskLists, ArrayList<String> labels, Task.Type dateType) {
-    ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null", taskLists,
-        dateType, labels);
-    ExceptionHelper.assertFalse("TaskGroupsAdapter does not support Task.Type.Mini",
-        dateType == Task.Type.Mini);
-    ExceptionHelper.assertFalse("Task.Type.Day requires 7 days as input",
-        dateType == Task.Type.Day && (taskLists.size() != 8 || labels.size() != 8));
-    ExceptionHelper.assertFalse("Task.Type.Month requires 12 months as input",
-        dateType == Task.Type.Month && (taskLists.size() != 12 || labels.size() != 12));
-
-    mTaskLists = taskLists;
-    mTaskGroupType = dateType;
+    mTaskGroups = taskGroups;
     mLabels = labels;
   }
 
   // -------------------------------------- ITaskGroupsAdapter ------------------------------------
 
+  @Override
+  public void attachCallbacks(Callbacks callbacks) {
+    mCallbacks = callbacks;
+  }
 
+  @Override
+  public void detachCallbacks() {
+    mCallbacks = null;
+  }
+
+  @Override
+  public void addTask(Task task) {
+    for (int i = 0; i < mTaskGroups.size(); ++i) {
+      TaskGroup taskGroup = mTaskGroups.get(i);
+
+      if (task.getType() == taskGroup.getType() && task.getDate().equals(taskGroup.getDate())) {
+        taskGroup.addTask(task);
+        notifyItemChanged(i);
+      }
+    }
+  }
+
+  @Override
+  public void refreshTask(Task task) {
+    for (int i = 0; i < mTaskGroups.size(); ++i) {
+      TaskGroup taskGroup = mTaskGroups.get(i);
+
+      if (task.getType() == taskGroup.getType() && task.getDate().equals(taskGroup.getDate())) {
+        notifyItemChanged(i);
+      }
+    }
+  }
+
+  // ---------------------------------- ITaskGroupAdapter.Callbacks -------------------------------
+
+  @Override
+  public void onTaskCreated(Task task) {
+    if (mCallbacks != null) {
+      mCallbacks.onTaskCreated(task);
+    }
+  }
+
+  @Override
+  public void onTaskRefreshed(Task task) {
+    if (mCallbacks != null) {
+      mCallbacks.onTaskRefreshed(task);
+    }
+  }
 
   // ------------------------------------- RecyclerView.Adapter -----------------------------------
 
   @Override
   public TaskGroupHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    TaskGroupHolder.ViewType holderViewType;
-    if (viewType == TaskGroupHolder.ViewType.WITH_DATE_TASKS.getValue()) {
-      holderViewType = TaskGroupHolder.ViewType.WITH_DATE_TASKS;
-    } else if (viewType == TaskGroupHolder.ViewType.WITHOUT_DATE_TASKS.getValue()) {
-      holderViewType = TaskGroupHolder.ViewType.WITHOUT_DATE_TASKS;
-    } else {
-      throw new IllegalStateException("Unknown adapter holder ViewType");
-    }
-
     View view = LayoutInflater.from(parent.getContext())
         .inflate(R.layout.item_task_group, parent, false);
 
-    ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder(parent.getContext())
-        .setScrollingEnabled(false)
-        .setOrientation(HORIZONTAL)
-        .build();
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(parent.getContext());
 
-    return new TaskGroupHolder(view, holderViewType, mTaskGroupType, chipsLayoutManager);
+    return new TaskGroupHolder(view, linearLayoutManager);
   }
 
   @Override
   public void onBindViewHolder(TaskGroupHolder holder, int p) {
     int position = holder.getAdapterPosition();
 
-    int viewType = getItemViewType(position);
-    if (viewType == holder.getItemViewType()) {
-      holder.setText(mLabels.get(position));
-    }
+    holder.setText(mLabels.get(position));
+    holder.setTaskGroup(mTaskGroups.get(position));
+    holder.setAdapterCallbacks(this);
   }
 
   @Override
   public int getItemCount() {
-    return mTaskLists.size();
-  }
-
-  @Override
-  public int getItemViewType(int position) {
-    if (mTaskGroupType == Task.Type.Day && position != 0) {
-      return TaskGroupHolder.ViewType.WITH_DATE_TASKS.getValue();
-    } else {
-      return TaskGroupHolder.ViewType.WITHOUT_DATE_TASKS.getValue();
-    }
+    return mTaskGroups.size();
   }
 
   // --------------------------------------- inner types ------------------------------------------
 
   static class TaskGroupHolder extends RecyclerView.ViewHolder {
 
-    private final ViewType viewType;
-    private final Task.Type taskType;
-    private final RecyclerView withoutDatesRecyclerView;
-    private final RecyclerView withDatesRecyclerView;
+    private final RecyclerView tasksRecyclerView;
+    private final TextView label;
     private final ExpandableLayout expandableLayout;
     private final ImageView imageExpand;
-    private final TextView label;
 
-    private TaskGroupHolder(View view, ViewType viewType, Task.Type taskType,
-                            ChipsLayoutManager chipsLayoutManager) {
+
+    private TaskGroupHolder(View view, RecyclerView.LayoutManager layoutManager) {
       super(view);
+      ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null", view, layoutManager);
 
-      ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null",
-          view, viewType, taskType, chipsLayoutManager);
-
-      this.viewType = viewType;
-      this.taskType = taskType;
-
-      imageExpand = (ImageView) view.findViewById(R.id.image_expand);
-      expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
-      withoutDatesRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_without_dates);
       label = (TextView) view.findViewById(R.id.label);
-      withDatesRecyclerView = null;
+      expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+      imageExpand = (ImageView) view.findViewById(R.id.image_expand);
 
-      initializeView(view, chipsLayoutManager);
+      tasksRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_tasks);
+      tasksRecyclerView.setAdapter(new TaskGroupAdapter());
+      tasksRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
+      tasksRecyclerView.setLayoutManager(layoutManager);
+      tasksRecyclerView.setHasFixedSize(true);
+      tasksRecyclerView.setNestedScrollingEnabled(false);
+
+      imageExpand.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          expandableLayout.toggle(false);
+        }
+      });
     }
 
-    private ViewType getViewType() {
-      return viewType;
+    private void setTaskGroup(TaskGroup taskGroup) {
+      ((ITaskGroupAdapter) tasksRecyclerView.getAdapter()).setOrRefreshTaskGroup(taskGroup);
     }
 
     private void setText(String text) {
       label.setText(text);
     }
 
-    private void initializeView(View view, ChipsLayoutManager chipsLayoutManager) {
-      imageExpand.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          expandableLayout.toggle(false);
-          expandableLayout.requestLayout();
-        }
-      });
-
-      withoutDatesRecyclerView.setAdapter(new TasksWithoutTimeAdapter(taskType));
-      withoutDatesRecyclerView.addItemDecoration(new SpacingItemDecoration(6, 6));
-      withoutDatesRecyclerView.setLayoutManager(chipsLayoutManager);
-      withoutDatesRecyclerView.setHasFixedSize(true);
-      withoutDatesRecyclerView.setNestedScrollingEnabled(false);
-
-      // TODO
+    private void setAdapterCallbacks(ITaskGroupAdapter.Callbacks callbacks) {
+      ((ITaskGroupAdapter) tasksRecyclerView.getAdapter()).attachCallbacks(callbacks);
     }
-
-    private enum ViewType {
-      WITH_DATE_TASKS(234),
-      WITHOUT_DATE_TASKS(591);
-
-      int value;
-
-      ViewType(int value) {
-        this.value = value;
-      }
-
-      public int getValue() {
-        return value;
-      }
-    }
-
   }
-
 }

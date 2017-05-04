@@ -3,6 +3,7 @@ package com.danielkashin.taskorganiser.domain_layer.pojo;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class Task {
@@ -45,7 +46,7 @@ public class Task {
 
   private Boolean deletedLocal;
 
-  private String changeOrDeleteLocalDate;
+  private Long changeOrDeleteLocalTimestamp;
 
   // ----------------------------------------------------------------------------------------------
 
@@ -57,6 +58,72 @@ public class Task {
 
     this.done = false;
     this.important = false;
+  }
+
+  public boolean equals(Task other) {
+    return this.name.equals(other.getName()) && this.type == other.getType() && this.UUID.equals(other.getUUID());
+  }
+
+  public boolean equalsWithAdditionalInformation(Task other) {
+    if (!this.equals(other)) {
+      return false;
+    }
+
+    if (this.tags == null && other.tags != null || this.tags != null && other.tags == null) {
+      return false;
+    }
+
+    if (this.tags != null) {
+      if (this.tags.size() != other.tags.size()) {
+        return false;
+      }
+
+      Collections.sort(this.tags);
+      Collections.sort(other.tags);
+
+      for (int i = 0; i < this.tags.size(); ++i) {
+        if (!this.tags.get(i).equals(other.tags.get(i))) {
+          return false;
+        }
+      }
+    }
+
+    if (this.minuteStart == null && other.minuteStart != null
+        || this.minuteStart != null && other.minuteStart == null
+        || this.minuteEnd == null && other.minuteEnd != null
+        || this.minuteEnd != null && other.minuteEnd == null) {
+      return false;
+    }
+
+    if (type == Type.Day && this.minuteStart != null && this.minuteEnd != null
+        && (!this.minuteStart.equals(other.minuteStart) || !this.minuteEnd.equals(other.minuteEnd))) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public String getTimeToString() {
+    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
+
+    if (this.minuteStart == null || this.minuteEnd == null) {
+      return null;
+    }
+
+    return String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
+        minuteEnd / 60, minuteEnd % 60 );
+  }
+
+  public String getUUID() {
+    return UUID;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public String getDate() {
+    return date;
   }
 
   public String getName() {
@@ -179,12 +246,12 @@ public class Task {
     this.deletedLocal = deletedLocal;
   }
 
-  public String getChangeOrDeleteLocalDate() {
-    return changeOrDeleteLocalDate;
+  public Long getChangeOrDeleteLocalTimestamp() {
+    return changeOrDeleteLocalTimestamp;
   }
 
-  public void setChangeOrDeleteLocalDate(String changeOrDeleteLocalDate) {
-    this.changeOrDeleteLocalDate = changeOrDeleteLocalDate;
+  public void setChangeOrDeleteLocalTimestamp(Long changeOrDeleteLocalTimestamp) {
+    this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
   }
 
   // ---------------------------------------- inner types -----------------------------------------

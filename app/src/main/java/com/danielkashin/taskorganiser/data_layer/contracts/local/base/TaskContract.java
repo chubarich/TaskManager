@@ -24,6 +24,6 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_DELETED_LOCAL = "deleted_local";
 
-  String COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE = "change_or_delete_date";
+  String COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP = "change_or_delete_date";
 
 }

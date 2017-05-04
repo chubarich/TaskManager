@@ -1,12 +1,11 @@
 package com.danielkashin.taskorganiser.data_layer.entities.local.data;
 
-import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract.COLUMN_NAME_ID;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_CHANGED_LOCAL;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DATE;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DELETED_LOCAL;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DONE;
@@ -76,7 +75,7 @@ public class TaskDay {
   @StorIOSQLiteColumn(name = COLUMN_NAME_DELETED_LOCAL)
   Boolean deletedLocal;
 
-  @StorIOSQLiteColumn(name = COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE)
+  @StorIOSQLiteColumn(name = COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP)
   Long changeOrDeleteLocalTimestamp;
 
 

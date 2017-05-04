@@ -2,8 +2,7 @@ package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
 
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;
-
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
 
 public class TaskMiniContract implements IdContract {
 
@@ -41,7 +40,7 @@ public class TaskMiniContract implements IdContract {
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_DATE + " DATETIME, "
+      + TaskContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
 
       // connections
       + COLUMN_NAME_TASK_DAY_ID + " INTEGER NOT NULL, "
