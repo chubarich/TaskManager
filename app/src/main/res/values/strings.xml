@@ -15,6 +15,10 @@
 
     <string name="new_task">Новая задача</string>
 
+    <string name="today">Сегодня</string>
+
+    <string name="current_week">Текущая неделя</string>
+
     <array name="days">
         <item>Понедельник</item>
         <item>Вторник</item>
@@ -25,7 +29,7 @@
         <item>Воскресенье</item>
     </array>
 
-    <array name="months">
+    <array name="months_simple">
         <item>Январь</item>
         <item>Февраль</item>
         <item>Март</item>
@@ -38,6 +42,21 @@
         <item>Октябрь</item>
         <item>Ноябрь</item>
         <item>Декабрь</item>
+    </array>
+
+    <array name="months">
+        <item>Января</item>
+        <item>Февраля</item>
+        <item>Марта</item>
+        <item>Апреля</item>
+        <item>Мая</item>
+        <item>Июня</item>
+        <item>Июля</item>
+        <item>Августа</item>
+        <item>Сентября</item>
+        <item>Октября</item>
+        <item>Ноября</item>
+        <item>Декабря</item>
     </array>
 
 </resources>

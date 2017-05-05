@@ -3,13 +3,12 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:paddingBottom="5dp"
+              android:paddingTop="20dp"
               android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingStart="10dp">
 
@@ -48,8 +47,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layoutDirection="ltr"
-                android:padding="5dp"/>
+                android:padding="5dp"
+                android:paddingBottom="0dp"/>
 
     </net.cachapa.expandablelayout.ExpandableLayout>
+
+    <View
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
+
+    <View
+        android:id="@+id/view_highlighter"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        android:background="@color/colorAccent"/>
 
 </LinearLayout>

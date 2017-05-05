@@ -1,6 +1,8 @@
 package com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups;
 
 
+import android.os.Bundle;
+
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 
 public interface ITaskGroupsAdapter {
@@ -12,6 +14,8 @@ public interface ITaskGroupsAdapter {
   void addTask(Task task);
 
   void refreshTask(Task task);
+
+  void saveToOutState(Bundle outState);
 
 
   interface Callbacks {

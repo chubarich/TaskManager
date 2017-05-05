@@ -18,7 +18,7 @@ public class TaskWeekContract implements TaskContract {
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 
       // id
-      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
+      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
 
       // TaskContract
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "

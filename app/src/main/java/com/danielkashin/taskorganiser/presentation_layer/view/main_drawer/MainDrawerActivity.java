@@ -2,6 +2,8 @@ package com.danielkashin.taskorganiser.presentation_layer.view.main_drawer;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,11 +18,14 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.danielkashin.taskorganiser.R;
-import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterActivity;
-import com.danielkashin.taskorganiser.presentation_layer.view.week.WeekFragment;
+import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
+import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
+import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
 
 public class MainDrawerActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener {
+    implements NavigationView.OnNavigationItemSelectedListener, IToolbarContainer {
+
+  private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
 
   private Toolbar mToolbar;
   private DrawerLayout mDrawerLayout;
@@ -36,7 +41,7 @@ public class MainDrawerActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main_drawer);
 
-    initializeView();
+    initializeView(savedInstanceState);
   }
 
   @Override
@@ -49,8 +54,19 @@ public class MainDrawerActivity extends AppCompatActivity
   protected void onStart() {
     super.onStart();
 
-    addFragment(WeekFragment.getInstance(), false);
+    if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+      addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+    }
+
     setListeners();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    if (getSupportActionBar() != null && getSupportActionBar().getTitle() != null) {
+      outState.putString(KEY_TOOLBAR_LABEL, getSupportActionBar().getTitle().toString());
+    }
   }
 
   @Override
@@ -78,23 +94,41 @@ public class MainDrawerActivity extends AppCompatActivity
   }
 
   @Override
-  public boolean onNavigationItemSelected(MenuItem item) {
-    int id = item.getItemId();
-
-    if (id == R.id.navigation_input) {
-
-    } else if (id == R.id.navigation_week) {
-
-    } else if (id == R.id.navigation_month) {
-
-    } else if (id == R.id.navigation_year) {
-
-    }
-
+  public boolean onNavigationItemSelected(final MenuItem item) {
     mDrawerLayout.closeDrawer(GravityCompat.START);
+
+    Runnable workRunnable = new Runnable() {
+      @Override
+      public void run() {
+        int id = item.getItemId();
+        if (id == R.id.navigation_input) {
+
+        } else if (id == R.id.navigation_week) {
+          addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+        } else if (id == R.id.navigation_month) {
+          addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Week), false);
+        } else if (id == R.id.navigation_year) {
+          addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Month), false);
+        }
+      }
+    };
+
+    int DELAY = 350;
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.postDelayed(workRunnable, DELAY);
 
     return true;
   }
+
+  // ---------------------------------- IToolbarContainer -----------------------------------------
+
+  @Override
+  public void setToolbarLabel(String text) {
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setTitle(text);
+    }
+  }
+
 
   // --------------------------------------- private ----------------------------------------------
 
@@ -112,20 +146,29 @@ public class MainDrawerActivity extends AppCompatActivity
     transaction.commit();
   }
 
-  private void initializeView() {
+  private void initializeView(Bundle savedInstanceState) {
     mToolbar = (Toolbar) findViewById(R.id.toolbar);
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
         R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
     mFragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
+
+    setSupportActionBar(mToolbar);
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      if (savedInstanceState != null && savedInstanceState.containsKey(KEY_TOOLBAR_LABEL)) {
+        getSupportActionBar().setTitle(savedInstanceState.getString(KEY_TOOLBAR_LABEL));
+      } else {
+        getSupportActionBar().setTitle("");
+      }
+    }
   }
 
   private void setListeners() {
-    setSupportActionBar(mToolbar);
     mDrawerLayout.addDrawerListener(mDrawerToggle);
     mNavigationView.setNavigationItemSelectedListener(this);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
       @Override
       public void onBackStackChanged() {

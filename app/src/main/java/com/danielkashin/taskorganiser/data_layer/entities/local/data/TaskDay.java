@@ -40,7 +40,7 @@ public class TaskDay {
   String note;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_UUID)
-  Long UUID;
+  String UUID;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_DURATION)
   Long duration;
@@ -60,7 +60,7 @@ public class TaskDay {
   Long minuteEnd;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_NOTIFICATION_DATE)
-  Integer notificationTimestamp;
+  Long notificationTimestamp;
 
   // connections
 
@@ -82,4 +82,64 @@ public class TaskDay {
   TaskDay() {
   }
 
+
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDate() {
+    return date;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public String getUUID() {
+    return UUID;
+  }
+
+  public Long getDuration() {
+    return duration;
+  }
+
+  public Integer getDone() {
+    return done;
+  }
+
+  public Integer getImportant() {
+    return important;
+  }
+
+  public Long getMinuteStart() {
+    return minuteStart;
+  }
+
+  public Long getMinuteEnd() {
+    return minuteEnd;
+  }
+
+  public Long getNotificationTimestamp() {
+    return notificationTimestamp;
+  }
+
+  public Long getTaskWeekId() {
+    return taskWeekId;
+  }
+
+  public Boolean getChangedLocal() {
+    return changedLocal;
+  }
+
+  public Boolean getDeletedLocal() {
+    return deletedLocal;
+  }
+
+  public Long getChangeOrDeleteLocalTimestamp() {
+    return changeOrDeleteLocalTimestamp;
+  }
 }

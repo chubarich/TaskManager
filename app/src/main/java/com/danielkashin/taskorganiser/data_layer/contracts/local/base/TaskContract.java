@@ -6,7 +6,7 @@ public interface TaskContract extends IdContract {
 
   String COLUMN_NAME_NAME = "name";
 
-  String COLUMN_NAME_DATE = "date_id";
+  String COLUMN_NAME_DATE = "date";
 
   String COLUMN_NAME_DURATION = "duration";
 

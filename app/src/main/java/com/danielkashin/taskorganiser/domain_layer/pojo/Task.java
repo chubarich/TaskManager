@@ -1,12 +1,19 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class Task {
+public class Task implements Parcelable {
 
   // ---------------------------------------- main info -------------------------------------------
 
@@ -26,7 +33,7 @@ public class Task {
 
   private Long minuteEnd;
 
-  private String notificationDate;
+  private Long notificationTimestamp;
 
   // -------------------------------------- additional info ---------------------------------------
 
@@ -55,10 +62,103 @@ public class Task {
     this.UUID = UUID;
     this.type = type;
     this.date = date;
-
-    this.done = false;
-    this.important = false;
   }
+
+  public Task(TaskMonth taskMonth) {
+    this.name = taskMonth.getName();
+    this.UUID = taskMonth.getUUID();
+    this.type = Type.Month;
+    this.date = taskMonth.getDate();
+    this.duration = taskMonth.getDuration();
+    this.done = taskMonth.getDone() == 1;
+    this.note = taskMonth.getNote();
+    this.important = taskMonth.getImportant() == 1;
+  }
+
+  public Task(TaskWeek taskWeek) {
+    this.name = taskWeek.getName();
+    this.UUID = taskWeek.getUUID();
+    this.type = Type.Week;
+    this.date = taskWeek.getDate();
+    this.duration = taskWeek.getDuration();
+    this.done = taskWeek.getDone() == 1;
+    this.note = taskWeek.getNote();
+    this.important = taskWeek.getImportant() == 1;
+  }
+
+  public Task(TaskDay taskDay) {
+    this.name = taskDay.getName();
+    this.UUID = taskDay.getUUID();
+    this.type = Type.Day;
+    this.date = taskDay.getDate();
+    this.duration = taskDay.getDuration();
+    this.done = taskDay.getDone() == 1;
+    this.note = taskDay.getNote();
+    this.important = taskDay.getImportant() == 1;
+    this.minuteStart = taskDay.getMinuteStart();
+    this.minuteEnd = taskDay.getMinuteEnd();
+    this.notificationTimestamp = taskDay.getNotificationTimestamp();
+  }
+
+  // ----------------------------------------- Parcelable -----------------------------------------
+
+  public Task(Parcel parcel) {
+    name = parcel.readString();
+    UUID = parcel.readString();
+    type = (Type) parcel.readSerializable();
+    date = parcel.readString();
+    duration = (Long) parcel.readSerializable();
+    minuteStart = (Long) parcel.readSerializable();
+    minuteEnd = (Long) parcel.readSerializable();
+    notificationTimestamp = (Long) parcel.readSerializable();
+    note = parcel.readString();
+    parcel.readStringList(tags);
+    subtasks = (ArrayList<Long>)parcel.readSerializable();
+    done = (Boolean) parcel.readSerializable();
+    important = (Boolean) parcel.readSerializable();
+    changedLocal = (Boolean) parcel.readSerializable();
+    deletedLocal = (Boolean) parcel.readSerializable();
+    changeOrDeleteLocalTimestamp = (Long) parcel.readSerializable();
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel parcel, int flags) {
+    parcel.writeString(name);
+    parcel.writeString(UUID);
+    parcel.writeSerializable(type);
+    parcel.writeString(date);
+    parcel.writeSerializable(duration);
+    parcel.writeSerializable(minuteStart);
+    parcel.writeSerializable(minuteEnd);
+    parcel.writeSerializable(notificationTimestamp);
+    parcel.writeString(note);
+    parcel.writeStringList(tags);
+    parcel.writeSerializable(subtasks);
+    parcel.writeSerializable(done);
+    parcel.writeSerializable(important);
+    parcel.writeSerializable(changedLocal);
+    parcel.writeSerializable(deletedLocal);
+    parcel.writeSerializable(changeOrDeleteLocalTimestamp);
+  }
+
+  public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
+    @Override
+    public Task createFromParcel(Parcel parcel) {
+      return new Task(parcel);
+    }
+
+    @Override
+    public Task[] newArray(int i) {
+      return new Task[i];
+    }
+  };
+
+  // ----------------------------------- getters/setters ------------------------------------------
 
   public boolean equals(Task other) {
     return this.name.equals(other.getName()) && this.type == other.getType() && this.UUID.equals(other.getUUID());
@@ -111,7 +211,7 @@ public class Task {
     }
 
     return String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
-        minuteEnd / 60, minuteEnd % 60 );
+        minuteEnd / 60, minuteEnd % 60);
   }
 
   public String getUUID() {
@@ -166,16 +266,16 @@ public class Task {
     this.minuteEnd = minuteEnd;
   }
 
-  public String getNotificationDate() {
+  public Long getNotificationTimestamp() {
     ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
 
-    return notificationDate;
+    return notificationTimestamp;
   }
 
-  public void setNotificationDate(String notificationDate) {
+  public void setNotificationTimestamp(Long notificationTimestamp) {
     ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
 
-    this.notificationDate = notificationDate;
+    this.notificationTimestamp = notificationTimestamp;
   }
 
   public String getNote() {
@@ -215,7 +315,7 @@ public class Task {
   }
 
   public Boolean getDone() {
-    return done;
+    return done != null && done;
   }
 
   public void setDone(Boolean done) {
@@ -223,7 +323,7 @@ public class Task {
   }
 
   public Boolean getImportant() {
-    return important;
+    return important != null && important;
   }
 
   public void setImportant(Boolean important) {

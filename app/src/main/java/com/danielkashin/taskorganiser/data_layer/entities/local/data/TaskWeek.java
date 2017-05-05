@@ -36,7 +36,7 @@ public class TaskWeek {
   String note;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_UUID)
-  Long UUID;
+  String UUID;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_DURATION)
   Long duration;
@@ -67,4 +67,48 @@ public class TaskWeek {
   TaskWeek() {
   }
 
+
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDate() {
+    return date;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public String getUUID() {
+    return UUID;
+  }
+
+  public Long getDuration() {
+    return duration;
+  }
+
+  public Integer getDone() {
+    return done;
+  }
+
+  public Integer getImportant() {
+    return important;
+  }
+
+  public Boolean getChangedLocal() {
+    return changedLocal;
+  }
+
+  public Boolean getDeletedLocal() {
+    return deletedLocal;
+  }
+
+  public Long getChangeOrDeleteLocalTimestamp() {
+    return changeOrDeleteLocalTimestamp;
+  }
 }

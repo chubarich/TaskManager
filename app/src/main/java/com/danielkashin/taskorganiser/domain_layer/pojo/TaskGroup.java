@@ -1,11 +1,15 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class TaskGroup {
+
+public class TaskGroup implements Parcelable {
 
   private final String date;
   private final Task.Type type;
@@ -17,6 +21,39 @@ public class TaskGroup {
     this.type = type;
     this.tasks = new ArrayList<>();
   }
+
+  // ----------------------------------------- Parcelable -----------------------------------------
+
+  public TaskGroup(Parcel parcel) {
+    this.date = parcel.readString();
+    this.type = (Task.Type) parcel.readSerializable();
+    this.tasks = new ArrayList<>();
+    parcel.readTypedList(this.tasks, Task.CREATOR);
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel parcel, int flags) {
+    parcel.writeString(date);
+    parcel.writeSerializable(type);
+    parcel.writeTypedList(tasks);
+  }
+
+  public static final Parcelable.Creator<TaskGroup> CREATOR = new Parcelable.Creator<TaskGroup>() {
+    @Override
+    public TaskGroup createFromParcel(Parcel parcel) {
+      return new TaskGroup(parcel);
+    }
+
+    @Override
+    public TaskGroup[] newArray(int i) {
+      return new TaskGroup[i];
+    }
+  };
 
   // --------------------------------------- setters ----------------------------------------------
 

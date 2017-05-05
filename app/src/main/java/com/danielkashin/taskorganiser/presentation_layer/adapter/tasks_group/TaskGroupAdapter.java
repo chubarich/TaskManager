@@ -1,5 +1,6 @@
 package com.danielkashin.taskorganiser.presentation_layer.adapter.tasks_group;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;

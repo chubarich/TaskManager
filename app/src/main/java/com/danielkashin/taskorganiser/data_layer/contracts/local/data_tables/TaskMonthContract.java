@@ -16,7 +16,7 @@ public class TaskMonthContract implements TaskContract {
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 
       // id
-      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
+      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
 
       // TaskContract
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
@@ -24,8 +24,8 @@ public class TaskMonthContract implements TaskContract {
       + COLUMN_NAME_NOTE + " TEXT, "
       + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE, "
       + COLUMN_NAME_DURATION + " INTEGER, "
-      + COLUMN_NAME_DONE + " INTEGER, "
-      + COLUMN_NAME_IMPORTANT + " INTEGER, "
+      + COLUMN_NAME_DONE + " INTEGER NOT NULL, "
+      + COLUMN_NAME_IMPORTANT + " INTEGER NOT NULL, "
 
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "

@@ -9,6 +9,7 @@ import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMiniContract.COLUMN_NAME_CHANGED_LOCAL;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMiniContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMiniContract.COLUMN_NAME_DELETED_LOCAL;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMiniContract.COLUMN_NAME_UUID;
 
 @StorIOSQLiteType(table = TaskMiniContract.TABLE_NAME)
 public class TaskMini {
@@ -24,6 +25,9 @@ public class TaskMini {
 
   @StorIOSQLiteColumn(name = TaskMiniContract.COLUMN_NAME_DONE)
   Boolean done;
+
+  @StorIOSQLiteColumn(name = COLUMN_NAME_UUID)
+  String UUID;
 
   // connections
 
