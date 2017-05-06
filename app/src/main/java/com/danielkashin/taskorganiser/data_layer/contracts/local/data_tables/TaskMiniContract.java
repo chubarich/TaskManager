@@ -11,7 +11,7 @@ public class TaskMiniContract implements IdContract {
 
   // -------------------------------------- constants ---------------------------------------------
 
-  public static final String TABLE_NAME = "table_name_task_mini";
+  public static final String TABLE_NAME = "mini_tasks";
 
   public static final String COLUMN_NAME_TASK_DAY_ID = "task_day_id";
 

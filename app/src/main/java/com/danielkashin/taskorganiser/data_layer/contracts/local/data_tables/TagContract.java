@@ -10,9 +10,7 @@ public class TagContract implements IdContract {
 
   // -------------------------------------- constants ---------------------------------------------
 
-  public static final String TABLE_NAME = "table_name_tag";
-
-  public static final String COLUMN_NAME_TASK_UUID = "task_uuid";
+  public static final String TABLE_NAME = "tags";
 
   public static final String COLUMN_NAME_LABEL = "label";
 
@@ -21,7 +19,6 @@ public class TagContract implements IdContract {
       + COLUMN_NAME_ID + " INTEGER NOT NULL, "
 
       // TagContract
-      + COLUMN_NAME_TASK_UUID + " INTEGER NON NULL, "
       + COLUMN_NAME_LABEL + " INTEGER NOT NULL, "
 
       + "PRIMARY KEY (" + COLUMN_NAME_ID + ") "

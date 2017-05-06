@@ -1,5 +1,8 @@
 package com.danielkashin.taskorganiser.presentation_layer.view.task_groups;
 
+import android.util.Pair;
+
+import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.IView;
 

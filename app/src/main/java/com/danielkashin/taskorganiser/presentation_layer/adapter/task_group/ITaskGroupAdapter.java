@@ -1,6 +1,4 @@
-package com.danielkashin.taskorganiser.presentation_layer.adapter.tasks_group;
-
-import android.os.Bundle;
+package com.danielkashin.taskorganiser.presentation_layer.adapter.task_group;
 
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;

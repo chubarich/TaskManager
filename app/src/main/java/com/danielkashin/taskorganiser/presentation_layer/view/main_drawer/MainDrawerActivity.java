@@ -4,7 +4,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
+import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,24 +14,35 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
+import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateContainer;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
 
+
 public class MainDrawerActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener, IToolbarContainer {
+    implements NavigationView.OnNavigationItemSelectedListener, IToolbarContainer, ICalendarWalker {
 
   private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
 
   private Toolbar mToolbar;
+  private TextView mTextToolbar;
+  private ImageView mImageToolbarParent;
+  private ImageView mImageToolbarUp;
+  private ImageView mImageToolbarDown;
   private DrawerLayout mDrawerLayout;
   private ActionBarDrawerToggle mDrawerToggle;
   private NavigationView mNavigationView;
   private FrameLayout mFragmentContainer;
+  private boolean mToolbarNavigationListenerIsRegistered;
 
 
   // --------------------------------------- lifecycle --------------------------------------------
@@ -42,12 +53,6 @@ public class MainDrawerActivity extends AppCompatActivity
     setContentView(R.layout.activity_main_drawer);
 
     initializeView(savedInstanceState);
-  }
-
-  @Override
-  protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-    super.onPostCreate(savedInstanceState);
-    mDrawerToggle.syncState();
   }
 
   @Override
@@ -64,9 +69,7 @@ public class MainDrawerActivity extends AppCompatActivity
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    if (getSupportActionBar() != null && getSupportActionBar().getTitle() != null) {
-      outState.putString(KEY_TOOLBAR_LABEL, getSupportActionBar().getTitle().toString());
-    }
+    outState.putString(KEY_TOOLBAR_LABEL, mTextToolbar.getText().toString());
   }
 
   @Override
@@ -85,15 +88,6 @@ public class MainDrawerActivity extends AppCompatActivity
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    if (mDrawerToggle.onOptionsItemSelected(item)) {
-      return true;
-    }
-
-    return super.onOptionsItemSelected(item);
-  }
-
-  @Override
   public boolean onNavigationItemSelected(final MenuItem item) {
     mDrawerLayout.closeDrawer(GravityCompat.START);
 
@@ -101,9 +95,7 @@ public class MainDrawerActivity extends AppCompatActivity
       @Override
       public void run() {
         int id = item.getItemId();
-        if (id == R.id.navigation_input) {
-
-        } else if (id == R.id.navigation_week) {
+        if (id == R.id.navigation_week) {
           addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
         } else if (id == R.id.navigation_month) {
           addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Week), false);
@@ -120,15 +112,34 @@ public class MainDrawerActivity extends AppCompatActivity
     return true;
   }
 
+  // ----------------------------------- ICalendarWalker ------------------------------------------
+
+  @Override
+  public void onOpenChildDate(String date, Task.Type type) {
+    addFragment(TaskGroupsFragment.getInstance(date, type), true);
+  }
+
   // ---------------------------------- IToolbarContainer -----------------------------------------
 
   @Override
-  public void setToolbarLabel(String text) {
-    if (getSupportActionBar() != null) {
-      getSupportActionBar().setTitle(text);
-    }
-  }
+  public void setToolbar(String text, boolean showCalendarParentIcon, boolean showCalendarNavigateIcons) {
+    mTextToolbar.setText(text);
 
+    if (showCalendarParentIcon) {
+      mImageToolbarParent.setVisibility(View.VISIBLE);
+    } else {
+      mImageToolbarParent.setVisibility(View.GONE);
+    }
+
+    if (showCalendarNavigateIcons) {
+      mImageToolbarDown.setVisibility(View.VISIBLE);
+      mImageToolbarUp.setVisibility(View.VISIBLE);
+    } else {
+      mImageToolbarDown.setVisibility(View.GONE);
+      mImageToolbarUp.setVisibility(View.GONE);
+    }
+
+  }
 
   // --------------------------------------- private ----------------------------------------------
 
@@ -148,24 +159,66 @@ public class MainDrawerActivity extends AppCompatActivity
 
   private void initializeView(Bundle savedInstanceState) {
     mToolbar = (Toolbar) findViewById(R.id.toolbar);
+    mTextToolbar = (TextView) findViewById(R.id.text_toolbar);
+    mImageToolbarParent = (ImageView) findViewById(R.id.image_calendar_parent);
+    mImageToolbarDown = (ImageView) findViewById(R.id.image_calendar_down);
+    mImageToolbarUp = (ImageView) findViewById(R.id.image_calendar_up);
+    if (savedInstanceState != null && savedInstanceState.containsKey(KEY_TOOLBAR_LABEL)) {
+      mTextToolbar.setText(savedInstanceState.getString(KEY_TOOLBAR_LABEL));
+    } else {
+      mTextToolbar.setText("");
+    }
+    setSupportActionBar(mToolbar);
+
     mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
         R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
     mFragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
 
-    setSupportActionBar(mToolbar);
-    if (getSupportActionBar() != null) {
-      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-      if (savedInstanceState != null && savedInstanceState.containsKey(KEY_TOOLBAR_LABEL)) {
-        getSupportActionBar().setTitle(savedInstanceState.getString(KEY_TOOLBAR_LABEL));
-      } else {
-        getSupportActionBar().setTitle("");
-      }
-    }
+    mDrawerToggle.syncState();
   }
 
   private void setListeners() {
+    mImageToolbarParent.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Fragment topFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (topFragment != null && topFragment instanceof IDateContainer) {
+          Pair<String, Task.Type> nextDate = ((IDateContainer) topFragment).getParentDate();
+          if (nextDate != null) {
+            addFragment(TaskGroupsFragment.getInstance(nextDate.first, nextDate.second), true);
+          }
+        }
+      }
+    });
+
+    mImageToolbarUp.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Fragment topFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (topFragment != null && topFragment instanceof IDateContainer) {
+          Pair<String, Task.Type> nextDate = ((IDateContainer) topFragment).getUpDate();
+          if (nextDate != null) {
+            addFragment(TaskGroupsFragment.getInstance(nextDate.first, nextDate.second), false);
+          }
+        }
+      }
+    });
+
+    mImageToolbarDown.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Fragment topFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (topFragment != null && topFragment instanceof IDateContainer) {
+          Pair<String, Task.Type> nextDate = ((IDateContainer) topFragment).getDownDate();
+          if (nextDate != null) {
+            addFragment(TaskGroupsFragment.getInstance(nextDate.first, nextDate.second), false);
+          }
+        }
+      }
+    });
+
     mDrawerLayout.addDrawerListener(mDrawerToggle);
     mNavigationView.setNavigationItemSelectedListener(this);
 
@@ -180,7 +233,26 @@ public class MainDrawerActivity extends AppCompatActivity
 
   private void setCurrentNavIcon() {
     int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
-    mDrawerToggle.setDrawerIndicatorEnabled(backStackEntryCount == 0);
+    if (backStackEntryCount == 0) {
+      getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+      mDrawerToggle.setDrawerIndicatorEnabled(true);
+
+      mToolbarNavigationListenerIsRegistered = false;
+    } else {
+      mDrawerToggle.setDrawerIndicatorEnabled(false);
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+      if (!mToolbarNavigationListenerIsRegistered) {
+        mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            onBackPressed();
+          }
+        });
+
+        mToolbarNavigationListenerIsRegistered = true;
+      }
+    }
   }
 
 }

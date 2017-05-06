@@ -42,15 +42,7 @@ public class GetTaskGroupUseCase {
         new RepositoryRunnableResponse<ArrayList<TaskGroup>>() {
           @Override
           public ArrayList<TaskGroup> run() throws ExceptionBundle {
-            if (type == Task.Type.Day) {
-              return tasksRepository.getWeekData(date);
-            } else if (type == Task.Type.Week) {
-              return tasksRepository.getMonthData(date);
-            } else if (type == Task.Type.Month) {
-              return tasksRepository.getYearData(date);
-            } else {
-              throw new IllegalStateException("Such task type is not supported");
-            }
+            return tasksRepository.getData(date, type);
           }
         };
 

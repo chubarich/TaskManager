@@ -1,16 +1,21 @@
 package com.danielkashin.taskorganiser.data_layer.services.local;
 
+import com.danielkashin.taskorganiser.data_layer.contracts.local.connections_tables.TaskToTagContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TagContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMonthContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskWeekContract;
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.danielkashin.taskorganiser.data_layer.services.base.DatabaseService;
 import com.pushtorefresh.storio.sqlite.StorIOSQLite;
 import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetListOfObjects;
+import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetObject;
+import com.pushtorefresh.storio.sqlite.operations.put.PreparedPutObject;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
 public class TasksLocalService extends DatabaseService implements ITasksLocalService {
@@ -20,28 +25,6 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
   }
 
   // -------------------------------- ITasksLocalService ------------------------------------------
-
-  //                            ----------- delete -------------
-
-  /*
-  public PreparedDeleteObject<DatabaseTranslation> deleteTranslation(DatabaseTranslation translation) {
-    return getSQLite().delete()
-        .object(translation)
-        .prepare();
-  }
-  */
-
-  /*
-  @Override
-  public PreparedDeleteByQuery deleteNonFavoriteTranslations() {
-    return getSQLite().delete()
-        .byQuery(DeleteQuery.builder()
-            .table(TranslationContract.TABLE_NAME)
-            .where(TranslationContract.COLUMN_NAME_IS_FAVOURITE + " = " + 0)
-            .build()
-        ).prepare();
-  }
-  */
 
   //                           ------------ get ------------
 
@@ -79,14 +62,49 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
   }
 
   @Override
-  public PreparedGetListOfObjects<Tag> getTags(String UUID) {
+  public PreparedGetListOfObjects<TaskToTag> getTaskToTags(String UUID) {
     return getSQLite().get()
-        .listOfObjects(Tag.class)
+        .listOfObjects(TaskToTag.class)
         .withQuery(Query.builder()
-            .table(TagContract.TABLE_NAME)
-            .where(TagContract.COLUMN_NAME_TASK_UUID + " = \"" + UUID + "\"")
+            .table(TaskToTagContract.TABLE_NAME)
+            .where(TaskToTagContract.COLUMN_NAME_TASK_UUID + " = \"" + UUID + "\"")
             .build())
         .prepare();
+  }
+
+  @Override
+  public PreparedGetObject<Tag> getTag(long id) {
+    return getSQLite().get()
+        .object(Tag.class)
+        .withQuery(Query.builder()
+            .table(TagContract.TABLE_NAME)
+            .where(TagContract.COLUMN_NAME_ID + " = " + id)
+            .build())
+        .prepare();
+  }
+
+  //                           ------------ put ------------
+
+  @Override
+  public PreparedPutObject<TaskMonth> putMonthTask(TaskMonth monthTask) {
+    return getSQLite().put()
+        .object(monthTask)
+        .prepare();
+  }
+
+  @Override
+  public PreparedPutObject<TaskWeek> putWeekTask(TaskWeek weekTask) {
+    return null;
+  }
+
+  @Override
+  public PreparedPutObject<TaskDay> putDayTask(TaskDay dayTask) {
+    return null;
+  }
+
+  @Override
+  public PreparedPutObject<TaskMini> putMiniTask(TaskMini taskMini) {
+    return null;
   }
 
   // ----------------------------------- inner types ----------------------------------------------

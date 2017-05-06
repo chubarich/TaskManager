@@ -24,5 +24,7 @@ public interface ITaskGroupsAdapter {
 
     void onTaskRefreshed(Task task);
 
+    void onTaskLabelClicked(String date, Task.Type type);
+
   }
 }

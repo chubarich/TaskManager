@@ -8,9 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="10dp"
-        android:paddingStart="10dp">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/label"
@@ -21,9 +19,12 @@
             android:layout_toStartOf="@+id/image_expand"
             android:ellipsize="end"
             android:maxLines="1"
+            android:layout_marginStart="2dp"
             android:paddingEnd="10dp"
             android:textColor="@color/main_text"
             android:textSize="22dp"/>
+
+
 
         <ImageView
             android:id="@+id/image_expand"
@@ -47,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layoutDirection="ltr"
-                android:padding="5dp"
+                android:paddingTop="5dp"
                 android:paddingBottom="0dp"/>
 
     </net.cachapa.expandablelayout.ExpandableLayout>

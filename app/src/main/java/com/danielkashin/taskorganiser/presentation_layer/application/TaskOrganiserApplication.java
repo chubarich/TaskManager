@@ -5,6 +5,7 @@ import android.app.Application;
 import com.danielkashin.taskorganiser.data_layer.database.SQLiteFactory;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.data_layer.services.local.TasksLocalService;
+import com.facebook.stetho.Stetho;
 
 
 public class TaskOrganiserApplication extends Application implements ITasksLocalServiceProvider {
@@ -15,6 +16,7 @@ public class TaskOrganiserApplication extends Application implements ITasksLocal
   @Override
   public void onCreate() {
     super.onCreate();
+    //Stetho.initializeWithDefaults(this);
   }
 
   @Override

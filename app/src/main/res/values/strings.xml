@@ -13,7 +13,7 @@
     <string name="tasks_for_month">Задачи на месяц</string>
     <string name="tasks_for_year">Задачи на год</string>
 
-    <string name="new_task">Новая задача</string>
+    <string name="new_task">новая задача</string>
 
     <string name="today">Сегодня</string>
 
@@ -45,18 +45,18 @@
     </array>
 
     <array name="months">
-        <item>Января</item>
-        <item>Февраля</item>
-        <item>Марта</item>
-        <item>Апреля</item>
-        <item>Мая</item>
-        <item>Июня</item>
-        <item>Июля</item>
-        <item>Августа</item>
-        <item>Сентября</item>
-        <item>Октября</item>
-        <item>Ноября</item>
-        <item>Декабря</item>
+        <item>января</item>
+        <item>февраля</item>
+        <item>марта</item>
+        <item>апреля</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>августа</item>
+        <item>сентября</item>
+        <item>октября</item>
+        <item>ноября</item>
+        <item>декабря</item>
     </array>
 
 </resources>

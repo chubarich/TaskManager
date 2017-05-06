@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
@@ -24,6 +23,7 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresent
 import com.danielkashin.taskorganiser.presentation_layer.presenter.task_groups.ITaskGroupsPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.task_groups.TaskGroupsPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ICalendarWalker;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
 import static com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper.Day;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 
 
 public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, ITaskGroupsView>
-    implements ITaskGroupsView, ITaskGroupsAdapter.Callbacks {
+    implements ITaskGroupsView, ITaskGroupsAdapter.Callbacks, IDateContainer {
 
   private RecyclerView mRecyclerView;
   private State mRestoredState;
@@ -61,24 +61,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     if (!mRestoredState.isInitialized()) {
       mRestoredState.initializeWithBundle(getArguments());
     }
-
     ExceptionHelper.assertTrue("Fragment state must be initialized", mRestoredState.isInitialized());
-
-    String[] months = getResources().getStringArray(R.array.months);
-    String[] simpleMonths = getResources().getStringArray(R.array.months_simple);
-    if (getActivity() != null) {
-      switch (mRestoredState.getType()) {
-        case Day:
-          ((IToolbarContainer) getActivity()).setToolbarLabel(getWeekLabel(months, mRestoredState.getDate()));
-          break;
-        case Week:
-          ((IToolbarContainer) getActivity()).setToolbarLabel(getMonthLabel(simpleMonths, mRestoredState.getDate()));
-          break;
-        case Month:
-          ((IToolbarContainer) getActivity()).setToolbarLabel(getYearLabel(mRestoredState.getDate()));
-          break;
-      }
-    }
 
     super.onCreate(savedInstanceState);
   }
@@ -87,11 +70,9 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   public void onStart() {
     super.onStart();
 
-    if (!mRestoredState.isAdapterInitialized()) {
-      ((ITaskGroupsPresenter) getPresenter()).onGetTaskGroupsData();
-    } else {
-      ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).attachCallbacks(this);
-    }
+    showActivityLabel();
+
+    ((ITaskGroupsPresenter) getPresenter()).onGetTaskGroupsData();
   }
 
   @Override
@@ -124,6 +105,58 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).attachCallbacks(this);
   }
 
+  // -------------------------------------- IDateContainer ----------------------------------------
+
+  @Override
+  public Pair<String, Task.Type> getParentDate() {
+    if (mRestoredState.getType() == Task.Type.Week) {
+      return new Pair<>(mRestoredState.getDate(), Task.Type.Month);
+    } else if (mRestoredState.getType() == Task.Type.Day) {
+      String firstDayOfMonth = DatetimeHelper.getFirstDayOfMonth(mRestoredState.getDate());
+      return new Pair<>(firstDayOfMonth, Task.Type.Week);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Pair<String, Task.Type> getUpDate() {
+    String upDate = null;
+    String date = mRestoredState.getDate();
+    if (mRestoredState.getType() == Task.Type.Day) {
+      upDate = DatetimeHelper.getUpWeek(date);
+    } else if (mRestoredState.getType() == Task.Type.Week) {
+      upDate = DatetimeHelper.getUpMonth(date);
+    } else {
+      upDate = DatetimeHelper.getUpYear(date);
+    }
+
+    if (upDate != null) {
+      return new Pair<>(upDate, mRestoredState.getType());
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Pair<String, Task.Type> getDownDate() {
+    String downDate = null;
+    String date = mRestoredState.getDate();
+    if (mRestoredState.getType() == Task.Type.Day) {
+      downDate = DatetimeHelper.getDownWeek(date);
+    } else if (mRestoredState.getType() == Task.Type.Week) {
+      downDate = DatetimeHelper.getDownMonth(date);
+    } else {
+      downDate = DatetimeHelper.getDownYear(date);
+    }
+
+    if (downDate != null) {
+      return new Pair<>(downDate, mRestoredState.getType());
+    } else {
+      return null;
+    }
+  }
+
   // -------------------------------- ITaskGroupsAdapter.Callbacks --------------------------------
 
   @Override
@@ -134,6 +167,11 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   @Override
   public void onTaskRefreshed(Task task) {
     ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).refreshTask(task);
+  }
+
+  @Override
+  public void onTaskLabelClicked(String date, Task.Type type) {
+    ((ICalendarWalker) getActivity()).onOpenChildDate(date, type);
   }
 
   // ------------------------------------- PresenterFragment --------------------------------------
@@ -175,10 +213,6 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
     mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     mRecyclerView.setNestedScrollingEnabled(false);
-
-    if (mRestoredState.isAdapterInitialized()) {
-      mRecyclerView.setAdapter((RecyclerView.Adapter) mRestoredState.getAdapter());
-    }
   }
 
   // ------------------------------------------ private -------------------------------------------
@@ -190,7 +224,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
     // output
     ArrayList<String> labels = new ArrayList<>();
-    Integer highlightIndex = null;
+    Integer highlightIndex = -1;
 
     // fill output data
     if (mRestoredState.getType() == Task.Type.Day) { // --------------- Task.Type.Day -------------
@@ -263,6 +297,24 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     return "" + year;
   }
 
+  private void showActivityLabel() {
+    String[] months = getResources().getStringArray(R.array.months);
+    String[] simpleMonths = getResources().getStringArray(R.array.months_simple);
+    if (getActivity() != null) {
+      switch (mRestoredState.getType()) {
+        case Day:
+          ((IToolbarContainer) getActivity()).setToolbar(getWeekLabel(months, mRestoredState.getDate()), true, true);
+          break;
+        case Week:
+          ((IToolbarContainer) getActivity()).setToolbar(getMonthLabel(simpleMonths, mRestoredState.getDate()), true, true);
+          break;
+        case Month:
+          ((IToolbarContainer) getActivity()).setToolbar(getYearLabel(mRestoredState.getDate()), false, true);
+          break;
+      }
+    }
+  }
+
   // ---------------------------------------- inner types -----------------------------------------
 
   private static class State {
@@ -270,6 +322,8 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     static final String KEY_DATE = "KEY_DATE";
     static final String KEY_TYPE = "KEY_TYPE";
 
+    // MUST BE: first day of month for Type.Week, first day of week for Type.Day,
+    // any day of year for Type.Month
     private String date;
     private Task.Type type;
     private ITaskGroupsAdapter adapter;

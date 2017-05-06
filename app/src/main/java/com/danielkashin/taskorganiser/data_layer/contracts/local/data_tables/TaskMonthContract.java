@@ -11,7 +11,7 @@ public class TaskMonthContract implements TaskContract {
 
   // -------------------------------------- constants ---------------------------------------------
 
-  public static final String TABLE_NAME = "table_name_task_month";
+  public static final String TABLE_NAME = "month_tasks";
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 

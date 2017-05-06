@@ -1,8 +1,6 @@
 package com.danielkashin.taskorganiser.domain_layer.repository;
 
-
-import android.icu.util.Calendar;
-
+import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
@@ -16,11 +14,34 @@ import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class TasksRepository implements ITasksRepository {
 
   private ITasksLocalService tasksLocalService;
 
-  public TasksRepository(ITasksLocalService tasksLocalService) {
+  // ---------------------------------------- public ----------------------------------------------
+
+  @Override
+  public ArrayList<TaskGroup> getData(String date, Task.Type type) throws ExceptionBundle {
+    if (type == Task.Type.Day) {
+      return getWeekData(date);
+    } else if (type == Task.Type.Week) {
+      return getMonthData(date);
+    } else if (type == Task.Type.Month) {
+      return getYearData(date);
+    } else {
+      throw new IllegalStateException("Such task type is not supported");
+    }
+  }
+
+  @Override
+  public void saveTask(Task task) {
+
+  }
+
+  // ---------------------------------------- private ---------------------------------------------
+
+  private TasksRepository(ITasksLocalService tasksLocalService) {
     if (tasksLocalService == null) {
       throw new IllegalStateException("All repository arguments must be non null");
     }
@@ -28,8 +49,7 @@ public class TasksRepository implements ITasksRepository {
     this.tasksLocalService = tasksLocalService;
   }
 
-  @Override
-  public ArrayList<TaskGroup> getWeekData(String date) throws ExceptionBundle {
+  private ArrayList<TaskGroup> getWeekData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> allDaysOfWeek = DatetimeHelper.getAllDaysOfWeek(date);
 
@@ -64,8 +84,7 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-  @Override
-  public ArrayList<TaskGroup> getMonthData(String date) throws ExceptionBundle {
+  private ArrayList<TaskGroup> getMonthData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> firstDaysOfWeeks = DatetimeHelper.getFirstDaysOfWeeksInMonth(date);
 
@@ -99,8 +118,7 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-  @Override
-  public ArrayList<TaskGroup> getYearData(String date) throws ExceptionBundle {
+  private ArrayList<TaskGroup> getYearData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> months = DatetimeHelper.getAllMonthsInYear(date);
 
@@ -126,12 +144,17 @@ public class TasksRepository implements ITasksRepository {
 
 
   private ArrayList<String> getTags(String UUID) {
-    List<Tag> rawTags = tasksLocalService.getTags(UUID).executeAsBlocking();
+    List<TaskToTag> rawTags = tasksLocalService.getTaskToTags(UUID)
+        .executeAsBlocking();
 
     if (rawTags.size() != 0) {
       ArrayList<String> tags = new ArrayList<>();
-      for (Tag tag : rawTags) {
-        tags.add(tag.getLabel());
+      for (TaskToTag taskToTag : rawTags) {
+        Tag tag = tasksLocalService.getTag(taskToTag.getTagId())
+            .executeAsBlocking();
+        if (tag != null) {
+          tags.add(tag.getLabel());
+        }
       }
       return tags;
     } else {

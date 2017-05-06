@@ -10,7 +10,7 @@ public class TaskDayContract implements TaskContract {
 
   // -------------------------------------- constants ---------------------------------------------
 
-  public static final String TABLE_NAME = "table_name_task_day";
+  public static final String TABLE_NAME = "task_days";
 
   public static final String COLUMN_NAME_TASK_WEEK_ID = "task_week_id";
 

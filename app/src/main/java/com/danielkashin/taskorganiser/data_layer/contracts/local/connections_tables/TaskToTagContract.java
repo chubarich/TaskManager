@@ -10,9 +10,9 @@ public class TaskToTagContract implements IdContract {
 
   // -------------------------------------- constants ---------------------------------------------
 
-  public static final String TABLE_NAME = "table_name_task_to_tag";
+  public static final String TABLE_NAME = "task_tag";
 
-  public static final String COLUMN_NAME_TASK_UUID = "task_global_id";
+  public static final String COLUMN_NAME_TASK_UUID = "task_UUID";
 
   public static final String COLUMN_NAME_TAG_ID = "tag_id";
 
