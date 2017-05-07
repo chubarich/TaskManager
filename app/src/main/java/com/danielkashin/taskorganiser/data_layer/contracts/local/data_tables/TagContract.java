@@ -12,14 +12,14 @@ public class TagContract implements IdContract {
 
   public static final String TABLE_NAME = "tags";
 
-  public static final String COLUMN_NAME_LABEL = "label";
+  public static final String COLUMN_NAME_NAME = "name";
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
       // id
       + COLUMN_NAME_ID + " INTEGER NOT NULL, "
 
       // TagContract
-      + COLUMN_NAME_LABEL + " INTEGER NOT NULL, "
+      + COLUMN_NAME_NAME + " INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE, "
 
       + "PRIMARY KEY (" + COLUMN_NAME_ID + ") "
       + ");";

@@ -34,7 +34,8 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskWeek.class)
         .withQuery(Query.builder()
             .table(TaskWeekContract.TABLE_NAME)
-            .where(TaskWeekContract.COLUMN_NAME_DATE + " = \"" + date + "\"")
+            .where(TaskWeekContract.COLUMN_NAME_DATE + " = \"" + date + "\""
+            + " AND " + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
             .build())
         .prepare();
   }
@@ -45,7 +46,8 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskDay.class)
         .withQuery(Query.builder()
             .table(TaskDayContract.TABLE_NAME)
-            .where(TaskDayContract.COLUMN_NAME_DATE + " = \"" + date + "\"")
+            .where(TaskDayContract.COLUMN_NAME_DATE + " = \"" + date + "\""
+                + " AND " + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
             .build())
         .prepare();
   }
@@ -56,7 +58,8 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskMonth.class)
         .withQuery(Query.builder()
             .table(TaskMonthContract.TABLE_NAME)
-            .where(TaskMonthContract.COLUMN_NAME_DATE + " = \"" + date + "\"")
+            .where(TaskMonthContract.COLUMN_NAME_DATE + " = \"" + date + "\""
+            + " AND " + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
             .build())
         .prepare();
   }
@@ -94,17 +97,23 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
 
   @Override
   public PreparedPutObject<TaskWeek> putWeekTask(TaskWeek weekTask) {
-    return null;
+    return getSQLite().put()
+        .object(weekTask)
+        .prepare();
   }
 
   @Override
   public PreparedPutObject<TaskDay> putDayTask(TaskDay dayTask) {
-    return null;
+    return getSQLite().put()
+        .object(dayTask)
+        .prepare();
   }
 
   @Override
   public PreparedPutObject<TaskMini> putMiniTask(TaskMini taskMini) {
-    return null;
+    return getSQLite().put()
+        .object(taskMini)
+        .prepare();
   }
 
   // ----------------------------------- inner types ----------------------------------------------

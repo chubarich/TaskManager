@@ -13,9 +13,11 @@ import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalServi
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskGroupUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.ITaskGroupsAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.TaskGroupsAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
@@ -24,6 +26,7 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.task_groups.I
 import com.danielkashin.taskorganiser.presentation_layer.presenter.task_groups.TaskGroupsPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ICalendarWalker;
+import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITagViewOpener;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
 import static com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper.Day;
@@ -44,10 +47,9 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   public static TaskGroupsFragment getInstance(String date, Task.Type type) {
     ExceptionHelper.assertFalse("Fragment does not support Task.Type.Mini", type == Task.Type.Mini);
 
-    Bundle bundle = State.saveToBundle(date, type);
-
     TaskGroupsFragment fragment = new TaskGroupsFragment();
-    fragment.setArguments(bundle);
+
+    fragment.setArguments(State.wrap(date, type));
 
     return fragment;
   }
@@ -87,14 +89,20 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    mRestoredState.setAdapter((ITaskGroupsAdapter) mRecyclerView.getAdapter());
-    mRestoredState.saveToBundle(outState);
+    mRestoredState.wrap(outState);
   }
 
   // -------------------------------------- ITaskGroupsView ---------------------------------------
 
   @Override
-  public void initializeAdapter(ArrayList<TaskGroup> taskGroups) {
+  public void addTaskToViewInterface(Task task) {
+    if (mRecyclerView.getAdapter() != null) {
+      ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).changeTask(task);
+    }
+  }
+
+  @Override
+  public void initializeAdapter(ArrayList<DateTypeTaskGroup> taskGroups) {
     Pair<ArrayList<String>, Integer> labelsAndHighlightIndex = getLabelsAndHighlightIndex(taskGroups);
 
     mRecyclerView.setAdapter(new TaskGroupsAdapter(taskGroups,
@@ -160,18 +168,18 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   // -------------------------------- ITaskGroupsAdapter.Callbacks --------------------------------
 
   @Override
-  public void onTaskCreated(Task task) {
-    ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).addTask(task);
-  }
-
-  @Override
-  public void onTaskRefreshed(Task task) {
-    ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).refreshTask(task);
+  public void onTaskChanged(Task task) {
+    ((ITaskGroupsPresenter)getPresenter()).onSaveTask(task);
   }
 
   @Override
   public void onTaskLabelClicked(String date, Task.Type type) {
     ((ICalendarWalker) getActivity()).onOpenChildDate(date, type);
+  }
+
+  @Override
+  public void onTagClicked(String tagName) {
+    ((ITagViewOpener)getActivity()).onTagClicked(tagName);
   }
 
   // ------------------------------------- PresenterFragment --------------------------------------
@@ -187,15 +195,19 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
         .getApplication())
         .getTasksLocalService();
 
-    TasksRepository tasksRepository = new TasksRepository(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
 
-    GetTaskGroupUseCase getTaskGroupUseCase = new GetTaskGroupUseCase(
+    GetDateTypeTaskGroupUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupUseCase(
         tasksRepository,
         AsyncTask.THREAD_POOL_EXECUTOR,
         mRestoredState.getType(),
         mRestoredState.getDate());
 
-    return new TaskGroupsPresenter.Factory(getTaskGroupUseCase);
+    SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(
+        tasksRepository,
+        AsyncTask.THREAD_POOL_EXECUTOR);
+
+    return new TaskGroupsPresenter.Factory(getTaskGroupUseCase, saveTaskUseCase);
   }
 
   @Override
@@ -217,7 +229,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
   // ------------------------------------------ private -------------------------------------------
 
-  private Pair<ArrayList<String>, Integer> getLabelsAndHighlightIndex(ArrayList<TaskGroup> taskGroups) {
+  private Pair<ArrayList<String>, Integer> getLabelsAndHighlightIndex(ArrayList<DateTypeTaskGroup> taskGroups) {
     String[] days = getResources().getStringArray(R.array.days);
     String[] months = getResources().getStringArray(R.array.months);
     String[] simpleMonths = getResources().getStringArray(R.array.months_simple);
@@ -326,7 +338,6 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     // any day of year for Type.Month
     private String date;
     private Task.Type type;
-    private ITaskGroupsAdapter adapter;
 
     State() {
     }
@@ -335,16 +346,9 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
       if (bundle != null && bundle.containsKey(KEY_DATE) && bundle.containsKey(KEY_TYPE)) {
         date = bundle.getString(KEY_DATE);
         type = (Task.Type) bundle.getSerializable(KEY_TYPE);
-
-        try {
-          adapter = new TaskGroupsAdapter(bundle);
-        } catch (IllegalStateException e) {
-          adapter = null;
-        }
       } else {
         date = null;
         type = null;
-        adapter = null;
       }
     }
 
@@ -360,30 +364,14 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
       return date != null && type != null;
     }
 
-    boolean isAdapterInitialized() {
-      return adapter != null;
-    }
-
-    void setAdapter(ITaskGroupsAdapter adapter) {
-      this.adapter = adapter;
-    }
-
-    ITaskGroupsAdapter getAdapter() {
-      return adapter;
-    }
-
-    void saveToBundle(Bundle outState) {
+    void wrap(Bundle outState) {
       if (isInitialized()) {
         outState.putString(KEY_DATE, date);
         outState.putSerializable(KEY_TYPE, type);
-
-        if (isAdapterInitialized()) {
-          adapter.saveToOutState(outState);
-        }
       }
     }
 
-    static Bundle saveToBundle(String date, Task.Type type) {
+    static Bundle wrap(String date, Task.Type type) {
       Bundle bundle = new Bundle();
       bundle.putString(KEY_DATE, date);
       bundle.putSerializable(KEY_TYPE, type);

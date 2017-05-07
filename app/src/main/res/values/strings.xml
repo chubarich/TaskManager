@@ -13,10 +13,11 @@
     <string name="tasks_for_month">Задачи на месяц</string>
     <string name="tasks_for_year">Задачи на год</string>
 
+    <string name="not_registered">Не выполнен вход</string>
+
+    <string name="important">Важное</string>
     <string name="new_task">новая задача</string>
-
     <string name="today">Сегодня</string>
-
     <string name="current_week">Текущая неделя</string>
 
     <array name="days">

@@ -8,6 +8,9 @@
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingStart="5dp"
+        android:background="@android:color/transparent"
         android:hint="@string/new_task"/>
 
 </FrameLayout>

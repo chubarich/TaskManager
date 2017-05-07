@@ -1,7 +1,10 @@
 package com.danielkashin.taskorganiser.presentation_layer.adapter.task_group;
 
+import android.content.Context;
+import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,33 +16,47 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.ITagsAdapter;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.TagsAdapter;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-    implements ITaskGroupAdapter {
+    implements ITaskGroupAdapter, ITagsAdapter.Callbacks {
 
   private final static int VIEW_TYPE_TASK = 21245;
   private final static int VIEW_TYPE_EDIT_TEXT = 12245;
 
   private ITaskGroupAdapter.Callbacks mCallbacks;
-  private TaskGroup mTaskGroup;
+  private ITaskGroup mTaskGroup;
 
 
   public TaskGroupAdapter() {
   }
 
-  public TaskGroupAdapter(TaskGroup taskGroup) {
+  public TaskGroupAdapter(ITaskGroup taskGroup) {
     ExceptionHelper.checkAllObjectsNonNull("All adapter arguments must be non null", taskGroup);
 
     mTaskGroup = taskGroup;
   }
 
-  // ----------------------------------- ITaskGroupAdapter  --------------------------------
+  // -------------------------------- ITagsAdapter.Callbacks --------------------------------------
+
+  @Override
+  public void onTagClicked(String tagName) {
+    if (mCallbacks != null) {
+      mCallbacks.onTagClicked(tagName);
+    }
+  }
+
+  // ----------------------------------- ITaskGroupAdapter  ---------------------------------------
 
   @Override
   public void attachCallbacks(Callbacks callbacks) {
@@ -53,57 +70,17 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
   @Override
   public void addTask(Task task) {
-    ExceptionHelper.assertFalse("TaskGroup is null", mTaskGroup == null);
+    ExceptionHelper.assertFalse("DateTypeTaskGroup is null", mTaskGroup == null);
 
     int insertedIndex = mTaskGroup.addTask(task);
     notifyItemInserted(insertedIndex);
   }
 
   @Override
-  public void setOrRefreshTaskGroup(TaskGroup taskGroup) {
-    if (mTaskGroup != null && mTaskGroup.getTaskSize() + 1 == taskGroup.getTaskSize()) {
-      int differIndex = -1;
-      for (int i = 0; i < mTaskGroup.getTaskSize(); ++i) {
-        if (!taskGroup.getTask(i).equals(mTaskGroup.getTask(i))) {
-          differIndex = i;
-          break;
-        }
-      }
-
-      if (differIndex == -1) {
-        mTaskGroup = taskGroup;
-        notifyDataSetChanged();
-        return;
-      }
-
-      for (int i = differIndex; i < mTaskGroup.getTaskSize(); ++i) {
-        if (!taskGroup.getTask(i).equals(mTaskGroup.getTask(i))) {
-          mTaskGroup = taskGroup;
-          notifyDataSetChanged();
-          return;
-        }
-      }
-
-      notifyItemInserted(mTaskGroup.addTask(taskGroup.getTask(differIndex)));
-    } else if (mTaskGroup != null && mTaskGroup.getTaskSize() == taskGroup.getTaskSize()) {
-      for (int i = 0; i < mTaskGroup.getTaskSize(); ++i) {
-        if (!taskGroup.getTask(i).equals(mTaskGroup.getTask(i))) {
-          mTaskGroup = taskGroup;
-          notifyDataSetChanged();
-          return;
-        }
-      }
-
-      for (int i = 0; i < mTaskGroup.getTaskSize(); ++i) {
-        if (!taskGroup.getTask(i).equalsWithAdditionalInformation(mTaskGroup.getTask(i))) {
-          mTaskGroup.setTask(mTaskGroup.getTask(i), i);
-          notifyItemChanged(i);
-        }
-      }
-    } else {
-      mTaskGroup = taskGroup;
-      notifyDataSetChanged();
-    }
+  public void changeTaskGroup(ITaskGroup taskGroup) {
+    mTaskGroup = taskGroup;
+    mTaskGroup.sort();
+    notifyDataSetChanged();
   }
 
   // ------------------------------------- RecyclerView.Adapter -----------------------------------
@@ -113,7 +90,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     if (viewType == VIEW_TYPE_TASK) {
       View view = LayoutInflater.from(parent.getContext())
           .inflate(R.layout.item_task, parent, false);
-      return new TaskViewHolder(view);
+      return new TaskViewHolder(view, parent.getContext());
     } else if (viewType == VIEW_TYPE_EDIT_TEXT) {
       View view = LayoutInflater.from(parent.getContext())
           .inflate(R.layout.item_edit_text, parent, false);
@@ -138,35 +115,56 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       taskViewHolder.setTextName(task.getName());
 
       // set time
-      if (mTaskGroup.getType() == Task.Type.Day) {
-        taskViewHolder.setTextTime(task.getTimeToString());
+      if (mTaskGroup instanceof DateTypeTaskGroup) {
+        if (((DateTypeTaskGroup) mTaskGroup).getType() == Task.Type.Day) {
+          taskViewHolder.setTextTime(task.getTimeToString());
+        } else {
+          taskViewHolder.setTextTime("");
+        }
       }
 
+      // set tags
+      taskViewHolder.setTags(task.getTags(), this);
+
+      // set important toggle
+      taskViewHolder.setToggleImportantChecked(task.getImportant());
+      taskViewHolder.setOnToggleImportantClickedListener(new TaskViewHolder.OnToggleClickedListener() {
+        @Override
+        public void onToggleClicked(boolean isChecked) {
+          if (mCallbacks != null) {
+            task.setImportant(isChecked);
+            mCallbacks.onTaskChanged(task);
+          }
+        }
+      });
+
       // set done toggle
-      taskViewHolder.setToggleButtonChecked(task.getDone());
-      taskViewHolder.setOnToggleClickedListener(new TaskViewHolder.OnToggleClickedListener() {
+      taskViewHolder.setToggleDoneChecked(task.getDone());
+      taskViewHolder.setOnToggleDoneClickedListener(new TaskViewHolder.OnToggleClickedListener() {
         @Override
         public void onToggleClicked(boolean isChecked) {
           if (mCallbacks != null) {
             task.setDone(isChecked);
-            mCallbacks.onTaskRefreshed(task);
+            mCallbacks.onTaskChanged(task);
           }
         }
       });
     } else if (holderIsEditText) {
-      ((EditTextViewHolder) holder).setOnTextChangedListener(new EditTextViewHolder.OnTextChangedListener() {
-        @Override
-        public void onTextChanged(String text) {
-          if (mCallbacks != null) {
-            Task task = new Task(text,
-                UUID.randomUUID().toString(),
-                mTaskGroup.getType(),
-                mTaskGroup.getDate());
+      if (mTaskGroup instanceof DateTypeTaskGroup) {
+        ((EditTextViewHolder) holder).setOnTextChangedListener(new EditTextViewHolder.OnTextChangedListener() {
+          @Override
+          public void onTextChanged(String text) {
+            if (mCallbacks != null) {
+              Task task = new Task(text,
+                  UUID.randomUUID().toString(),
+                  ((DateTypeTaskGroup) mTaskGroup).getType(),
+                  ((DateTypeTaskGroup) mTaskGroup).getDate());
 
-            mCallbacks.onTaskCreated(task);
+              mCallbacks.onTaskChanged(task);
+            }
           }
-        }
-      });
+        });
+      }
     }
   }
 
@@ -194,17 +192,23 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private TextView textName;
     private TextView textTime;
-    private ToggleButton toggleButton;
-    private RecyclerView recyclerView;
-    private OnToggleClickedListener onToggleClickedListener;
+    private ToggleButton toggleDone;
+    private ToggleButton toggleImportant;
+    private RecyclerView recyclerTags;
+    private OnToggleClickedListener onToggleDoneClickedListener;
+    private OnToggleClickedListener onToggleImportantClickedListener;
 
-    private TaskViewHolder(View view) {
+    private TaskViewHolder(View view, Context context) {
       super(view);
       textName = (TextView) view.findViewById(R.id.text_name);
       textTime = (TextView) view.findViewById(R.id.text_time);
-      toggleButton = (ToggleButton) view.findViewById(R.id.toggle_button);
-      recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-      setOnToggleClickedListenerLocal();
+      toggleDone = (ToggleButton) view.findViewById(R.id.toggle_done);
+      toggleImportant = (ToggleButton) view.findViewById(R.id.toggle_important);
+      recyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
+      recyclerTags.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+      recyclerTags.addItemDecoration(new SpacingItemDecoration(18, 0));
+      recyclerTags.setAdapter(new TagsAdapter());
+      setOnToggleDoneClickedListenerLocal();
     }
 
     private void setTextName(String name) {
@@ -215,24 +219,63 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       textTime.setText(time);
     }
 
-    private void setToggleButtonChecked(boolean checked) {
-      toggleButton.setOnCheckedChangeListener(null);
-      toggleButton.setChecked(checked);
-      setOnToggleClickedListenerLocal();
+    private void setTags(ArrayList<String> tags, ITagsAdapter.Callbacks callbacks) {
+      if (recyclerTags.getAdapter() != null) {
+        ((ITagsAdapter) recyclerTags.getAdapter()).setTags(tags);
+        ((ITagsAdapter) recyclerTags.getAdapter()).attachCallbacks(callbacks);
+      }
     }
 
-    private void setOnToggleClickedListener(OnToggleClickedListener onToggleButtonListener) {
-      this.onToggleClickedListener = onToggleClickedListener;
+    // ----------------------------------- toggle important ---------------------------------------
+
+    private void setToggleImportantChecked(boolean checked) {
+      toggleImportant.setOnCheckedChangeListener(null);
+      toggleImportant.setChecked(checked);
+      setOnToggleImportantClickedListenerLocal();
     }
 
-    // ----------------------------------------- local --------------------------------------------
+    private void setOnToggleImportantClickedListener(OnToggleClickedListener onToggleClickedListener) {
+      this.onToggleImportantClickedListener = onToggleClickedListener;
+      setOnToggleImportantClickedListenerLocal();
+    }
 
-    private void setOnToggleClickedListenerLocal() {
-      toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    private void setOnToggleImportantClickedListenerLocal() {
+      toggleImportant.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-          if (onToggleClickedListener != null) {
-            onToggleClickedListener.onToggleClicked(isChecked);
+          if (onToggleImportantClickedListener != null) {
+            onToggleImportantClickedListener.onToggleClicked(isChecked);
+          }
+        }
+      });
+    }
+
+    // ------------------------------------- toggle done ------------------------------------------
+
+    private void setToggleDoneChecked(boolean checked) {
+      toggleDone.setOnCheckedChangeListener(null);
+      toggleDone.setChecked(checked);
+
+      if (checked) {
+        textName.setPaintFlags(textName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+      } else {
+        textName.setPaintFlags(textName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+      }
+
+      setOnToggleDoneClickedListenerLocal();
+    }
+
+    private void setOnToggleDoneClickedListener(OnToggleClickedListener onToggleClickedListener) {
+      this.onToggleDoneClickedListener = onToggleClickedListener;
+      setOnToggleDoneClickedListenerLocal();
+    }
+
+    private void setOnToggleDoneClickedListenerLocal() {
+      toggleDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+          if (onToggleDoneClickedListener != null) {
+            onToggleDoneClickedListener.onToggleClicked(isChecked);
           }
         }
       });

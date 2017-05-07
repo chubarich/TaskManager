@@ -11,20 +11,18 @@ public interface ITaskGroupsAdapter {
 
   void detachCallbacks();
 
-  void addTask(Task task);
-
-  void refreshTask(Task task);
+  void changeTask(Task task);
 
   void saveToOutState(Bundle outState);
 
 
   interface Callbacks {
 
-    void onTaskCreated(Task task);
-
-    void onTaskRefreshed(Task task);
+    void onTaskChanged(Task task);
 
     void onTaskLabelClicked(String date, Task.Type type);
+
+    void onTagClicked(String tagName);
 
   }
 }

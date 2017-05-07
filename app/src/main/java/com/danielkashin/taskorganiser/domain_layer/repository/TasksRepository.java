@@ -3,13 +3,15 @@ package com.danielkashin.taskorganiser.domain_layer.repository;
 import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
+import com.danielkashin.taskorganiser.domain_layer.helper.NumbersHelper;
+import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +21,19 @@ public class TasksRepository implements ITasksRepository {
 
   private ITasksLocalService tasksLocalService;
 
+
+  private TasksRepository(ITasksLocalService tasksLocalService) {
+    if (tasksLocalService == null) {
+      throw new IllegalStateException("All repository arguments must be non null");
+    }
+
+    this.tasksLocalService = tasksLocalService;
+  }
+
   // ---------------------------------------- public ----------------------------------------------
 
   @Override
-  public ArrayList<TaskGroup> getData(String date, Task.Type type) throws ExceptionBundle {
+  public ArrayList<DateTypeTaskGroup> getData(String date, Task.Type type) throws ExceptionBundle {
     if (type == Task.Type.Day) {
       return getWeekData(date);
     } else if (type == Task.Type.Week) {
@@ -35,29 +46,52 @@ public class TasksRepository implements ITasksRepository {
   }
 
   @Override
-  public void saveTask(Task task) {
+  public void saveTask(Task task) throws ExceptionBundle {
+    // TODO: remove nulls, zeros and ones
+    if (task.getType() == Task.Type.Day) {
+      TaskDay taskDay = new TaskDay(null, task.getName(), task.getDate(), task.getNote(), task.getUUID(),
+          task.getDuration(), NumbersHelper.getInteger(task.getDone()),
+          NumbersHelper.getInteger(task.getImportant()), task.getMinuteStart(),
+          task.getMinuteEnd(), task.getNotificationTimestamp(), null, 1, 0,
+          DatetimeHelper.getCurrentTimestamp());
 
+      tasksLocalService.putDayTask(taskDay)
+          .executeAsBlocking();
+    } else if (task.getType() == Task.Type.Week) {
+      TaskWeek taskWeek = new TaskWeek(null, task.getName(), task.getDate(), task.getNote(),
+          task.getUUID(), task.getDuration(), NumbersHelper.getInteger(task.getDone()),
+          NumbersHelper.getInteger(task.getImportant()), null, 1, 0,
+          DatetimeHelper.getCurrentTimestamp());
+
+      tasksLocalService.putWeekTask(taskWeek)
+          .executeAsBlocking();
+    } else if (task.getType() == Task.Type.Month) {
+      TaskMonth taskMonth = new TaskMonth(null, task.getName(), task.getDate(), task.getNote(),
+          task.getUUID(), task.getDuration(), NumbersHelper.getInteger(task.getDone()),
+          NumbersHelper.getInteger(task.getImportant()), 1, 0,
+          DatetimeHelper.getCurrentTimestamp());
+
+      tasksLocalService.putMonthTask(taskMonth)
+          .executeAsBlocking();
+    } else if (task.getType() == Task.Type.Mini) {
+      TaskMini miniTask = new TaskMini(null, task.getName(), NumbersHelper.getInteger(task.getDone()),
+          task.getUUID(), null, 1, 0, DatetimeHelper.getCurrentTimestamp());
+    } else {
+      throw new IllegalStateException("Such task type is not supported");
+    }
   }
 
   // ---------------------------------------- private ---------------------------------------------
 
-  private TasksRepository(ITasksLocalService tasksLocalService) {
-    if (tasksLocalService == null) {
-      throw new IllegalStateException("All repository arguments must be non null");
-    }
-
-    this.tasksLocalService = tasksLocalService;
-  }
-
-  private ArrayList<TaskGroup> getWeekData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getWeekData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> allDaysOfWeek = DatetimeHelper.getAllDaysOfWeek(date);
 
     // setup output dates and types
-    ArrayList<TaskGroup> output = new ArrayList<>();
-    output.add(new TaskGroup(allDaysOfWeek.get(0), Task.Type.Week));
+    ArrayList<DateTypeTaskGroup> output = new ArrayList<>();
+    output.add(new DateTypeTaskGroup(allDaysOfWeek.get(0), Task.Type.Week));
     for (int i = 0; i < allDaysOfWeek.size(); ++i) {
-      output.add(new TaskGroup(allDaysOfWeek.get(i), Task.Type.Day));
+      output.add(new DateTypeTaskGroup(allDaysOfWeek.get(i), Task.Type.Day));
     }
 
     // setup week task group
@@ -84,22 +118,22 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-  private ArrayList<TaskGroup> getMonthData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getMonthData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> firstDaysOfWeeks = DatetimeHelper.getFirstDaysOfWeeksInMonth(date);
 
     // setup output dates and types
-    ArrayList<TaskGroup> output = new ArrayList<>();
-    output.add(new TaskGroup(DatetimeHelper.getFirstDayOfMonth(date), Task.Type.Month));
+    ArrayList<DateTypeTaskGroup> output = new ArrayList<>();
+    output.add(new DateTypeTaskGroup(DatetimeHelper.getFirstDayOfMonth(date), Task.Type.Month));
     for (int i = 0; i < firstDaysOfWeeks.size(); ++i) {
-      output.add(new TaskGroup(firstDaysOfWeeks.get(i), Task.Type.Week));
+      output.add(new DateTypeTaskGroup(firstDaysOfWeeks.get(i), Task.Type.Week));
     }
 
     // setup month task group
     List<TaskMonth> monthTasks = tasksLocalService.getMonthTasks(date)
         .executeAsBlocking();
-    for (TaskMonth taskMonth : monthTasks) {
-      Task task = new Task(taskMonth);
+    for (int i = 0; i < monthTasks.size(); ++i) {
+      Task task = new Task(monthTasks.get(i));
       task.setTags(getTags(task.getUUID()));
       output.get(0).addTask(task);
     }
@@ -111,21 +145,21 @@ public class TasksRepository implements ITasksRepository {
       for (TaskWeek taskWeek : weekTasks) {
         Task task = new Task(taskWeek);
         task.setTags(getTags(task.getUUID()));
-        output.get(i).addTask(task);
+        output.get(i + 1).addTask(task);
       }
     }
 
     return output;
   }
 
-  private ArrayList<TaskGroup> getYearData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getYearData(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> months = DatetimeHelper.getAllMonthsInYear(date);
 
     // setup output dates and types
-    ArrayList<TaskGroup> output = new ArrayList<>();
+    ArrayList<DateTypeTaskGroup> output = new ArrayList<>();
     for (int i = 0; i < months.size(); ++i) {
-      output.add(new TaskGroup(months.get(i), Task.Type.Month));
+      output.add(new DateTypeTaskGroup(months.get(i), Task.Type.Month));
     }
 
     // setup weeks task group
@@ -142,7 +176,6 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-
   private ArrayList<String> getTags(String UUID) {
     List<TaskToTag> rawTags = tasksLocalService.getTaskToTags(UUID)
         .executeAsBlocking();
@@ -153,12 +186,24 @@ public class TasksRepository implements ITasksRepository {
         Tag tag = tasksLocalService.getTag(taskToTag.getTagId())
             .executeAsBlocking();
         if (tag != null) {
-          tags.add(tag.getLabel());
+          tags.add(tag.getName());
         }
       }
       return tags;
     } else {
       return null;
+    }
+  }
+
+
+  public static class Factory {
+
+    private Factory() {
+    }
+
+
+    public static ITasksRepository create(ITasksLocalService tasksLocalService) {
+      return new TasksRepository(tasksLocalService);
     }
   }
 }

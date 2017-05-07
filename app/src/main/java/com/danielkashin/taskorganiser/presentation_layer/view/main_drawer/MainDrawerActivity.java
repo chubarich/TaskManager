@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
@@ -28,8 +29,8 @@ import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateC
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
 
 
-public class MainDrawerActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener, IToolbarContainer, ICalendarWalker {
+public class MainDrawerActivity extends AppCompatActivity implements IMainDrawerView,
+    NavigationView.OnNavigationItemSelectedListener{
 
   private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
 
@@ -110,6 +111,13 @@ public class MainDrawerActivity extends AppCompatActivity
     handler.postDelayed(workRunnable, DELAY);
 
     return true;
+  }
+
+  // ------------------------------------- ITagOpener ---------------------------------------------
+
+  @Override
+  public void onTagClicked(String tagName) {
+    Toast.makeText(this, tagName, Toast.LENGTH_SHORT).show();
   }
 
   // ----------------------------------- ICalendarWalker ------------------------------------------

@@ -4,7 +4,7 @@ import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract.COLUMN_NAME_ID;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TagContract.COLUMN_NAME_LABEL;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TagContract.COLUMN_NAME_NAME;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TagContract.TABLE_NAME;
 
 
@@ -14,15 +14,15 @@ public class Tag {
   @StorIOSQLiteColumn(name = COLUMN_NAME_ID, key = true)
   Long id;
 
-  @StorIOSQLiteColumn(name = COLUMN_NAME_LABEL)
-  String label;
+  @StorIOSQLiteColumn(name = COLUMN_NAME_NAME)
+  String name;
 
 
   Tag() {
   }
 
-  public String getLabel() {
-    return label;
+  public String getName() {
+    return name;
   }
 
 }

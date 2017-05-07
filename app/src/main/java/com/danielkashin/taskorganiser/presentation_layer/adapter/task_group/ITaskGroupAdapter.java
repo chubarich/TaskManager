@@ -1,7 +1,8 @@
 package com.danielkashin.taskorganiser.presentation_layer.adapter.task_group;
 
+import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 
 
 public interface ITaskGroupAdapter {
@@ -12,15 +13,14 @@ public interface ITaskGroupAdapter {
 
   void addTask(Task task);
 
-  void setOrRefreshTaskGroup(TaskGroup taskGroup);
+  void changeTaskGroup(ITaskGroup taskGroup);
 
 
   interface Callbacks {
 
-    void onTaskCreated(Task task);
+    void onTaskChanged(Task task);
 
-    void onTaskRefreshed(Task task);
+    void onTagClicked(String tagName);
 
   }
-
 }

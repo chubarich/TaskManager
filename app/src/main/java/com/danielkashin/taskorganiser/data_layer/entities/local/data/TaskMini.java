@@ -24,7 +24,7 @@ public class TaskMini {
   String text;
 
   @StorIOSQLiteColumn(name = TaskMiniContract.COLUMN_NAME_DONE)
-  Boolean done;
+  Integer done;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_UUID)
   String UUID;
@@ -37,10 +37,10 @@ public class TaskMini {
   // synchronization
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_CHANGED_LOCAL)
-  Boolean changedLocal;
+  Integer changedLocal;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_DELETED_LOCAL)
-  Boolean deletedLocal;
+  Integer deletedLocal;
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP)
   Long changeOrDeleteLocalTimestamp;
@@ -49,4 +49,15 @@ public class TaskMini {
   TaskMini(){
   }
 
+  public TaskMini(Long id, String text, Integer done, String UUID, Long taskDayId,
+                  Integer changedLocal, Integer deletedLocal, Long changeOrDeleteLocalTimestamp) {
+    this.id = id;
+    this.text = text;
+    this.done = done;
+    this.UUID = UUID;
+    this.taskDayId = taskDayId;
+    this.changedLocal = changedLocal;
+    this.deletedLocal = deletedLocal;
+    this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
+  }
 }

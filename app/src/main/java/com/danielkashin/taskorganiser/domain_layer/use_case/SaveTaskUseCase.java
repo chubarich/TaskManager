@@ -28,20 +28,20 @@ public class SaveTaskUseCase {
     this.executor = executor;
   }
 
-  public void run(final Callbacks callbacks, Task task) {
+  public void run(final Callbacks callbacks, final Task task) {
     ExceptionHelper.checkAllObjectsNonNull("All use case run() arguments must be non null", callbacks, task);
 
     RepositoryRunnableVoid saveTaskRunnable = new RepositoryRunnableVoid() {
           @Override
           public void run() throws ExceptionBundle {
-
+            tasksRepository.saveTask(task);
           }
         };
 
     PostExecuteListenerVoid saveTaskListener = new PostExecuteListenerVoid() {
       @Override
       public void onResult() {
-        callbacks.onSaveTaskSuccess();
+        callbacks.onSaveTaskSuccess(task);
       }
 
       @Override
@@ -59,7 +59,7 @@ public class SaveTaskUseCase {
 
   public interface Callbacks {
 
-    void onSaveTaskSuccess();
+    void onSaveTaskSuccess(Task task);
 
     void onSaveTaskException(ExceptionBundle exceptionBundle);
 

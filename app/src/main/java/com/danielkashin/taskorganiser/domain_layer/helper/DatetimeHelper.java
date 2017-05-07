@@ -2,6 +2,7 @@ package com.danielkashin.taskorganiser.domain_layer.helper;
 
 import android.util.Pair;
 
+import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,6 +12,7 @@ import java.util.Locale;
 public class DatetimeHelper {
 
   public static final String PATTERN = "yyyy-MM-dd";
+
 
 
   public static String getUpYear(String date) {
@@ -307,6 +309,9 @@ public class DatetimeHelper {
   }
 
 
+  public static long getCurrentTimestamp() {
+    return Calendar.getInstance(new Locale("ru,ru")).getTimeInMillis() / 1000;
+  }
 
   public static String getCurrentMonth() {
     Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));

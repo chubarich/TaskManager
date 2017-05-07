@@ -14,7 +14,7 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.pojo.TaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.ITaskGroupAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.TaskGroupAdapter;
 
@@ -33,7 +33,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   private static final String KEY_COMMON_COLOR = "COMMON_COLOR";
   private static final String KEY_CHECKED_POSITIONS = "CHECKED_POSITIONS";
 
-  private ArrayList<TaskGroup> mTaskGroups;
+  private ArrayList<DateTypeTaskGroup> mTaskGroups;
   private ArrayList<String> mLabels;
   private int mHighlightIndex;
   private int mHighlightColor;
@@ -42,7 +42,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   private ITaskGroupsAdapter.Callbacks mCallbacks;
 
 
-  public TaskGroupsAdapter(ArrayList<TaskGroup> taskGroups,
+  public TaskGroupsAdapter(ArrayList<DateTypeTaskGroup> taskGroups,
                            ArrayList<String> labels,
                            int highlightIndex,
                            int highlightColor,
@@ -99,24 +99,23 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   }
 
   @Override
-  public void addTask(Task task) {
+  public void changeTask(Task task) {
     for (int i = 0; i < mTaskGroups.size(); ++i) {
-      TaskGroup taskGroup = mTaskGroups.get(i);
+      DateTypeTaskGroup taskGroup = mTaskGroups.get(i);
 
       if (task.getType() == taskGroup.getType() && task.getDate().equals(taskGroup.getDate())) {
+        ArrayList<Task> tasks = taskGroup.getTasks();
+        for (int j = 0; j < tasks.size(); ++j) {
+          if (tasks.get(j).equals(task)) {
+            taskGroup.setTask(task, j);
+            notifyItemChanged(i);
+            return;
+          }
+        }
+
         taskGroup.addTask(task);
         notifyItemChanged(i);
-      }
-    }
-  }
-
-  @Override
-  public void refreshTask(Task task) {
-    for (int i = 0; i < mTaskGroups.size(); ++i) {
-      TaskGroup taskGroup = mTaskGroups.get(i);
-
-      if (task.getType() == taskGroup.getType() && task.getDate().equals(taskGroup.getDate())) {
-        notifyItemChanged(i);
+        return;
       }
     }
   }
@@ -124,16 +123,16 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   // ---------------------------------- ITaskGroupAdapter.Callbacks -------------------------------
 
   @Override
-  public void onTaskCreated(Task task) {
+  public void onTaskChanged(Task task) {
     if (mCallbacks != null) {
-      mCallbacks.onTaskCreated(task);
+      mCallbacks.onTaskChanged(task);
     }
   }
 
   @Override
-  public void onTaskRefreshed(Task task) {
+  public void onTagClicked(String tagName) {
     if (mCallbacks != null) {
-      mCallbacks.onTaskRefreshed(task);
+      mCallbacks.onTagClicked(tagName);
     }
   }
 
@@ -210,7 +209,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
 
   // ----------------------------------------- private --------------------------------------------
 
-  private ArrayList<TaskGroup> restoreTaskGroups(Bundle savedInstanceState) {
+  private ArrayList<DateTypeTaskGroup> restoreTaskGroups(Bundle savedInstanceState) {
     ArrayList<Parcelable> parcelableArrayList = savedInstanceState
         .getParcelableArrayList(KEY_TASK_GROUPS);
 
@@ -218,9 +217,9 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       throw new IllegalStateException("Bundle must contain TaskGroups key");
     }
 
-    ArrayList<TaskGroup> result = new ArrayList<>();
+    ArrayList<DateTypeTaskGroup> result = new ArrayList<>();
     for (Parcelable parcelable : parcelableArrayList) {
-      result.add((TaskGroup) parcelable);
+      result.add((DateTypeTaskGroup) parcelable);
     }
     return result;
   }
@@ -254,13 +253,13 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       imageExpand.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          expandableLayout.toggle(true);
+          expandableLayout.toggle(false);
         }
       });
     }
 
-    private void setTaskGroup(TaskGroup taskGroup) {
-      ((ITaskGroupAdapter) tasksRecyclerView.getAdapter()).setOrRefreshTaskGroup(taskGroup);
+    private void setTaskGroup(DateTypeTaskGroup taskGroup) {
+      ((ITaskGroupAdapter) tasksRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
     }
 
     private void setOnLabelClickListener(View.OnClickListener listener) {

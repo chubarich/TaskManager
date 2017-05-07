@@ -55,10 +55,10 @@ public class TaskWeek {
   // synchronization
 
   @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_CHANGED_LOCAL)
-  Boolean changedLocal;
+  Integer changedLocal;
 
   @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_DELETED_LOCAL)
-  Boolean deletedLocal;
+  Integer deletedLocal;
 
   @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP)
   Long changeOrDeleteLocalTimestamp;
@@ -67,6 +67,22 @@ public class TaskWeek {
   TaskWeek() {
   }
 
+  public TaskWeek(Long id, String name, String date, String note, String UUID, Long duration,
+                  Integer done, Integer important, Long taskWeekId, Integer changedLocal,
+                  Integer deletedLocal, Long changeOrDeleteLocalTimestamp) {
+    this.id = id;
+    this.name = name;
+    this.date = date;
+    this.note = note;
+    this.UUID = UUID;
+    this.duration = duration;
+    this.done = done;
+    this.important = important;
+    this.taskWeekId = taskWeekId;
+    this.changedLocal = changedLocal;
+    this.deletedLocal = deletedLocal;
+    this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
+  }
 
   public Long getId() {
     return id;
@@ -100,11 +116,11 @@ public class TaskWeek {
     return important;
   }
 
-  public Boolean getChangedLocal() {
+  public Integer getChangedLocal() {
     return changedLocal;
   }
 
-  public Boolean getDeletedLocal() {
+  public Integer getDeletedLocal() {
     return deletedLocal;
   }
 

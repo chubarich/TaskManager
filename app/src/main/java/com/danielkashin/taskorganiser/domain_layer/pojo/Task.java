@@ -11,6 +11,7 @@ import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 
 public class Task implements Parcelable {
@@ -112,8 +113,9 @@ public class Task implements Parcelable {
     minuteEnd = (Long) parcel.readSerializable();
     notificationTimestamp = (Long) parcel.readSerializable();
     note = parcel.readString();
+    tags = new ArrayList<>();
     parcel.readStringList(tags);
-    subtasks = (ArrayList<Long>)parcel.readSerializable();
+    subtasks = (ArrayList<Long>) parcel.readSerializable();
     done = (Boolean) parcel.readSerializable();
     important = (Boolean) parcel.readSerializable();
     changedLocal = (Boolean) parcel.readSerializable();
@@ -161,7 +163,7 @@ public class Task implements Parcelable {
   // ----------------------------------- getters/setters ------------------------------------------
 
   public boolean equals(Task other) {
-    return this.name.equals(other.getName()) && this.type == other.getType() && this.UUID.equals(other.getUUID());
+    return this.type == other.getType() && this.UUID.equals(other.getUUID());
   }
 
   public boolean equalsWithAdditionalInformation(Task other) {
@@ -318,6 +320,55 @@ public class Task implements Parcelable {
     return done != null && done;
   }
 
+
+  public static int compare(Task o1, Task other) {
+    if (o1.getType() != other.getType()) {
+      if ((o1.getType() == Task.Type.Day && (other.getType() == Task.Type.Week || other.getType() == Task.Type.Month))
+          || (o1.getType() == Task.Type.Week && other.getType() == Task.Type.Month)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }
+
+    if (o1.getType() == Task.Type.Day) {
+      if (o1.getMinuteStart() != null && other.getMinuteStart() == null) {
+        return 1;
+      } else if (other.getMinuteStart() != null && o1.getMinuteStart() == null) {
+        return -1;
+      }
+    }
+
+    if (o1.getDone() && !other.getDone()) {
+      return -1;
+    } else if (other.getDone() && !o1.getDone()) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  public static Comparator<Task> getComparator() {
+    return new Comparator<Task>() {
+      @Override
+      public int compare(Task o1, Task o2) {
+        return Task.compare(o1, o2);
+      }
+    };
+  }
+
+  public static int addTaskToList(Task task, ArrayList<Task> tasks) {
+    ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task, tasks);
+
+    int position = tasks.size() - 1;
+    while (position > 0 && getComparator().compare(task, tasks.get(position)) < 0) {
+      position--;
+    }
+    tasks.add(position + 1, task);
+
+    return position;
+  }
+
   public void setDone(Boolean done) {
     this.done = done;
   }
@@ -353,6 +404,7 @@ public class Task implements Parcelable {
   public void setChangeOrDeleteLocalTimestamp(Long changeOrDeleteLocalTimestamp) {
     this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
   }
+
 
   // ---------------------------------------- inner types -----------------------------------------
 

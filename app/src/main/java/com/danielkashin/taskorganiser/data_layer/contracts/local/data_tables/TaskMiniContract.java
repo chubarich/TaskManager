@@ -33,7 +33,7 @@ public class TaskMiniContract implements IdContract {
       + COLUMN_NAME_ID + " INTEGER NOT NULL, "
 
       // TaskMiniContract
-      + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE, "
+      + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE, "
       + COLUMN_NAME_TEXT + " TEXT NOT NULL, "
       + COLUMN_NAME_DONE + " INTEGER NOT NULL, "
 

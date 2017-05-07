@@ -29,7 +29,7 @@ public class TaskDayContract implements TaskContract {
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
       + COLUMN_NAME_DATE + " DATETIME NOT NULL, "
       + COLUMN_NAME_NOTE + " TEXT, "
-      + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE, "
+      + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE, "
       + COLUMN_NAME_DURATION + " INTEGER, "
       + COLUMN_NAME_DONE + " INTEGER, "
       + COLUMN_NAME_IMPORTANT + " INTEGER, "

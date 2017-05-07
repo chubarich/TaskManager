@@ -1,32 +1,27 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 
-public class TaskGroup implements Parcelable {
+public class ImportantTaskGroup implements Parcelable, ITaskGroup {
 
-  private final String date;
-  private final Task.Type type;
   private final ArrayList<Task> tasks;
 
 
-  public TaskGroup(String date, Task.Type type) {
-    this.date = date;
-    this.type = type;
+  public ImportantTaskGroup() {
     this.tasks = new ArrayList<>();
   }
 
   // ----------------------------------------- Parcelable -----------------------------------------
 
-  public TaskGroup(Parcel parcel) {
-    this.date = parcel.readString();
-    this.type = (Task.Type) parcel.readSerializable();
+  public ImportantTaskGroup(Parcel parcel) {
     this.tasks = new ArrayList<>();
     parcel.readTypedList(this.tasks, Task.CREATOR);
   }
@@ -38,25 +33,24 @@ public class TaskGroup implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel parcel, int flags) {
-    parcel.writeString(date);
-    parcel.writeSerializable(type);
     parcel.writeTypedList(tasks);
   }
 
-  public static final Parcelable.Creator<TaskGroup> CREATOR = new Parcelable.Creator<TaskGroup>() {
+  public static final Parcelable.Creator<DateTypeTaskGroup> CREATOR = new Parcelable.Creator<DateTypeTaskGroup>() {
     @Override
-    public TaskGroup createFromParcel(Parcel parcel) {
-      return new TaskGroup(parcel);
+    public DateTypeTaskGroup createFromParcel(Parcel parcel) {
+      return new DateTypeTaskGroup(parcel);
     }
 
     @Override
-    public TaskGroup[] newArray(int i) {
-      return new TaskGroup[i];
+    public DateTypeTaskGroup[] newArray(int i) {
+      return new DateTypeTaskGroup[i];
     }
   };
 
   // --------------------------------------- setters ----------------------------------------------
 
+  @Override
   public void setTask(Task task, int position) {
     boolean positionIsValid = position >= 0 && position < tasks.size();
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
@@ -64,44 +58,28 @@ public class TaskGroup implements Parcelable {
     tasks.set(position, task);
   }
 
+  @Override
+  public void sort() {
+    Collections.sort(tasks, Task.getComparator());
+  }
+
+  @Override
   public int addTask(Task task) {
     ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
-    boolean taskIsValid = task.getDate().equals(this.date) && task.getType() == this.type;
+    boolean taskIsValid = task.getImportant();
     ExceptionHelper.assertTrue("Task is not valid", taskIsValid);
 
-    if (type != Task.Type.Day) {
-      tasks.add(task);
-      return tasks.size() - 1;
-    } else {
-      boolean taskHasTime = task.getMinuteStart() != null;
-      for (int i = 0; i < tasks.size(); ++i) {
-        boolean currentTaskHasTime = tasks.get(i).getMinuteStart() != null;
-
-        if (!taskHasTime && currentTaskHasTime) {
-          tasks.add(i, task);
-          return i;
-        } else if (taskHasTime && currentTaskHasTime
-            && tasks.get(i).getMinuteStart() > task.getMinuteStart()) {
-          tasks.add(i, task);
-          return i;
-        }
-      }
-
-      tasks.add(task);
-      return tasks.size() - 1;
-    }
+    return Task.addTaskToList(task, tasks);
   }
 
   // --------------------------------------- getters ----------------------------------------------
 
-  public Task.Type getType() {
-    return type;
+  @Override
+  public ArrayList<Task> getTasks() {
+    return tasks;
   }
 
-  public String getDate() {
-    return date;
-  }
-
+  @Override
   public Task getTask(int position) {
     boolean positionIsValid = position >= 0 && position < tasks.size();
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
@@ -109,10 +87,12 @@ public class TaskGroup implements Parcelable {
     return tasks.get(position);
   }
 
+  @Override
   public int getTaskSize() {
     return tasks.size();
   }
 
+  @Override
   public Task popTask(int position) {
     boolean positionIsValid = position >= 0 && position < tasks.size();
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
