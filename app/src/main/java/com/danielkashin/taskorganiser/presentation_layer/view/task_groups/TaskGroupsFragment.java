@@ -89,7 +89,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    mRestoredState.wrap(outState);
+    mRestoredState.saveToOutState(outState);
   }
 
   // -------------------------------------- ITaskGroupsView ---------------------------------------
@@ -217,7 +217,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
   @Override
   protected int getLayoutRes() {
-    return R.layout.fragment_tasks_container;
+    return R.layout.fragment_task_container;
   }
 
   @Override
@@ -364,7 +364,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
       return date != null && type != null;
     }
 
-    void wrap(Bundle outState) {
+    void saveToOutState(Bundle outState) {
       if (isInitialized()) {
         outState.putString(KEY_DATE, date);
         outState.putSerializable(KEY_TYPE, type);

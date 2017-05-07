@@ -25,12 +25,13 @@ import android.widget.Toast;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
+import com.danielkashin.taskorganiser.presentation_layer.view.important_tasks.ImportantTasksFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateContainer;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
 
 
 public class MainDrawerActivity extends AppCompatActivity implements IMainDrawerView,
-    NavigationView.OnNavigationItemSelectedListener{
+    NavigationView.OnNavigationItemSelectedListener {
 
   private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
 
@@ -90,6 +91,10 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
 
   @Override
   public boolean onNavigationItemSelected(final MenuItem item) {
+    mImageToolbarDown.setClickable(false);
+    mImageToolbarUp.setClickable(false);
+    mImageToolbarParent.setClickable(false);
+
     mDrawerLayout.closeDrawer(GravityCompat.START);
 
     Runnable workRunnable = new Runnable() {
@@ -102,6 +107,8 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
           addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Week), false);
         } else if (id == R.id.navigation_year) {
           addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Month), false);
+        } else if (id == R.id.navigation_important) {
+          addFragment(ImportantTasksFragment.getInstance(), false);
         }
       }
     };
@@ -135,6 +142,7 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
 
     if (showCalendarParentIcon) {
       mImageToolbarParent.setVisibility(View.VISIBLE);
+      mImageToolbarParent.setClickable(true);
     } else {
       mImageToolbarParent.setVisibility(View.GONE);
     }
@@ -142,11 +150,12 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
     if (showCalendarNavigateIcons) {
       mImageToolbarDown.setVisibility(View.VISIBLE);
       mImageToolbarUp.setVisibility(View.VISIBLE);
+      mImageToolbarDown.setClickable(true);
+      mImageToolbarUp.setClickable(true);
     } else {
       mImageToolbarDown.setVisibility(View.GONE);
       mImageToolbarUp.setVisibility(View.GONE);
     }
-
   }
 
   // --------------------------------------- private ----------------------------------------------

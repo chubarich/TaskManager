@@ -1,18 +1,80 @@
 package com.danielkashin.taskorganiser.presentation_layer.view.important_tasks;
 
+import android.os.AsyncTask;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
+import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
+import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetImportantTaskGroupUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.ITaskGroupAdapter;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.TaskGroupAdapter;
+import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
+import com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks.IImportantTasksPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks.ImportantTasksPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
 
 public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPresenter, IImportantTasksView>
-    implements IImportantTasksView {
+    implements IImportantTasksView, ITaskGroupAdapter.Callbacks {
 
   private RecyclerView mRecyclerView;
 
+
+  // ----------------------------------------- lifecycle ------------------------------------------
+
+  @Override
+  public void onStart() {
+    super.onStart();
+
+    ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.important), false, false);
+
+    ((IImportantTasksPresenter) getPresenter()).onGetTaskGroupData();
+  }
+
+  @Override
+  public void onStop() {
+    if (mRecyclerView.getAdapter() != null) {
+      ((ITaskGroupAdapter) mRecyclerView.getAdapter()).detachCallbacks();
+    }
+
+    super.onStop();
+  }
+
+  // --------------------------------------- getInstance ------------------------------------------
+
+  public static ImportantTasksFragment getInstance() {
+    return new ImportantTasksFragment();
+  }
+
+  // --------------------------------- ITaskGroupAdapter.Callbacks --------------------------------
+
+  @Override
+  public void onTaskChanged(Task task) {
+
+  }
+
+  @Override
+  public void onTagClicked(String tagName) {
+
+  }
+
+  // ------------------------------------ IImportantTasksView -------------------------------------
+
+  @Override
+  public void initializeAdapter(ImportantTaskGroup taskGroup) {
+    mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup));
+    ((ITaskGroupAdapter) mRecyclerView.getAdapter()).attachCallbacks(this);
+  }
 
   // ------------------------------------- PresenterFragment --------------------------------------
 
@@ -23,21 +85,42 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
 
   @Override
   protected IPresenterFactory<ImportantTasksPresenter, IImportantTasksView> getPresenterFactory() {
-    return null;
+    ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getActivity()
+        .getApplication())
+        .getTasksLocalService();
+
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+
+    GetImportantTaskGroupUseCase getTaskGroupUseCase = new GetImportantTaskGroupUseCase(
+        tasksRepository,
+        AsyncTask.THREAD_POOL_EXECUTOR);
+
+    SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(
+        tasksRepository,
+        AsyncTask.THREAD_POOL_EXECUTOR);
+
+    return new ImportantTasksPresenter.Factory(getTaskGroupUseCase, saveTaskUseCase);
   }
 
   @Override
   protected int getFragmentId() {
-    return 0;
+    return this.getClass().getSimpleName().hashCode();
   }
 
   @Override
   protected int getLayoutRes() {
-    return 0;
+    return R.layout.fragment_task_container;
   }
 
   @Override
   protected void initializeView(View view) {
+    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+    layoutManager.setReverseLayout(true);
+    layoutManager.setStackFromEnd(true);
 
+    mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+    mRecyclerView.setLayoutManager(layoutManager);
+    mRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
+    mRecyclerView.setNestedScrollingEnabled(false);
   }
 }
