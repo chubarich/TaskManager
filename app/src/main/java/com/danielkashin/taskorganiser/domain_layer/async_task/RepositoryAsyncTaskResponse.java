@@ -42,6 +42,8 @@ public class RepositoryAsyncTaskResponse<T> extends VoidAsyncTask<Pair<T, Except
       return new Pair<>(result, null);
     } catch (ExceptionBundle exception) {
       return new Pair<>(null, exception);
+    } catch (Exception exception) {
+      return new Pair<>(null, new ExceptionBundle(ExceptionBundle.Reason.UNKNOWN));
     }
   }
 

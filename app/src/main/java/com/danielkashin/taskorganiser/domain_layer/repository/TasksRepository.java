@@ -11,6 +11,7 @@ import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalServi
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.helper.NumbersHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 
 import java.util.ArrayList;
@@ -32,14 +33,49 @@ public class TasksRepository implements ITasksRepository {
 
   // ---------------------------------------- public ----------------------------------------------
 
+
+  @Override
+  public ImportantTaskGroup getImportantData() throws ExceptionBundle {
+    ImportantTaskGroup output = new ImportantTaskGroup();
+
+    // setup month task group
+    List<TaskMonth> monthTasks = tasksLocalService.getFavoriteMonthTasks()
+        .executeAsBlocking();
+    for (int i = 0; i < monthTasks.size(); ++i) {
+      Task task = new Task(monthTasks.get(i));
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    // setup week task group
+    List<TaskWeek> weekTasks = tasksLocalService.getFavoriteWeekTasks()
+        .executeAsBlocking();
+    for (TaskWeek taskWeek : weekTasks) {
+      Task task = new Task(taskWeek);
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    // setup day task group
+    List<TaskDay> dayTasks = tasksLocalService.getFavoriteDayTasks()
+        .executeAsBlocking();
+    for (TaskDay taskDay : dayTasks) {
+      Task task = new Task(taskDay);
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    return output;
+  }
+
   @Override
   public ArrayList<DateTypeTaskGroup> getData(String date, Task.Type type) throws ExceptionBundle {
     if (type == Task.Type.Day) {
-      return getWeekData(date);
+      return getWeekTasks(date);
     } else if (type == Task.Type.Week) {
-      return getMonthData(date);
+      return getMonthTasks(date);
     } else if (type == Task.Type.Month) {
-      return getYearData(date);
+      return getYearTasks(date);
     } else {
       throw new IllegalStateException("Such task type is not supported");
     }
@@ -83,7 +119,7 @@ public class TasksRepository implements ITasksRepository {
 
   // ---------------------------------------- private ---------------------------------------------
 
-  private ArrayList<DateTypeTaskGroup> getWeekData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getWeekTasks(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> allDaysOfWeek = DatetimeHelper.getAllDaysOfWeek(date);
 
@@ -118,7 +154,7 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-  private ArrayList<DateTypeTaskGroup> getMonthData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getMonthTasks(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> firstDaysOfWeeks = DatetimeHelper.getFirstDaysOfWeeksInMonth(date);
 
@@ -152,7 +188,7 @@ public class TasksRepository implements ITasksRepository {
     return output;
   }
 
-  private ArrayList<DateTypeTaskGroup> getYearData(String date) throws ExceptionBundle {
+  private ArrayList<DateTypeTaskGroup> getYearTasks(String date) throws ExceptionBundle {
     // get the needed dates
     ArrayList<String> months = DatetimeHelper.getAllMonthsInYear(date);
 

@@ -29,6 +29,42 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
   //                           ------------ get ------------
 
   @Override
+  public PreparedGetListOfObjects<TaskWeek> getFavoriteWeekTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskWeek.class)
+        .withQuery(Query.builder()
+            .table(TaskWeekContract.TABLE_NAME)
+            .where(TaskWeekContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
+                + " AND " + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskDay> getFavoriteDayTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskDay.class)
+        .withQuery(Query.builder()
+            .table(TaskDayContract.TABLE_NAME)
+            .where(TaskDayContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
+                + " AND " + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskMonth> getFavoriteMonthTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskMonth.class)
+        .withQuery(Query.builder()
+            .table(TaskMonthContract.TABLE_NAME)
+            .where(TaskMonthContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
+                + " AND " + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
   public PreparedGetListOfObjects<TaskWeek> getWeekTasks(String date) {
     return getSQLite().get()
         .listOfObjects(TaskWeek.class)

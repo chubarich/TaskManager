@@ -1,5 +1,7 @@
 package com.danielkashin.taskorganiser.domain_layer.async_task;
 
+import android.util.Pair;
+
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 
 /*
@@ -34,6 +36,8 @@ public class RepositoryAsyncTaskVoid extends VoidAsyncTask<ExceptionBundle> {
       return null;
     } catch (ExceptionBundle exception) {
       return exception;
+    } catch (Exception exception) {
+      return new ExceptionBundle(ExceptionBundle.Reason.UNKNOWN);
     }
   }
 

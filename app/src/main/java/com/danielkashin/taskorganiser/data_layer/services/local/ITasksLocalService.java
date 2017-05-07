@@ -15,6 +15,12 @@ public interface ITasksLocalService {
 
   // ---------------------------------------- get -------------------------------------------------
 
+  PreparedGetListOfObjects<TaskWeek> getFavoriteWeekTasks();
+
+  PreparedGetListOfObjects<TaskDay> getFavoriteDayTasks();
+
+  PreparedGetListOfObjects<TaskMonth> getFavoriteMonthTasks();
+
   PreparedGetListOfObjects<TaskWeek> getWeekTasks(String date);
 
   PreparedGetListOfObjects<TaskDay> getDayTasks(String date);
