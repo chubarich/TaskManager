@@ -3,6 +3,7 @@ package com.danielkashin.taskorganiser.presentation_layer.presenter.important_ta
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetImportantTaskGroupUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
@@ -11,7 +12,8 @@ import com.danielkashin.taskorganiser.presentation_layer.view.important_tasks.II
 
 
 public class ImportantTasksPresenter extends Presenter<IImportantTasksView>
-    implements IImportantTasksPresenter, GetImportantTaskGroupUseCase.Callbacks {
+    implements IImportantTasksPresenter, GetImportantTaskGroupUseCase.Callbacks,
+    SaveTaskUseCase.Callbacks {
 
   private final GetImportantTaskGroupUseCase mGetImportantTaskGroupUseCase;
   private final SaveTaskUseCase mSaveTaskUseCase;
@@ -43,6 +45,20 @@ public class ImportantTasksPresenter extends Presenter<IImportantTasksView>
 
   }
 
+  // --------------------------------- SaveTaskUseCase.Callbacks ----------------------------------
+
+  @Override
+  public void onSaveTaskSuccess(Task task) {
+    if (getView() != null) {
+      getView().addTaskToViewInterface(task);
+    }
+  }
+
+  @Override
+  public void onSaveTaskException(ExceptionBundle exceptionBundle) {
+    // do nothing
+  }
+
   // --------------------------- GetImportantTaskGroupUseCase.Callbacks ---------------------------
 
   @Override
@@ -54,10 +70,16 @@ public class ImportantTasksPresenter extends Presenter<IImportantTasksView>
 
   @Override
   public void onGetTaskGroupsException(ExceptionBundle exceptionBundle) {
-
+    // do nothing
   }
 
   // --------------------------------- IImportantTasksPresenter -----------------------------------
+
+
+  @Override
+  public void onSaveTask(Task task) {
+    mSaveTaskUseCase.run(this, task);
+  }
 
   @Override
   public void onGetTaskGroupData() {

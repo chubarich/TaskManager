@@ -8,6 +8,9 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
+import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
@@ -21,6 +24,7 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresent
 import com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks.IImportantTasksPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks.ImportantTasksPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITagViewOpener;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
 
@@ -36,7 +40,7 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
   public void onStart() {
     super.onStart();
 
-    ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.important), false, false);
+    ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.important), false, false, false);
 
     ((IImportantTasksPresenter) getPresenter()).onGetTaskGroupData();
   }
@@ -59,16 +63,33 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
   // --------------------------------- ITaskGroupAdapter.Callbacks --------------------------------
 
   @Override
-  public void onTaskChanged(Task task) {
+  public void onCreateTask(String name, String UUID, ITaskGroup taskGroup) {
+    ExceptionHelper.assertTrue("", taskGroup instanceof ImportantTaskGroup);
 
+    Task task = new Task(name, UUID, Task.Type.Month, DatetimeHelper.getCurrentMonth());
+    task.setImportant(true);
+
+    ((IImportantTasksPresenter) getPresenter()).onSaveTask(task);
+  }
+
+  @Override
+  public void onTaskChanged(Task task) {
+    ((IImportantTasksPresenter) getPresenter()).onSaveTask(task);
   }
 
   @Override
   public void onTagClicked(String tagName) {
-
+    ((ITagViewOpener) getActivity()).onTagClicked(tagName);
   }
 
   // ------------------------------------ IImportantTasksView -------------------------------------
+
+  @Override
+  public void addTaskToViewInterface(Task task) {
+    if (mRecyclerView.getAdapter() != null) {
+      ((ITaskGroupAdapter) mRecyclerView.getAdapter()).addTask(task);
+    }
+  }
 
   @Override
   public void initializeAdapter(ImportantTaskGroup taskGroup) {

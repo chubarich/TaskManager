@@ -20,6 +20,8 @@ public interface ITaskGroupAdapter {
 
     void onTaskChanged(Task task);
 
+    void onCreateTask(String name, String UUID, ITaskGroup taskGroup);
+
     void onTagClicked(String tagName);
 
   }

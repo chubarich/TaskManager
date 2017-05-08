@@ -1,6 +1,15 @@
 package com.danielkashin.taskorganiser.domain_layer.helper;
 
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,5 +34,29 @@ public class ColorHelper {
 
   public static int getMaterialColor(Object key) {
     return materialColors.get(Math.abs(key.hashCode()) % materialColors.size());
+  }
+
+  public static Drawable generateCircleBitmap(Context context, int circleColor, float diameterDP, String text) {
+    final int textColor = 0xffffffff;
+
+    DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+    float diameterPixels = diameterDP * (metrics.densityDpi / 160f);
+    float radiusPixels = diameterPixels / 2;
+
+    // Create the bitmap
+    Bitmap output = Bitmap.createBitmap((int) diameterPixels, (int) diameterPixels,
+        Bitmap.Config.ARGB_8888);
+
+    // Create the canvas to draw on
+    Canvas canvas = new Canvas(output);
+    canvas.drawARGB(0, 0, 0, 0);
+
+    // Draw the circle
+    final Paint paintC = new Paint();
+    paintC.setAntiAlias(true);
+    paintC.setColor(circleColor);
+    canvas.drawCircle(radiusPixels, radiusPixels, radiusPixels, paintC);
+
+    return new BitmapDrawable(context.getResources(), output);
   }
 }

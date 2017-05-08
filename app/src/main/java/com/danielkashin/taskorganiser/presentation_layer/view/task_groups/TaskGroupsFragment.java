@@ -315,13 +315,13 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     if (getActivity() != null) {
       switch (mRestoredState.getType()) {
         case Day:
-          ((IToolbarContainer) getActivity()).setToolbar(getWeekLabel(months, mRestoredState.getDate()), true, true);
+          ((IToolbarContainer) getActivity()).setToolbar(getWeekLabel(months, mRestoredState.getDate()), true, true, false);
           break;
         case Week:
-          ((IToolbarContainer) getActivity()).setToolbar(getMonthLabel(simpleMonths, mRestoredState.getDate()), true, true);
+          ((IToolbarContainer) getActivity()).setToolbar(getMonthLabel(simpleMonths, mRestoredState.getDate()), true, true, false);
           break;
         case Month:
-          ((IToolbarContainer) getActivity()).setToolbar(getYearLabel(mRestoredState.getDate()), false, true);
+          ((IToolbarContainer) getActivity()).setToolbar(getYearLabel(mRestoredState.getDate()), false, true, false);
           break;
       }
     }

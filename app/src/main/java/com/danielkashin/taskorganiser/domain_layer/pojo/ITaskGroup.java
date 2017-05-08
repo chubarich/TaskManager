@@ -12,7 +12,7 @@ public interface ITaskGroup {
 
   void sort();
 
-  int addTask(Task task);
+  void addTask(Task task);
 
   ArrayList<Task> getTasks();
 
@@ -21,5 +21,9 @@ public interface ITaskGroup {
   int getTaskSize();
 
   Task popTask(int position);
+
+  void initialize(ITaskGroup taskGroup);
+
+  boolean canBelongTo(Task task);
 
 }

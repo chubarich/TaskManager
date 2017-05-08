@@ -13,8 +13,8 @@ import java.util.Comparator;
 
 public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
 
-  private final String date;
-  private final Task.Type type;
+  private String date;
+  private Task.Type type;
   private final ArrayList<Task> tasks;
 
 
@@ -22,6 +22,11 @@ public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
     this.date = date;
     this.type = type;
     this.tasks = new ArrayList<>();
+  }
+
+  public DateTypeTaskGroup(DateTypeTaskGroup taskGroup) {
+    tasks = new ArrayList<>();
+    initialize(taskGroup);
   }
 
   // ----------------------------------------- Parcelable -----------------------------------------
@@ -59,12 +64,36 @@ public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
 
   // --------------------------------------- setters ----------------------------------------------
 
+
+  @Override
+  public boolean canBelongTo(Task task) {
+    return task.getType() == type && task.getDate().equals(date);
+  }
+
+  @Override
+  public void initialize(ITaskGroup taskGroup) {
+    ExceptionHelper.assertTrue("", taskGroup instanceof DateTypeTaskGroup);
+
+    date = ((DateTypeTaskGroup) taskGroup).getDate();
+    type = ((DateTypeTaskGroup) taskGroup).getType();
+
+    ArrayList<Task> outTasks = new ArrayList<>();
+    for (int i = 0; i < taskGroup.getTasks().size(); ++i) {
+      outTasks.add(taskGroup.getTask(i));
+    }
+
+    tasks.clear();
+    tasks.addAll(outTasks);
+    sort();
+  }
+
   @Override
   public void setTask(Task task, int position) {
     boolean positionIsValid = position >= 0 && position < tasks.size();
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
 
     tasks.set(position, task);
+    sort();
   }
 
   @Override
@@ -73,12 +102,25 @@ public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
   }
 
   @Override
-  public int addTask(Task task) {
+  public void addTask(Task task) {
     ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
     boolean taskIsValid = task.getDate().equals(this.date) && task.getType() == this.type;
     ExceptionHelper.assertTrue("Task is not valid", taskIsValid);
 
-    return Task.addTaskToList(task, tasks);
+    int jToSet = -1;
+    for (int j = 0; j < tasks.size(); ++j) {
+      if (tasks.get(j).equals(task)) {
+        jToSet = j;
+      }
+    }
+
+    if (jToSet != -1) {
+      tasks.set(jToSet, task);
+    } else {
+      tasks.add(task);
+    }
+
+    sort();
   }
 
   // --------------------------------------- getters ----------------------------------------------

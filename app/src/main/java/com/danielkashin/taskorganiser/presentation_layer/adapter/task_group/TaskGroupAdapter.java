@@ -72,14 +72,19 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
   public void addTask(Task task) {
     ExceptionHelper.assertFalse("DateTypeTaskGroup is null", mTaskGroup == null);
 
-    int insertedIndex = mTaskGroup.addTask(task);
-    notifyItemInserted(insertedIndex);
+    mTaskGroup.addTask(task);
+    notifyDataSetChanged();
   }
 
   @Override
   public void changeTaskGroup(ITaskGroup taskGroup) {
-    mTaskGroup = taskGroup;
-    mTaskGroup.sort();
+    if (mTaskGroup == null) {
+      mTaskGroup = taskGroup;
+      mTaskGroup.sort();
+    } else {
+      mTaskGroup.initialize(taskGroup);
+    }
+
     notifyDataSetChanged();
   }
 
@@ -102,14 +107,17 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
   @Override
   public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-    boolean holderIsTask = getItemViewType(holder.getAdapterPosition()) == VIEW_TYPE_TASK
+    boolean holderIsTask = getItemViewType(position) == VIEW_TYPE_TASK
         && holder instanceof TaskViewHolder;
-    boolean holderIsEditText = getItemViewType(holder.getAdapterPosition()) == VIEW_TYPE_EDIT_TEXT
+    boolean holderIsEditText = getItemViewType(position) == VIEW_TYPE_EDIT_TEXT
         && holder instanceof EditTextViewHolder;
 
     if (holderIsTask) {
-      final Task task = mTaskGroup.getTask(holder.getAdapterPosition());
+      final Task task = mTaskGroup.getTask(position);
       TaskViewHolder taskViewHolder = (TaskViewHolder) holder;
+
+      taskViewHolder.setToggleDoneChecked(task.getDone());
+      taskViewHolder.setToggleImportantChecked(task.getImportant());
 
       // set name
       taskViewHolder.setTextName(task.getName());
@@ -126,45 +134,36 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       // set tags
       taskViewHolder.setTags(task.getTags(), this);
 
-      // set important toggle
-      taskViewHolder.setToggleImportantChecked(task.getImportant());
-      taskViewHolder.setOnToggleImportantClickedListener(new TaskViewHolder.OnToggleClickedListener() {
-        @Override
-        public void onToggleClicked(boolean isChecked) {
-          if (mCallbacks != null) {
-            task.setImportant(isChecked);
-            mCallbacks.onTaskChanged(task);
-          }
-        }
-      });
-
-      // set done toggle
-      taskViewHolder.setToggleDoneChecked(task.getDone());
+      // set listeners
       taskViewHolder.setOnToggleDoneClickedListener(new TaskViewHolder.OnToggleClickedListener() {
         @Override
         public void onToggleClicked(boolean isChecked) {
           if (mCallbacks != null) {
-            task.setDone(isChecked);
-            mCallbacks.onTaskChanged(task);
+            Task newTask = task.getCopy();
+            newTask.setDone(isChecked);
+            mCallbacks.onTaskChanged(newTask);
+          }
+        }
+      });
+      taskViewHolder.setOnToggleImportantClickedListener(new TaskViewHolder.OnToggleClickedListener() {
+        @Override
+        public void onToggleClicked(boolean isChecked) {
+          if (mCallbacks != null) {
+            Task newTask = task.getCopy();
+            newTask.setImportant(isChecked);
+            mCallbacks.onTaskChanged(newTask);
           }
         }
       });
     } else if (holderIsEditText) {
-      if (mTaskGroup instanceof DateTypeTaskGroup) {
-        ((EditTextViewHolder) holder).setOnTextChangedListener(new EditTextViewHolder.OnTextChangedListener() {
-          @Override
-          public void onTextChanged(String text) {
-            if (mCallbacks != null) {
-              Task task = new Task(text,
-                  UUID.randomUUID().toString(),
-                  ((DateTypeTaskGroup) mTaskGroup).getType(),
-                  ((DateTypeTaskGroup) mTaskGroup).getDate());
-
-              mCallbacks.onTaskChanged(task);
-            }
+      ((EditTextViewHolder) holder).setOnTextChangedListener(new EditTextViewHolder.OnTextChangedListener() {
+        @Override
+        public void onTextChanged(String text) {
+          if (mCallbacks != null) {
+            mCallbacks.onCreateTask(text, UUID.randomUUID().toString(), mTaskGroup);
           }
-        });
-      }
+        }
+      });
     }
   }
 

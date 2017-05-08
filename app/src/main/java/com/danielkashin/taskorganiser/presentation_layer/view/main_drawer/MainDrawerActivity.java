@@ -1,6 +1,9 @@
 package com.danielkashin.taskorganiser.presentation_layer.view.main_drawer;
 
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,13 +12,17 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,11 +30,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.domain_layer.helper.ColorHelper;
 import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.presentation_layer.view.important_tasks.ImportantTasksFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateContainer;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class MainDrawerActivity extends AppCompatActivity implements IMainDrawerView,
@@ -40,6 +52,9 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
   private ImageView mImageToolbarParent;
   private ImageView mImageToolbarUp;
   private ImageView mImageToolbarDown;
+  private ImageView mImageToolbarDone;
+  private ImageView mImageToolbarDelete;
+
   private DrawerLayout mDrawerLayout;
   private ActionBarDrawerToggle mDrawerToggle;
   private NavigationView mNavigationView;
@@ -94,6 +109,8 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
     mImageToolbarDown.setClickable(false);
     mImageToolbarUp.setClickable(false);
     mImageToolbarParent.setClickable(false);
+    mImageToolbarDone.setClickable(false);
+    mImageToolbarDelete.setClickable(false);
 
     mDrawerLayout.closeDrawer(GravityCompat.START);
 
@@ -109,6 +126,10 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
           addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Month), false);
         } else if (id == R.id.navigation_important) {
           addFragment(ImportantTasksFragment.getInstance(), false);
+        } else if (item.getTitle() == getString(R.string.new_tag)) {
+          // todo: new tag
+        } else {
+
         }
       }
     };
@@ -137,7 +158,9 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
   // ---------------------------------- IToolbarContainer -----------------------------------------
 
   @Override
-  public void setToolbar(String text, boolean showCalendarParentIcon, boolean showCalendarNavigateIcons) {
+  public void setToolbar(String text, boolean showCalendarParentIcon, boolean showCalendarNavigateIcons,
+                         boolean showSaveDeleteTaskIcons) {
+
     mTextToolbar.setText(text);
 
     if (showCalendarParentIcon) {
@@ -156,6 +179,28 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
       mImageToolbarDown.setVisibility(View.GONE);
       mImageToolbarUp.setVisibility(View.GONE);
     }
+
+    if (showSaveDeleteTaskIcons) {
+      mImageToolbarDone.setVisibility(View.VISIBLE);
+      mImageToolbarDelete.setVisibility(View.VISIBLE);
+      mImageToolbarDone.setClickable(true);
+      mImageToolbarDelete.setClickable(true);
+    } else {
+      mImageToolbarDone.setVisibility(View.GONE);
+      mImageToolbarDelete.setVisibility(View.GONE);
+    }
+  }
+
+  public void setupTags(ArrayList<String> tags) {
+    SubMenu subMenu = mNavigationView.getMenu().addSubMenu(getString(R.string.tags));
+    for (int i = 0; i < tags.size(); ++i) {
+      MenuItem menuItem = subMenu.add(tags.get(i));
+      Drawable drawable = ContextCompat.getDrawable(this, R.drawable.circle);
+      drawable.setColorFilter(ColorHelper.getMaterialColor(tags.get(i)), PorterDuff.Mode.SRC_ATOP);
+      menuItem.setIcon(drawable);
+    }
+
+    subMenu.add("Новый тег");
   }
 
   // --------------------------------------- private ----------------------------------------------
@@ -180,6 +225,9 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
     mImageToolbarParent = (ImageView) findViewById(R.id.image_calendar_parent);
     mImageToolbarDown = (ImageView) findViewById(R.id.image_calendar_down);
     mImageToolbarUp = (ImageView) findViewById(R.id.image_calendar_up);
+    mImageToolbarDone = (ImageView) findViewById(R.id.image_done);
+    mImageToolbarDelete = (ImageView) findViewById(R.id.image_delete);
+
     if (savedInstanceState != null && savedInstanceState.containsKey(KEY_TOOLBAR_LABEL)) {
       mTextToolbar.setText(savedInstanceState.getString(KEY_TOOLBAR_LABEL));
     } else {
@@ -191,6 +239,13 @@ public class MainDrawerActivity extends AppCompatActivity implements IMainDrawer
     mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
         R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+    mNavigationView.setItemIconTintList(null);
+
+    String[] tags = {"Работа", "Учеба", "Покупки"};
+    ArrayList<String> tagList = new ArrayList<>();
+    Collections.addAll(tagList, tags);
+    setupTags(tagList);
+
     mFragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
 
     mDrawerToggle.syncState();

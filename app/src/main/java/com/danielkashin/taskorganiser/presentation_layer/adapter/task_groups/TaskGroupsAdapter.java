@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.ITaskGroupAdapter;
@@ -26,7 +28,6 @@ import java.util.ArrayList;
 public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.TaskGroupHolder>
     implements ITaskGroupsAdapter, ITaskGroupAdapter.Callbacks {
 
-  private static final String KEY_TASK_GROUPS = "TASK_GROUPS";
   private static final String KEY_LABELS = "LABELS";
   private static final String KEY_HIGHLIGHT_INDEX = "HIGHLIGHT_INDEX";
   private static final String KEY_HIGHLIGHT_COLOR = "HIGHLIGHT_COLOR";
@@ -39,6 +40,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   private int mHighlightColor;
   private int mCommonColor;
   private boolean[] mCheckedPositions;
+  private boolean[] mShowExpandable;
   private ITaskGroupsAdapter.Callbacks mCallbacks;
 
 
@@ -57,36 +59,14 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
     mCommonColor = commonColor;
 
     mCheckedPositions = new boolean[mTaskGroups.size()];
+    mShowExpandable = new boolean[mTaskGroups.size()];
     for (int i = 0; i < mCheckedPositions.length; ++i) {
       mCheckedPositions[i] = false;
+      mShowExpandable[i] = false;
     }
   }
 
-  public TaskGroupsAdapter(Bundle bundle) throws IllegalStateException {
-    boolean illegalBundle = bundle == null || !bundle.containsKey(KEY_LABELS)
-        || !bundle.containsKey(KEY_TASK_GROUPS) || !bundle.containsKey(KEY_HIGHLIGHT_INDEX)
-        || !bundle.containsKey(KEY_HIGHLIGHT_COLOR) || !bundle.containsKey(KEY_COMMON_COLOR)
-        || !bundle.containsKey(KEY_CHECKED_POSITIONS);
-    ExceptionHelper.assertFalse("Bundle must contain all the needed fields", illegalBundle);
-
-    mTaskGroups = restoreTaskGroups(bundle);
-    mLabels = bundle.getStringArrayList(KEY_LABELS);
-    mHighlightIndex = bundle.getInt(KEY_HIGHLIGHT_INDEX);
-    mHighlightColor = bundle.getInt(KEY_HIGHLIGHT_COLOR);
-    mCommonColor = bundle.getInt(KEY_COMMON_COLOR);
-    mCheckedPositions = bundle.getBooleanArray(KEY_CHECKED_POSITIONS);
-  }
-
   // -------------------------------------- ITaskGroupsAdapter ------------------------------------
-
-  @Override
-  public void saveToOutState(Bundle outState) {
-    outState.putParcelableArrayList(KEY_TASK_GROUPS, mTaskGroups);
-    outState.putStringArrayList(KEY_LABELS, mLabels);
-    outState.putInt(KEY_HIGHLIGHT_INDEX, mHighlightIndex);
-    outState.putInt(KEY_HIGHLIGHT_COLOR, mHighlightColor);
-    outState.putBooleanArray(KEY_CHECKED_POSITIONS, mCheckedPositions);
-  }
 
   @Override
   public void attachCallbacks(Callbacks callbacks) {
@@ -100,27 +80,32 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
 
   @Override
   public void changeTask(Task task) {
+    int iToSet = -1;
+
     for (int i = 0; i < mTaskGroups.size(); ++i) {
-      DateTypeTaskGroup taskGroup = mTaskGroups.get(i);
-
-      if (task.getType() == taskGroup.getType() && task.getDate().equals(taskGroup.getDate())) {
-        ArrayList<Task> tasks = taskGroup.getTasks();
-        for (int j = 0; j < tasks.size(); ++j) {
-          if (tasks.get(j).equals(task)) {
-            taskGroup.setTask(task, j);
-            notifyItemChanged(i);
-            return;
-          }
-        }
-
-        taskGroup.addTask(task);
-        notifyItemChanged(i);
-        return;
+      if (mTaskGroups.get(i).canBelongTo(task)) {
+        iToSet = i;
       }
+    }
+
+    if (iToSet != -1) {
+      mTaskGroups.get(iToSet).addTask(task);
+      mShowExpandable[iToSet] = true;
+      notifyItemChanged(iToSet);
     }
   }
 
   // ---------------------------------- ITaskGroupAdapter.Callbacks -------------------------------
+
+  @Override
+  public void onCreateTask(String name, String UUID, ITaskGroup taskGroup) {
+    if (mCallbacks != null) {
+      ExceptionHelper.assertTrue("", taskGroup instanceof DateTypeTaskGroup);
+      Task task = new Task(name, UUID, ((DateTypeTaskGroup) taskGroup).getType(),
+          ((DateTypeTaskGroup) taskGroup).getDate());
+      mCallbacks.onTaskChanged(task);
+    }
+  }
 
   @Override
   public void onTaskChanged(Task task) {
@@ -149,20 +134,33 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   }
 
   @Override
-  public void onBindViewHolder(TaskGroupHolder holder, int p) {
-    final int position = holder.getAdapterPosition();
+  public void onBindViewHolder(final TaskGroupHolder holder, final int position) {
+    final DateTypeTaskGroup newTaskGroup = new DateTypeTaskGroup(mTaskGroups.get(position));
 
     boolean isHeader = position == 0 && (mTaskGroups.get(1).getType() == Task.Type.Day
         || mTaskGroups.get(1).getType() == Task.Type.Week);
     boolean isHighlighted = position == mHighlightIndex;
 
-    if (!mCheckedPositions[position] && (isHeader || isHighlighted)) {
+    if (mShowExpandable[position]) {
+      mShowExpandable[position] = false;
       mCheckedPositions[position] = true;
+
       holder.showExpandable();
     } else if (!mCheckedPositions[position]) {
       mCheckedPositions[position] = true;
-      holder.hideExpandable();
+
+      if (isHeader || isHighlighted) {
+        holder.showExpandable();
+      } else {
+        holder.hideExpandable();
+      }
     }
+
+
+    holder.setTaskGroup(newTaskGroup);
+    holder.setText(mLabels.get(position));
+    holder.setAdapterCallbacks(this);
+
 
     if (isHeader) {
       holder.showViewHighlighter();
@@ -176,17 +174,13 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       holder.colorText(mCommonColor);
     }
 
-    holder.setText(mLabels.get(position));
-    holder.setTaskGroup(mTaskGroups.get(position));
-    holder.setAdapterCallbacks(this);
-
     if (!isHeader) {
       holder.setOnLabelClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
           if (mCallbacks != null) {
             Task.Type childType = null;
-            Task.Type currentType = mTaskGroups.get(position).getType();
+            Task.Type currentType = newTaskGroup.getType();
             if (currentType == Task.Type.Month) {
               childType = Task.Type.Week;
             } else if (currentType == Task.Type.Week) {
@@ -194,7 +188,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
             }
 
             if (childType != null) {
-              mCallbacks.onTaskLabelClicked(mTaskGroups.get(position).getDate(), childType);
+              mCallbacks.onTaskLabelClicked(newTaskGroup.getDate(), childType);
             }
           }
         }
@@ -205,23 +199,6 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
   @Override
   public int getItemCount() {
     return mTaskGroups.size();
-  }
-
-  // ----------------------------------------- private --------------------------------------------
-
-  private ArrayList<DateTypeTaskGroup> restoreTaskGroups(Bundle savedInstanceState) {
-    ArrayList<Parcelable> parcelableArrayList = savedInstanceState
-        .getParcelableArrayList(KEY_TASK_GROUPS);
-
-    if (parcelableArrayList == null) {
-      throw new IllegalStateException("Bundle must contain TaskGroups key");
-    }
-
-    ArrayList<DateTypeTaskGroup> result = new ArrayList<>();
-    for (Parcelable parcelable : parcelableArrayList) {
-      result.add((DateTypeTaskGroup) parcelable);
-    }
-    return result;
   }
 
   // --------------------------------------- inner types ------------------------------------------
@@ -247,8 +224,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       tasksRecyclerView.setAdapter(new TaskGroupAdapter());
       tasksRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
       tasksRecyclerView.setLayoutManager(layoutManager);
-      tasksRecyclerView.setHasFixedSize(true);
-      tasksRecyclerView.setNestedScrollingEnabled(false);
+      //tasksRecyclerView.setNestedScrollingEnabled(false);
 
       imageExpand.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -275,11 +251,15 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
     }
 
     private void showExpandable() {
-      expandableLayout.expand(false);
+      if (!expandableLayout.isExpanded()) {
+        expandableLayout.expand(false);
+      }
     }
 
     private void hideExpandable() {
-      expandableLayout.collapse(false);
+      if (expandableLayout.isExpanded()) {
+        expandableLayout.collapse(false);
+      }
     }
 
     private void colorText(int color) {

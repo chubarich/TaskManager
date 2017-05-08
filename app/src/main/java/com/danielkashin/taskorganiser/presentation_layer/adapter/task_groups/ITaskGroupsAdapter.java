@@ -13,8 +13,6 @@ public interface ITaskGroupsAdapter {
 
   void changeTask(Task task);
 
-  void saveToOutState(Bundle outState);
-
 
   interface Callbacks {
 

@@ -321,7 +321,37 @@ public class Task implements Parcelable {
   }
 
 
+  public Task getCopy() {
+    Task task = new Task(name, UUID, type, date);
+    task.setDone(done);
+    task.setChangedLocal(changedLocal);
+    task.setDeletedLocal(deletedLocal);
+    task.setChangeOrDeleteLocalTimestamp(changeOrDeleteLocalTimestamp);
+
+    if (type != Type.Mini) {
+      task.setImportant(important);
+      task.setDuration(duration);
+      task.setNote(note);
+      task.setTags(tags);
+      task.setSubtasks(subtasks);
+    }
+
+    if (type == Type.Day) {
+      task.setMinuteStart(minuteStart);
+      task.setMinuteEnd(minuteEnd);
+      task.setNotificationTimestamp(notificationTimestamp);
+    }
+
+    return task;
+  }
+
   public static int compare(Task o1, Task other) {
+    if (o1.getDone() && !other.getDone()) {
+      return -1;
+    } else if (other.getDone() && !o1.getDone()) {
+      return 1;
+    }
+
     if (o1.getType() != other.getType()) {
       if ((o1.getType() == Task.Type.Day && (other.getType() == Task.Type.Week || other.getType() == Task.Type.Month))
           || (o1.getType() == Task.Type.Week && other.getType() == Task.Type.Month)) {
@@ -339,13 +369,7 @@ public class Task implements Parcelable {
       }
     }
 
-    if (o1.getDone() && !other.getDone()) {
-      return -1;
-    } else if (other.getDone() && !o1.getDone()) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return 0;
   }
 
   public static Comparator<Task> getComparator() {

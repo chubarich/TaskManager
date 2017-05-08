@@ -51,11 +51,21 @@ public class ImportantTaskGroup implements Parcelable, ITaskGroup {
   // --------------------------------------- setters ----------------------------------------------
 
   @Override
+  public void initialize(ITaskGroup taskGroup) {
+    ExceptionHelper.assertTrue("", taskGroup instanceof ImportantTaskGroup);
+
+    tasks.clear();
+    tasks.addAll(taskGroup.getTasks());
+    sort();
+  }
+
+  @Override
   public void setTask(Task task, int position) {
     boolean positionIsValid = position >= 0 && position < tasks.size();
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
 
     tasks.set(position, task);
+    sort();
   }
 
   @Override
@@ -64,15 +74,32 @@ public class ImportantTaskGroup implements Parcelable, ITaskGroup {
   }
 
   @Override
-  public int addTask(Task task) {
+  public void addTask(Task task) {
     ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
-    boolean taskIsValid = task.getImportant();
-    ExceptionHelper.assertTrue("Task is not valid", taskIsValid);
 
-    return Task.addTaskToList(task, tasks);
+    int jToSet = -1;
+    for (int j = 0; j < tasks.size(); ++j) {
+      if (tasks.get(j).equals(task)) {
+        jToSet = j;
+      }
+    }
+
+    if (jToSet != -1) {
+      tasks.set(jToSet, task);
+    } else {
+      tasks.add(task);
+    }
+
+    sort();
   }
 
   // --------------------------------------- getters ----------------------------------------------
+
+
+  @Override
+  public boolean canBelongTo(Task task) {
+    return true;
+  }
 
   @Override
   public ArrayList<Task> getTasks() {

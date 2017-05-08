@@ -71,6 +71,22 @@
                         android:background="@mipmap/ic_calendar_go_up"
                         android:visibility="gone"/>
 
+                    <ImageView
+                        android:id="@+id/image_done"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@mipmap/ic_done"
+                        android:visibility="gone"/>
+
+                    <ImageView
+                        android:id="@+id/image_delete"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="@mipmap/ic_delete"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
 
             </RelativeLayout>
