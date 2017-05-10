@@ -8,8 +8,7 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
-import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
@@ -40,7 +39,7 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
   public void onStart() {
     super.onStart();
 
-    ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.important), false, false, false);
+    ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.drawer_important), false, false, false, false);
 
     ((IImportantTasksPresenter) getPresenter()).onGetTaskGroupData();
   }
@@ -66,7 +65,7 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
   public void onCreateTask(String name, String UUID, ITaskGroup taskGroup) {
     ExceptionHelper.assertTrue("", taskGroup instanceof ImportantTaskGroup);
 
-    Task task = new Task(name, UUID, Task.Type.Month, DatetimeHelper.getCurrentMonth());
+    Task task = new Task(name, UUID, Task.Type.NoDate, null);
     task.setImportant(true);
 
     ((IImportantTasksPresenter) getPresenter()).onSaveTask(task);
@@ -93,7 +92,12 @@ public class ImportantTasksFragment extends PresenterFragment<ImportantTasksPres
 
   @Override
   public void initializeAdapter(ImportantTaskGroup taskGroup) {
-    mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup));
+    if (mRecyclerView.getAdapter() == null) {
+      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup));
+    } else {
+      ((ITaskGroupAdapter) mRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
+    }
+
     ((ITaskGroupAdapter) mRecyclerView.getAdapter()).attachCallbacks(this);
   }
 

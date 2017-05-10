@@ -2,7 +2,7 @@ package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
 
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;
-import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract;
 
 public class TaskMiniContract implements IdContract {
 
@@ -30,7 +30,7 @@ public class TaskMiniContract implements IdContract {
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 
       // id
-      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
+      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
 
       // TaskMiniContract
       + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE, "
@@ -40,12 +40,11 @@ public class TaskMiniContract implements IdContract {
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + TaskContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
+      + TaskDateContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
 
       // connections
       + COLUMN_NAME_TASK_DAY_ID + " INTEGER NOT NULL, "
 
-      + "PRIMARY KEY (" + COLUMN_NAME_ID + "), "
       + "FOREIGN KEY (" + COLUMN_NAME_TASK_DAY_ID + ") REFERENCES "
       + TaskDayContract.TABLE_NAME + "(" + TaskDayContract.COLUMN_NAME_ID + ")" + " ON DELETE CASCADE"
       + ");";

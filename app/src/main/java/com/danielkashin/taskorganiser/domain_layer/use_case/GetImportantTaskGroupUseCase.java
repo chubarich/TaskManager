@@ -2,14 +2,10 @@ package com.danielkashin.taskorganiser.domain_layer.use_case;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
-import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.ITagsAdapter;
 
-import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 

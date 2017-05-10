@@ -1,9 +1,8 @@
 package com.danielkashin.taskorganiser.domain_layer.use_case;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
-import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskVoid;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
 

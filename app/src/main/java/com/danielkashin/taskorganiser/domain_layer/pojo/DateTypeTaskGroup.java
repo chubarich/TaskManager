@@ -1,17 +1,12 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
-import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.ITagsAdapter;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 
-public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
+public class DateTypeTaskGroup implements ITaskGroup {
 
   private String date;
   private Task.Type type;
@@ -29,45 +24,12 @@ public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
     initialize(taskGroup);
   }
 
-  // ----------------------------------------- Parcelable -----------------------------------------
-
-  public DateTypeTaskGroup(Parcel parcel) {
-    this.date = parcel.readString();
-    this.type = (Task.Type) parcel.readSerializable();
-    this.tasks = new ArrayList<>();
-    parcel.readTypedList(this.tasks, Task.CREATOR);
-  }
-
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel parcel, int flags) {
-    parcel.writeString(date);
-    parcel.writeSerializable(type);
-    parcel.writeTypedList(tasks);
-  }
-
-  public static final Parcelable.Creator<DateTypeTaskGroup> CREATOR = new Parcelable.Creator<DateTypeTaskGroup>() {
-    @Override
-    public DateTypeTaskGroup createFromParcel(Parcel parcel) {
-      return new DateTypeTaskGroup(parcel);
-    }
-
-    @Override
-    public DateTypeTaskGroup[] newArray(int i) {
-      return new DateTypeTaskGroup[i];
-    }
-  };
-
   // --------------------------------------- setters ----------------------------------------------
 
 
   @Override
   public boolean canBelongTo(Task task) {
-    return task.getType() == type && task.getDate().equals(date);
+    return task.getType() == type && (task.getDate() == null && date == null || task.getDate().equals(date));
   }
 
   @Override
@@ -104,7 +66,7 @@ public class DateTypeTaskGroup implements Parcelable, ITaskGroup {
   @Override
   public void addTask(Task task) {
     ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
-    boolean taskIsValid = task.getDate().equals(this.date) && task.getType() == this.type;
+    boolean taskIsValid = canBelongTo(task);
     ExceptionHelper.assertTrue("Task is not valid", taskIsValid);
 
     int jToSet = -1;

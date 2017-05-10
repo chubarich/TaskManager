@@ -1,10 +1,10 @@
 package com.danielkashin.taskorganiser.presentation_layer.presenter.task_groups;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupsUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.Presenter;
@@ -14,13 +14,13 @@ import java.util.ArrayList;
 
 
 public class TaskGroupsPresenter extends Presenter<ITaskGroupsView>
-    implements ITaskGroupsPresenter, GetDateTypeTaskGroupUseCase.Callbacks, SaveTaskUseCase.Callbacks {
+    implements ITaskGroupsPresenter, GetDateTypeTaskGroupsUseCase.Callbacks, SaveTaskUseCase.Callbacks {
 
-  private final GetDateTypeTaskGroupUseCase mGetTaskGroupUseCase;
+  private final GetDateTypeTaskGroupsUseCase mGetTaskGroupUseCase;
   private final SaveTaskUseCase mSaveTaskUseCase;
 
 
-  public TaskGroupsPresenter(GetDateTypeTaskGroupUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
+  public TaskGroupsPresenter(GetDateTypeTaskGroupsUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter arguments must be non null",
         getTaskGroupUseCase, saveTaskUseCase);
 
@@ -59,7 +59,7 @@ public class TaskGroupsPresenter extends Presenter<ITaskGroupsView>
     // do nothing
   }
 
-  // ------------------------------ GetDateTypeTaskGroupUseCase.Callbacks ---------------------------------
+  // ------------------------------ GetDateTypeTaskGroupsUseCase.Callbacks ---------------------------------
 
   @Override
   public void onGetDateTypeTaskGroupsSuccess(ArrayList<DateTypeTaskGroup> taskGroups) {
@@ -89,10 +89,10 @@ public class TaskGroupsPresenter extends Presenter<ITaskGroupsView>
 
   public static class Factory implements IPresenterFactory<TaskGroupsPresenter, ITaskGroupsView> {
 
-    private final GetDateTypeTaskGroupUseCase getTaskGroupUseCase;
+    private final GetDateTypeTaskGroupsUseCase getTaskGroupUseCase;
     private final SaveTaskUseCase saveTaskUseCase;
 
-    public Factory(GetDateTypeTaskGroupUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
+    public Factory(GetDateTypeTaskGroupsUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
       this.getTaskGroupUseCase = getTaskGroupUseCase;
       this.saveTaskUseCase = saveTaskUseCase;
     }

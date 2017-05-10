@@ -1,9 +1,6 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
-
 import java.util.ArrayList;
-import java.util.Collections;
 
 
 public interface ITaskGroup {

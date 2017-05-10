@@ -2,7 +2,7 @@ package com.danielkashin.taskorganiser.domain_layer.use_case;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 
-public class GetDateTypeTaskGroupUseCase {
+public class GetDateTypeTaskGroupsUseCase {
 
   private final ITasksRepository tasksRepository;
   private final Executor executor;
@@ -24,7 +24,7 @@ public class GetDateTypeTaskGroupUseCase {
   private RepositoryAsyncTaskResponse<ArrayList<DateTypeTaskGroup>> getTaskGroup;
 
 
-  public GetDateTypeTaskGroupUseCase(ITasksRepository tasksRepository, Executor executor, Task.Type type, String date) {
+  public GetDateTypeTaskGroupsUseCase(ITasksRepository tasksRepository, Executor executor, Task.Type type, String date) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter objects must be non null",
         tasksRepository, executor, type, date);
 
@@ -41,7 +41,7 @@ public class GetDateTypeTaskGroupUseCase {
         new RepositoryRunnableResponse<ArrayList<DateTypeTaskGroup>>() {
           @Override
           public ArrayList<DateTypeTaskGroup> run() throws ExceptionBundle {
-            return tasksRepository.getData(date, type);
+            return tasksRepository.getDateTypeData(date, type);
           }
         };
 

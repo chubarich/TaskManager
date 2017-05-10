@@ -4,6 +4,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="drawer_important">Важные</string>
+    <string name="drawer_tasks">Задачи</string>
+    <string name="drawer_calendar">Календарь</string>
+    <string name="drawer_done">Завершенные</string>
+    <string name="drawer_no_date">Без даты</string>
     <string name="drawer_input">Входящие</string>
     <string name="drawer_week">Неделя</string>
     <string name="drawer_month">Месяц</string>
@@ -15,13 +20,22 @@
 
     <string name="not_registered">Не выполнен вход</string>
 
-    <string name="important">Важное</string>
     <string name="new_task">новая задача</string>
     <string name="today">Сегодня</string>
     <string name="current_week">Текущая неделя</string>
 
     <string name="tags">Теги</string>
     <string name="new_tag">Новый тег</string>
+    <string name="tag">тег</string>
+    <string name="tag_parse_error">Тег должен состоять из одного слова длиной от 3 до 15 символов</string>
+    <string name="tag_already_exists">Тег уже существует</string>
+    <string name="tag_saving">Сохранение тега</string>
+    <string name="tag_deletion">Удаление тега</string>
+    <string name="tag_deletion_message">При удалении тега все задачи сохранятся</string>
+
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
 
     <array name="days">
         <item>Понедельник</item>

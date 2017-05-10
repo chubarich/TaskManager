@@ -7,8 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.danielkashin.taskorganiser.R;
-import com.danielkashin.taskorganiser.domain_layer.helper.ColorHelper;
-import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.ITaskGroupsAdapter;
+import com.danielkashin.taskorganiser.util.ColorHelper;
 
 import java.util.ArrayList;
 

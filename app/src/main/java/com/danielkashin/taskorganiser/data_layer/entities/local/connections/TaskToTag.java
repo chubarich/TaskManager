@@ -26,8 +26,17 @@ public class TaskToTag {
   }
 
 
+  public TaskToTag(String taskUUID, Long tagId) {
+    this.taskUUID = taskUUID;
+    this.tagId = tagId;
+  }
+
   public Long getTagId() {
     return tagId;
+  }
+
+  public String getTaskUUID() {
+    return taskUUID;
   }
 
 }

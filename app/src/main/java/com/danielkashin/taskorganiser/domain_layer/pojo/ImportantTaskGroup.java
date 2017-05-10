@@ -1,16 +1,13 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class ImportantTaskGroup implements Parcelable, ITaskGroup {
+public class ImportantTaskGroup implements ITaskGroup {
 
   private final ArrayList<Task> tasks;
 
@@ -19,43 +16,19 @@ public class ImportantTaskGroup implements Parcelable, ITaskGroup {
     this.tasks = new ArrayList<>();
   }
 
-  // ----------------------------------------- Parcelable -----------------------------------------
-
-  public ImportantTaskGroup(Parcel parcel) {
-    this.tasks = new ArrayList<>();
-    parcel.readTypedList(this.tasks, Task.CREATOR);
-  }
-
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel parcel, int flags) {
-    parcel.writeTypedList(tasks);
-  }
-
-  public static final Parcelable.Creator<DateTypeTaskGroup> CREATOR = new Parcelable.Creator<DateTypeTaskGroup>() {
-    @Override
-    public DateTypeTaskGroup createFromParcel(Parcel parcel) {
-      return new DateTypeTaskGroup(parcel);
-    }
-
-    @Override
-    public DateTypeTaskGroup[] newArray(int i) {
-      return new DateTypeTaskGroup[i];
-    }
-  };
-
   // --------------------------------------- setters ----------------------------------------------
 
   @Override
   public void initialize(ITaskGroup taskGroup) {
     ExceptionHelper.assertTrue("", taskGroup instanceof ImportantTaskGroup);
 
+    ArrayList<Task> outTasks = new ArrayList<>();
+    for (int i = 0; i < taskGroup.getTasks().size(); ++i) {
+      outTasks.add(taskGroup.getTask(i));
+    }
+
     tasks.clear();
-    tasks.addAll(taskGroup.getTasks());
+    tasks.addAll(outTasks);
     sort();
   }
 

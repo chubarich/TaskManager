@@ -1,4 +1,4 @@
-package com.danielkashin.taskorganiser.domain_layer.helper;
+package com.danielkashin.taskorganiser.util;
 
 
 public class NumbersHelper {

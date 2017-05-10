@@ -16,12 +16,11 @@ public class TagContract implements IdContract {
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
       // id
-      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
+      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
 
       // TagContract
-      + COLUMN_NAME_NAME + " INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE, "
+      + COLUMN_NAME_NAME + " INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE "
 
-      + "PRIMARY KEY (" + COLUMN_NAME_ID + ") "
       + ");";
 
   public static String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

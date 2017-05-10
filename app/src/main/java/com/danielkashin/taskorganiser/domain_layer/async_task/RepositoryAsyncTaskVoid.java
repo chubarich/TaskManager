@@ -36,9 +36,9 @@ public class RepositoryAsyncTaskVoid extends VoidAsyncTask<ExceptionBundle> {
       return null;
     } catch (ExceptionBundle exception) {
       return exception;
-    } catch (Exception exception) {
-      return new ExceptionBundle(ExceptionBundle.Reason.UNKNOWN);
-    }
+    }// catch (Exception exception) {
+     // return new ExceptionBundle(ExceptionBundle.Reason.UNKNOWN);
+    //}
   }
 
   @Override

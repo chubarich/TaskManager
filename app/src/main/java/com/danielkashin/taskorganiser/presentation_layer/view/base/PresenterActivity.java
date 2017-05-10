@@ -19,7 +19,7 @@ public abstract class PresenterActivity<P extends Presenter<V>, V extends IView>
 
   private P mPresenter;
 
-  private final Presenter<V> getPresenter() {
+  protected final Presenter<V> getPresenter() {
     return mPresenter;
   }
 
@@ -43,13 +43,13 @@ public abstract class PresenterActivity<P extends Presenter<V>, V extends IView>
   }
 
   @Override
-  public void onStart() {
+  protected void onStart() {
     super.onStart();
     mPresenter.attachView(getViewInterface());
   }
 
   @Override
-  public void onStop() {
+  protected void onStop() {
     mPresenter.detachView();
     super.onStop();
   }
@@ -63,7 +63,7 @@ public abstract class PresenterActivity<P extends Presenter<V>, V extends IView>
 
   @Override
   public void onLoadFinished(Loader<P> loader, P presenter) {
-    this.mPresenter = presenter;
+    mPresenter = presenter;
   }
 
   @Override

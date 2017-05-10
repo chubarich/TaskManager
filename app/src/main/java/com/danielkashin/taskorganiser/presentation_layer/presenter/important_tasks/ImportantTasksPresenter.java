@@ -1,7 +1,7 @@
 package com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetImportantTaskGroupUseCase;

@@ -20,7 +20,7 @@ public class TaskToTagContract implements IdContract {
       + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
       + COLUMN_NAME_TASK_UUID + " INTEGER NOT NULL, "
       + COLUMN_NAME_TAG_ID + " INTEGER NOT NULL, "
-      + "UNIQUE(" + COLUMN_NAME_TASK_UUID + ", " + COLUMN_NAME_TAG_ID + ") ON CONFLICT REPLACE"
+      + "UNIQUE(" + COLUMN_NAME_TASK_UUID + ", " + COLUMN_NAME_TAG_ID + ") ON CONFLICT IGNORE"
       + ");";
 
   public static String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

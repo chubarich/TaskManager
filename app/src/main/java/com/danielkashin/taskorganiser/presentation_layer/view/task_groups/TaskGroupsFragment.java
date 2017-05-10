@@ -10,13 +10,13 @@ import android.view.View;
 
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
-import com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.DatetimeHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupsUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.ITaskGroupsAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.TaskGroupsAdapter;
@@ -29,8 +29,8 @@ import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ICalen
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITagViewOpener;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
-import static com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper.Day;
-import static com.danielkashin.taskorganiser.domain_layer.helper.DatetimeHelper.Month;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.Day;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.Month;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,7 +197,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
     ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
 
-    GetDateTypeTaskGroupUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupUseCase(
+    GetDateTypeTaskGroupsUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupsUseCase(
         tasksRepository,
         AsyncTask.THREAD_POOL_EXECUTOR,
         mRestoredState.getType(),
@@ -315,13 +315,13 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     if (getActivity() != null) {
       switch (mRestoredState.getType()) {
         case Day:
-          ((IToolbarContainer) getActivity()).setToolbar(getWeekLabel(months, mRestoredState.getDate()), true, true, false);
+          ((IToolbarContainer) getActivity()).setToolbar(getWeekLabel(months, mRestoredState.getDate()), true, true, false, false);
           break;
         case Week:
-          ((IToolbarContainer) getActivity()).setToolbar(getMonthLabel(simpleMonths, mRestoredState.getDate()), true, true, false);
+          ((IToolbarContainer) getActivity()).setToolbar(getMonthLabel(simpleMonths, mRestoredState.getDate()), true, true, false, false);
           break;
         case Month:
-          ((IToolbarContainer) getActivity()).setToolbar(getYearLabel(mRestoredState.getDate()), false, true, false);
+          ((IToolbarContainer) getActivity()).setToolbar(getYearLabel(mRestoredState.getDate()), false, true, false, false);
           break;
       }
     }

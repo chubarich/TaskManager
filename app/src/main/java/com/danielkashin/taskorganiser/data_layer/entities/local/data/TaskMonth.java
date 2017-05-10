@@ -7,13 +7,13 @@ import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract.COLUMN_NAME_ID;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DATE;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DONE;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_DURATION;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_IMPORTANT;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_NAME;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_NOTE;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_UUID;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DATE;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DONE;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DURATION;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_IMPORTANT;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_NAME;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_NOTE;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_UUID;
 
 @StorIOSQLiteType(table = TaskMonthContract.TABLE_NAME)
 public class TaskMonth {
@@ -23,7 +23,7 @@ public class TaskMonth {
   @StorIOSQLiteColumn(name = COLUMN_NAME_ID, key = true)
   Long id;
 
-  // TaskContract
+  // TaskDateContract
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_NAME)
   String name;

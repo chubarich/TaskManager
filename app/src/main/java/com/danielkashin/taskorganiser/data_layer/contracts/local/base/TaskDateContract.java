@@ -2,7 +2,7 @@ package com.danielkashin.taskorganiser.data_layer.contracts.local.base;
 
 
 
-public interface TaskContract extends IdContract {
+public interface TaskDateContract extends IdContract {
 
   String COLUMN_NAME_NAME = "name";
 

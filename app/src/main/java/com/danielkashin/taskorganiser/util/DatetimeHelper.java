@@ -1,8 +1,7 @@
-package com.danielkashin.taskorganiser.domain_layer.helper;
+package com.danielkashin.taskorganiser.util;
 
 import android.util.Pair;
 
-import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;

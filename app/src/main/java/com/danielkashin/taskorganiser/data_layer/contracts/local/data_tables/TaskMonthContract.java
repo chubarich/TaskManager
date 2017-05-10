@@ -1,10 +1,10 @@
 package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
 
-import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract;
 
 
-public class TaskMonthContract implements TaskContract {
+public class TaskMonthContract implements TaskDateContract {
 
   private TaskMonthContract() {
   }
@@ -16,9 +16,9 @@ public class TaskMonthContract implements TaskContract {
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 
       // id
-      + COLUMN_NAME_ID + " INTEGER NOT NULL, "
+      + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
 
-      // TaskContract
+      // TaskDateContract
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
       + COLUMN_NAME_DATE + " DATETIME NOT NULL, "
       + COLUMN_NAME_NOTE + " TEXT, "
@@ -30,9 +30,8 @@ public class TaskMonthContract implements TaskContract {
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
+      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP "
 
-      + "PRIMARY KEY (" + COLUMN_NAME_ID + ") "
       + ");";
 
   public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

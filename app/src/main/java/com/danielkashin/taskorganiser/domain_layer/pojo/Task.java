@@ -1,13 +1,13 @@
 package com.danielkashin.taskorganiser.domain_layer.pojo;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
+import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
-import com.danielkashin.taskorganiser.domain_layer.helper.ExceptionHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,9 +24,9 @@ public class Task implements Parcelable {
 
   private final Type type;
 
-  private final String date;
-
   // ----------------------------------------- time -----------------------------------------------
+
+  private String date;
 
   private Long duration;
 
@@ -99,6 +99,15 @@ public class Task implements Parcelable {
     this.minuteStart = taskDay.getMinuteStart();
     this.minuteEnd = taskDay.getMinuteEnd();
     this.notificationTimestamp = taskDay.getNotificationTimestamp();
+  }
+
+  public Task(TaskNoDate taskNoDate) {
+    this.name = taskNoDate.getName();
+    this.UUID = taskNoDate.getUUID();
+    this.type = Type.NoDate;
+    this.done = taskNoDate.getDone() == 1;
+    this.note = taskNoDate.getNote();
+    this.important = taskNoDate.getImportant() == 1;
   }
 
   // ----------------------------------------- Parcelable -----------------------------------------
@@ -436,7 +445,8 @@ public class Task implements Parcelable {
     Month,
     Week,
     Day,
-    Mini
+    Mini,
+    NoDate
   }
 
 }
