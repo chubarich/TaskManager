@@ -1,31 +1,30 @@
-package com.danielkashin.taskorganiser.presentation_layer.presenter.no_date_tasks;
+package com.danielkashin.taskorganiser.presentation_layer.presenter.typed_tasks;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
+import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetTypedTaskGroupUseCase;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
-import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetNoDateTaskGroupUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.Presenter;
-import com.danielkashin.taskorganiser.presentation_layer.presenter.important_tasks.IImportantTasksPresenter;
-import com.danielkashin.taskorganiser.presentation_layer.view.no_date_tasks.INoDateTasksView;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
 
 
-public class NoDateTasksPresenter extends Presenter<INoDateTasksView>
-    implements INoDateTasksPresenter, GetNoDateTaskGroupUseCase.Callbacks,
+public class TypedTasksPresenter extends Presenter<ITypedTasksView>
+    implements ITypedTasksPresenter, GetTypedTaskGroupUseCase.Callbacks,
     SaveTaskUseCase.Callbacks {
 
-  private final GetNoDateTaskGroupUseCase mGetNoDateTaskGroupUseCase;
+  private final GetTypedTaskGroupUseCase mGetTypedTaskGroupUseCase;
   private final SaveTaskUseCase mSaveTaskUseCase;
 
 
-  public NoDateTasksPresenter(GetNoDateTaskGroupUseCase getNoDateTaskGroupUseCase,
-                              SaveTaskUseCase saveTaskUseCase) {
+  public TypedTasksPresenter(GetTypedTaskGroupUseCase getTypedTaskGroupUseCase,
+                             SaveTaskUseCase saveTaskUseCase) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter arguments must be non null",
-        getNoDateTaskGroupUseCase, saveTaskUseCase);
+        getTypedTaskGroupUseCase, saveTaskUseCase);
 
-    mGetNoDateTaskGroupUseCase = getNoDateTaskGroupUseCase;
+    mGetTypedTaskGroupUseCase = getTypedTaskGroupUseCase;
     mSaveTaskUseCase = saveTaskUseCase;
   }
 
@@ -60,22 +59,21 @@ public class NoDateTasksPresenter extends Presenter<INoDateTasksView>
     // do nothing
   }
 
-  // ----------------------------- GetNoDateTaskGroupUseCase.Callbacks ----------------------------
-
+  // ----------------------------- GetTypedTaskGroupUseCase.Callbacks ----------------------------
 
   @Override
-  public void onGetNoDateTaskGroupSuccess(DateTypeTaskGroup taskGroup) {
+  public void onGetRandomTaskGroupSuccess(ITaskGroup taskGroup) {
     if (getView() != null) {
       getView().initializeAdapter(taskGroup);
     }
   }
 
   @Override
-  public void onGetNoDateTaskGroupException(ExceptionBundle exceptionBundle) {
+  public void onGetRandomTaskGroupException(ExceptionBundle exceptionBundle) {
     // do nothing
   }
 
-  // ----------------------------------- INoDateTasksPresenter ------------------------------------
+  // ----------------------------------- ITypedTasksPresenter ------------------------------------
 
   @Override
   public void onSaveTask(Task task) {
@@ -84,24 +82,24 @@ public class NoDateTasksPresenter extends Presenter<INoDateTasksView>
 
   @Override
   public void onGetTaskGroupData() {
-    mGetNoDateTaskGroupUseCase.run(this);
+    mGetTypedTaskGroupUseCase.run(this);
   }
 
   // --------------------------------------- inner types ------------------------------------------
 
-  public static class Factory implements IPresenterFactory<NoDateTasksPresenter, INoDateTasksView> {
+  public static class Factory implements IPresenterFactory<TypedTasksPresenter, ITypedTasksView> {
 
-    private final GetNoDateTaskGroupUseCase getTaskGroupUseCase;
+    private final GetTypedTaskGroupUseCase getTaskGroupUseCase;
     private final SaveTaskUseCase saveTaskUseCase;
 
-    public Factory(GetNoDateTaskGroupUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
+    public Factory(GetTypedTaskGroupUseCase getTaskGroupUseCase, SaveTaskUseCase saveTaskUseCase) {
       this.getTaskGroupUseCase = getTaskGroupUseCase;
       this.saveTaskUseCase = saveTaskUseCase;
     }
 
     @Override
-    public NoDateTasksPresenter create() {
-      return new NoDateTasksPresenter(getTaskGroupUseCase, saveTaskUseCase);
+    public TypedTasksPresenter create() {
+      return new TypedTasksPresenter(getTaskGroupUseCase, saveTaskUseCase);
     }
   }
 }

@@ -16,9 +16,12 @@ import java.util.Comparator;
 
 public class Task implements Parcelable {
 
+  public static final int MAX_NAME_LENGTH = 200;
+  public static final int MAX_NOTE_LENGTH = 1000;
+
   // ---------------------------------------- main info -------------------------------------------
 
-  private final String name;
+  private String name;
 
   private final String UUID;
 
@@ -171,6 +174,13 @@ public class Task implements Parcelable {
 
   // ----------------------------------- getters/setters ------------------------------------------
 
+  public boolean isValid() {
+    boolean nameIsValid = name != null && name.length() < MAX_NAME_LENGTH && name.trim().length() > 0;
+    boolean noteIsValid = note == null || note.length() < MAX_NOTE_LENGTH;
+
+    return nameIsValid && noteIsValid;
+  }
+
   public boolean equals(Task other) {
     return this.type == other.getType() && this.UUID.equals(other.getUUID());
   }
@@ -257,6 +267,10 @@ public class Task implements Parcelable {
     ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
 
     return minuteStart;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public void setMinuteStart(Long minuteStart) {

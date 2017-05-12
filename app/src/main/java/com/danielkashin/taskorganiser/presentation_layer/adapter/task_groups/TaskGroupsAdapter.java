@@ -118,6 +118,13 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
     }
   }
 
+  @Override
+  public void onTaskClicked(Task task) {
+    if (mCallbacks != null) {
+      mCallbacks.onTaskClicked(task);
+    }
+  }
+
   // ------------------------------------- RecyclerView.Adapter -----------------------------------
 
   @Override
@@ -218,10 +225,9 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       viewHighlighter = view.findViewById(R.id.view_highlighter);
 
       tasksRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_tasks);
-      tasksRecyclerView.setAdapter(new TaskGroupAdapter());
+      tasksRecyclerView.setAdapter(new TaskGroupAdapter(true));
       tasksRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
       tasksRecyclerView.setLayoutManager(layoutManager);
-      //tasksRecyclerView.setNestedScrollingEnabled(false);
 
       imageExpand.setOnClickListener(new View.OnClickListener() {
         @Override

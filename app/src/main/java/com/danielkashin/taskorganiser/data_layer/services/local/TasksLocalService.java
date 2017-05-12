@@ -98,8 +98,9 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskWeek.class)
         .withQuery(Query.builder()
             .table(TaskWeekContract.TABLE_NAME)
-            .where(TaskWeekContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
-                + " AND " + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .where(TaskWeekContract.COLUMN_NAME_IMPORTANT + " = ? AND "
+                + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
             .build())
         .prepare();
   }
@@ -110,8 +111,9 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskDay.class)
         .withQuery(Query.builder()
             .table(TaskDayContract.TABLE_NAME)
-            .where(TaskDayContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
-                + " AND " + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .where(TaskDayContract.COLUMN_NAME_IMPORTANT + " = ? AND "
+                + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
             .build())
         .prepare();
   }
@@ -122,8 +124,9 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskMonth.class)
         .withQuery(Query.builder()
             .table(TaskMonthContract.TABLE_NAME)
-            .where(TaskMonthContract.COLUMN_NAME_IMPORTANT + " = \"" + 1 + "\""
-                + " AND " + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = " + 0)
+            .where(TaskMonthContract.COLUMN_NAME_IMPORTANT + " = ? AND "
+                + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
             .build())
         .prepare();
   }
@@ -141,6 +144,57 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .prepare();
   }
 
+  @Override
+  public PreparedGetListOfObjects<TaskWeek> getDoneWeekTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskWeek.class)
+        .withQuery(Query.builder()
+            .table(TaskWeekContract.TABLE_NAME)
+            .where(TaskWeekContract.COLUMN_NAME_DONE + " =  ? AND "
+                + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " =  ?")
+            .whereArgs(1, 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskDay> getDoneDayTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskDay.class)
+        .withQuery(Query.builder()
+            .table(TaskDayContract.TABLE_NAME)
+            .where(TaskDayContract.COLUMN_NAME_DONE + " = ? AND "
+                + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskMonth> getDoneMonthTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskMonth.class)
+        .withQuery(Query.builder()
+            .table(TaskMonthContract.TABLE_NAME)
+            .where(TaskMonthContract.COLUMN_NAME_DONE + " = ? AND "
+                + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskNoDate> getDoneNoDateTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskNoDate.class)
+        .withQuery(Query.builder()
+            .table(TaskNoDateContract.TABLE_NAME)
+            .where(TaskNoDateContract.COLUMN_NAME_DONE + " = ? AND "
+                + TaskNoDateContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(1, 0)
+            .build())
+        .prepare();
+  }
 
   @Override
   public PreparedGetListOfObjects<TaskWeek> getWeekTasks(String[] UUIDs) {
@@ -237,6 +291,8 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .listOfObjects(TaskNoDate.class)
         .withQuery(Query.builder()
             .table(TaskNoDateContract.TABLE_NAME)
+            .where(TaskNoDateContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(0)
             .build())
         .prepare();
   }
@@ -316,7 +372,7 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .prepare();
   }
 
-// ------------------------------------- private ------------------------------------------------
+  // ------------------------------------- private ------------------------------------------------
 
   private String generateSearchIn(int count) {
     ExceptionHelper.assertTrue("", count > 0);

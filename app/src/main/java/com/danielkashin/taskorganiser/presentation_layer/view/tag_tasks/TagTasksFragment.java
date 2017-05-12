@@ -9,6 +9,7 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
@@ -100,13 +101,10 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
   @Override
   public void onCreate(Bundle savedInstanceState) {
     mRestoredState = new State();
-
     mRestoredState.initializeWithBundle(savedInstanceState);
-
     if (!mRestoredState.isInitialized()) {
       mRestoredState.initializeWithBundle(getArguments());
     }
-
     ExceptionHelper.assertTrue("Fragment state must be initialized", mRestoredState.isInitialized());
 
     super.onCreate(savedInstanceState);
@@ -158,7 +156,12 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
 
   @Override
   public void onTagClicked(String tagName) {
-    ((ITagViewOpener) getActivity()).onTagClicked(tagName);
+    ((ITagViewOpener) getActivity()).onOpenTagView(tagName);
+  }
+
+  @Override
+  public void onTaskClicked(Task task) {
+    ((ITaskViewOpener) getActivity()).onOpenTaskView(task.getType(), task.getUUID());
   }
 
   // -------------------------------------- ITagTasksView -----------------------------------------
@@ -176,9 +179,9 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
   }
 
   @Override
-  public void initializeAdapter(TagTaskGroup taskGroup) {
+  public void initializeAdapter(ITaskGroup taskGroup) {
     if (mRecyclerView.getAdapter() == null) {
-      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup));
+      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup, true));
     } else {
       ((ITaskGroupAdapter) mRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
     }

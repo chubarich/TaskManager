@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class ImportantTaskGroup implements ITaskGroup {
+public class RandomTaskGroup implements ITaskGroup {
 
   private final ArrayList<Task> tasks;
 
 
-  public ImportantTaskGroup() {
+  public RandomTaskGroup() {
     this.tasks = new ArrayList<>();
   }
 
@@ -20,7 +20,7 @@ public class ImportantTaskGroup implements ITaskGroup {
 
   @Override
   public void initialize(ITaskGroup taskGroup) {
-    ExceptionHelper.assertTrue("", taskGroup instanceof ImportantTaskGroup);
+    ExceptionHelper.assertTrue("", taskGroup instanceof RandomTaskGroup);
 
     ArrayList<Task> outTasks = new ArrayList<>();
     for (int i = 0; i < taskGroup.getTasks().size(); ++i) {

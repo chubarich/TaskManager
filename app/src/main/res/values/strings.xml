@@ -7,7 +7,7 @@
     <string name="drawer_important">Важные</string>
     <string name="drawer_tasks">Задачи</string>
     <string name="drawer_calendar">Календарь</string>
-    <string name="drawer_done">Завершенные</string>
+    <string name="drawer_done">Выполненные</string>
     <string name="drawer_no_date">Без даты</string>
     <string name="drawer_input">Входящие</string>
     <string name="drawer_week">Неделя</string>
@@ -31,11 +31,28 @@
     <string name="tag_already_exists">Тег уже существует</string>
     <string name="tag_saving">Сохранение тега</string>
     <string name="tag_deletion">Удаление тега</string>
-    <string name="tag_deletion_message">При удалении тега все задачи сохранятся</string>
+    <string name="tag_deletion_message">Вы действительно хотите удалить тег? При удалении тега все задачи сохранятся</string>
+
+    <string name="done_deletion">Удаление выполненных задач</string>
+    <string name="done_deletion_message">Вы действительно хотите очистить список выполненых задач? Это действие необратимо</string>
 
     <string name="save">Сохранить</string>
     <string name="delete">Удалить</string>
     <string name="cancel">Отмена</string>
+
+    <string name="task_toolbar">Задача</string>
+    <string name="task_saved">Задача сохранена</string>
+    <string name="task_not_saved">Задача не сохранена</string>
+    <string name="task_not_deleted">Задача не удалена</string>
+    <string name="task_deleted">Задача удалена</string>
+
+    <string name="task_name_too_long">Название задачи слишком длинное</string>
+    <string name="task_name_too_short">Название задачи слишком короткое</string>
+    <string name="task_note_too_long">Заметка слишком длинная</string>
+    <string name="could_not_save_task">Не удается сохранить задачу с выбранными данными</string>
+
+    <string name="note_label">Заметка</string>
+    <string name="name_label">Название</string>
 
     <array name="days">
         <item>Понедельник</item>

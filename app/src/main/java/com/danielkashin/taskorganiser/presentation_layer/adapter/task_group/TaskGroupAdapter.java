@@ -36,15 +36,18 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
   private ITaskGroupAdapter.Callbacks mCallbacks;
   private ITaskGroup mTaskGroup;
+  private boolean mShowEditText;
 
 
-  public TaskGroupAdapter() {
+  public TaskGroupAdapter(boolean showEditText) {
+    mShowEditText = showEditText;
   }
 
-  public TaskGroupAdapter(ITaskGroup taskGroup) {
+  public TaskGroupAdapter(ITaskGroup taskGroup, boolean showEditText) {
     ExceptionHelper.checkAllObjectsNonNull("All adapter arguments must be non null", taskGroup);
 
     mTaskGroup = taskGroup;
+    mShowEditText = showEditText;
   }
 
   // -------------------------------- ITagsAdapter.Callbacks --------------------------------------
@@ -155,6 +158,14 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
           }
         }
       });
+      taskViewHolder.setOnRootViewClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          if (mCallbacks != null) {
+            mCallbacks.onTaskClicked(task);
+          }
+        }
+      });
     } else if (holderIsEditText) {
       ((EditTextViewHolder) holder).setOnTextChangedListener(new EditTextViewHolder.OnTextChangedListener() {
         @Override
@@ -172,7 +183,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     if (mTaskGroup == null) {
       return 0;
     } else {
-      return mTaskGroup.getTaskSize() + 1;
+      return mTaskGroup.getTaskSize() + (mShowEditText ? 1 : 0);
     }
   }
 
@@ -189,6 +200,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
   private static class TaskViewHolder extends RecyclerView.ViewHolder {
 
+    private View rootView;
     private TextView textName;
     private TextView textTime;
     private ToggleButton toggleDone;
@@ -199,6 +211,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private TaskViewHolder(View view, Context context) {
       super(view);
+      rootView = view;
       textName = (TextView) view.findViewById(R.id.text_name);
       textTime = (TextView) view.findViewById(R.id.text_time);
       toggleDone = (ToggleButton) view.findViewById(R.id.toggle_done);
@@ -264,6 +277,10 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       setOnToggleDoneClickedListenerLocal();
     }
 
+    private void setOnRootViewClickListener(View.OnClickListener listener) {
+      rootView.setOnClickListener(listener);
+    }
+
     private void setOnToggleDoneClickedListener(OnToggleClickedListener onToggleClickedListener) {
       this.onToggleDoneClickedListener = onToggleClickedListener;
       setOnToggleDoneClickedListenerLocal();
@@ -308,7 +325,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void setOnTextChangedListenerLocal() {
       editText.addTextChangedListener(new TextWatcher() {
         // fields to perform delay
-        private final static int INPUT_DELAY_IN_MS = 1000;
+        private final static int INPUT_DELAY_IN_MS = 1500;
         private Handler handler = new Handler(Looper.getMainLooper());
         Runnable workRunnable;
 
@@ -323,7 +340,9 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         @Override
         public void afterTextChanged(final Editable editable) {
-          if (!editable.toString().trim().isEmpty()) {
+          if (editable.toString().length() > Task.MAX_NAME_LENGTH) {
+            editText.setText("");
+          } else if (!editable.toString().trim().isEmpty()) {
             workRunnable = new Runnable() {
               @Override
               public void run() {

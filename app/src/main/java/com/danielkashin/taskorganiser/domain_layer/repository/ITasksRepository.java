@@ -2,7 +2,7 @@ package com.danielkashin.taskorganiser.domain_layer.repository;
 
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.RandomTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 
@@ -13,11 +13,15 @@ public interface ITasksRepository {
 
   // ---------------------------------------- get -------------------------------------------------
 
+  Task getTask(Task.Type type, String UUID) throws ExceptionBundle;
+
   ArrayList<DateTypeTaskGroup> getDateTypeData(String date, Task.Type type) throws ExceptionBundle;
 
   DateTypeTaskGroup getNoDateData() throws ExceptionBundle;
 
-  ImportantTaskGroup getImportantData() throws ExceptionBundle;
+  RandomTaskGroup getImportantData() throws ExceptionBundle;
+
+  RandomTaskGroup getDoneData() throws ExceptionBundle;
 
   TagTaskGroup getTagTaskGroup(String tag) throws ExceptionBundle;
 
@@ -31,6 +35,9 @@ public interface ITasksRepository {
 
   // --------------------------------------- delete -----------------------------------------------
 
-  void deleteTag(String tag);
+  void deleteTask(Task.Type type, String UUID) throws ExceptionBundle;
 
+  void deleteTag(String tag) throws ExceptionBundle;
+
+  void deleteDoneData() throws ExceptionBundle;
 }

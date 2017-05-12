@@ -1,9 +1,9 @@
-package com.danielkashin.taskorganiser.presentation_layer.presenter.no_date_tasks;
+package com.danielkashin.taskorganiser.presentation_layer.presenter.typed_tasks;
 
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 
 
-public interface INoDateTasksPresenter {
+public interface ITypedTasksPresenter {
 
   void onSaveTask(Task task);
 

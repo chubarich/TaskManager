@@ -84,6 +84,15 @@ public class TaskWeek {
     this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
   }
 
+  public void setDeletedLocal(boolean deletedLocal) {
+    this.deletedLocal = deletedLocal ? 1 : 0;
+  }
+
+  public void setChangeOrDeleteLocalTimestamp(Long timestamp) {
+    this.changeOrDeleteLocalTimestamp = timestamp;
+  }
+
+
   public Long getId() {
     return id;
   }

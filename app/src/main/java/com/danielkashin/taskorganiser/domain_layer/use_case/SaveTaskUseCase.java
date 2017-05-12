@@ -1,5 +1,7 @@
 package com.danielkashin.taskorganiser.domain_layer.use_case;
 
+import android.os.AsyncTask;
+
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskVoid;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
@@ -25,6 +27,12 @@ public class SaveTaskUseCase {
 
     this.tasksRepository = tasksRepository;
     this.executor = executor;
+  }
+
+  public void cancel() {
+    if (saveTask != null && saveTask.getStatus() == AsyncTask.Status.RUNNING && !saveTask.isCancelled()) {
+      saveTask.cancel(false);
+    }
   }
 
   public void run(final Callbacks callbacks, final Task task) {

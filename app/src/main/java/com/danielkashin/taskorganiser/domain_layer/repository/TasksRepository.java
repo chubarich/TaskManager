@@ -12,13 +12,13 @@ import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalServi
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.NumbersHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.pojo.ImportantTaskGroup;
+import com.danielkashin.taskorganiser.domain_layer.pojo.RandomTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.pushtorefresh.storio.sqlite.operations.delete.DeleteResult;
 import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -40,8 +40,40 @@ public class TasksRepository implements ITasksRepository {
   //                            -------------- get ----------------
 
   @Override
-  public ImportantTaskGroup getImportantData() throws ExceptionBundle {
-    ImportantTaskGroup output = new ImportantTaskGroup();
+  public Task getTask(Task.Type type, String UUID) throws ExceptionBundle {
+    String[] UUIDs = new String[]{UUID};
+    if (type == Task.Type.Day) {
+      List<TaskDay> tasks = tasksLocalService.getDayTasks(UUIDs)
+          .executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      return new Task(tasks.get(0));
+    } else if (type == Task.Type.Week) {
+      List<TaskWeek> tasks = tasksLocalService.getWeekTasks(UUIDs)
+          .executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      return new Task(tasks.get(0));
+    } else if (type == Task.Type.Month) {
+      List<TaskMonth> tasks = tasksLocalService.getMonthTasks(UUIDs)
+          .executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      return new Task(tasks.get(0));
+    } else if (type == Task.Type.NoDate) {
+      List<TaskNoDate> tasks = tasksLocalService.getNoDateTasks(UUIDs)
+          .executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      return new Task(tasks.get(0));
+    } else {
+      throw new IllegalStateException("");
+    }
+  }
+
+  @Override
+  public RandomTaskGroup getImportantData() throws ExceptionBundle {
+    RandomTaskGroup output = new RandomTaskGroup();
 
     // setup month task group
     List<TaskMonth> monthTasks = tasksLocalService.getImportantMonthTasks()
@@ -72,6 +104,49 @@ public class TasksRepository implements ITasksRepository {
 
     // setup no date task group
     List<TaskNoDate> noDateTasks = tasksLocalService.getImportantNoDateTasks()
+        .executeAsBlocking();
+    for (TaskNoDate taskNoDate : noDateTasks) {
+      Task task = new Task(taskNoDate);
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    return output;
+  }
+
+  @Override
+  public RandomTaskGroup getDoneData() throws ExceptionBundle {
+    RandomTaskGroup output = new RandomTaskGroup();
+
+    // setup month task group
+    List<TaskMonth> monthTasks = tasksLocalService.getDoneMonthTasks()
+        .executeAsBlocking();
+    for (int i = 0; i < monthTasks.size(); ++i) {
+      Task task = new Task(monthTasks.get(i));
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    // setup week task group
+    List<TaskWeek> weekTasks = tasksLocalService.getDoneWeekTasks()
+        .executeAsBlocking();
+    for (TaskWeek taskWeek : weekTasks) {
+      Task task = new Task(taskWeek);
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    // setup day task group
+    List<TaskDay> dayTasks = tasksLocalService.getDoneDayTasks()
+        .executeAsBlocking();
+    for (TaskDay taskDay : dayTasks) {
+      Task task = new Task(taskDay);
+      task.setTags(getTags(task.getUUID()));
+      output.addTask(task);
+    }
+
+    // setup no date task group
+    List<TaskNoDate> noDateTasks = tasksLocalService.getDoneNoDateTasks()
         .executeAsBlocking();
     for (TaskNoDate taskNoDate : noDateTasks) {
       Task task = new Task(taskNoDate);
@@ -247,6 +322,44 @@ public class TasksRepository implements ITasksRepository {
   // ----------------------------------------- delete ---------------------------------------------
 
   @Override
+  public void deleteTask(Task.Type type, String UUID) throws ExceptionBundle {
+    Long currentTimestamp = DatetimeHelper.getCurrentTimestamp();
+
+    String[] UUIDs = new String[]{UUID};
+    if (type == Task.Type.Day) {
+      List<TaskDay> tasks = tasksLocalService.getDayTasks(UUIDs).executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      tasks.get(0).setDeletedLocal(true);
+      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putDayTask(tasks.get(0)).executeAsBlocking();
+    } else if (type == Task.Type.Week) {
+      List<TaskWeek> tasks = tasksLocalService.getWeekTasks(UUIDs).executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      tasks.get(0).setDeletedLocal(true);
+      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putWeekTask(tasks.get(0)).executeAsBlocking();
+    } else if (type == Task.Type.Month) {
+      List<TaskMonth> tasks = tasksLocalService.getMonthTasks(UUIDs).executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      tasks.get(0).setDeletedLocal(true);
+      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putMonthTask(tasks.get(0)).executeAsBlocking();
+    } else if (type == Task.Type.NoDate) {
+      List<TaskNoDate> tasks = tasksLocalService.getNoDateTasks(UUIDs).executeAsBlocking();
+      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
+
+      tasks.get(0).setDeletedLocal(true);
+      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putNoDateTask(tasks.get(0)).executeAsBlocking();
+    } else {
+      throw new IllegalStateException("");
+    }
+  }
+
+  @Override
   public void deleteTag(String tagName) {
     Tag tag = tasksLocalService.getTag(tagName)
         .executeAsBlocking();
@@ -255,6 +368,47 @@ public class TasksRepository implements ITasksRepository {
       tasksLocalService.deleteTag(tagName)
           .executeAsBlocking();
       tasksLocalService.deleteTaskToTag(tag.getId())
+          .executeAsBlocking();
+    }
+  }
+
+  @Override
+  public void deleteDoneData() {
+    Long currentTimestamp = DatetimeHelper.getCurrentTimestamp();
+
+    List<TaskDay> dayTasks = tasksLocalService.getDoneDayTasks()
+        .executeAsBlocking();
+    for (TaskDay taskDay : dayTasks) {
+      taskDay.setDeletedLocal(true);
+      taskDay.setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putDayTask(taskDay)
+          .executeAsBlocking();
+    }
+
+    List<TaskMonth> monthTasks = tasksLocalService.getDoneMonthTasks()
+        .executeAsBlocking();
+    for (TaskMonth taskMonth : monthTasks) {
+      taskMonth.setDeletedLocal(true);
+      taskMonth.setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putMonthTask(taskMonth)
+          .executeAsBlocking();
+    }
+
+    List<TaskWeek> weekTasks = tasksLocalService.getDoneWeekTasks()
+        .executeAsBlocking();
+    for (TaskWeek taskWeek : weekTasks) {
+      taskWeek.setDeletedLocal(true);
+      taskWeek.setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putWeekTask(taskWeek)
+          .executeAsBlocking();
+    }
+
+    List<TaskNoDate> noDateTasks = tasksLocalService.getDoneNoDateTasks()
+        .executeAsBlocking();
+    for (TaskNoDate taskNoDate : noDateTasks) {
+      taskNoDate.setDeletedLocal(true);
+      taskNoDate.setChangeOrDeleteLocalTimestamp(currentTimestamp);
+      tasksLocalService.putNoDateTask(taskNoDate)
           .executeAsBlocking();
     }
   }

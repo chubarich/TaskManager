@@ -31,7 +31,13 @@ import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteDoneTasksUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTagUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTaskUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
+import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
+import com.danielkashin.taskorganiser.presentation_layer.view.task.TaskFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
 import com.danielkashin.taskorganiser.util.ColorHelper;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
@@ -44,19 +50,20 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresent
 import com.danielkashin.taskorganiser.presentation_layer.presenter.main_drawer.IMainDrawerPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.main_drawer.MainDrawerPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterActivity;
-import com.danielkashin.taskorganiser.presentation_layer.view.important_tasks.ImportantTasksFragment;
-import com.danielkashin.taskorganiser.presentation_layer.view.no_date_tasks.NoDateTasksFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.tag_tasks.ITagTasksView;
 import com.danielkashin.taskorganiser.presentation_layer.view.tag_tasks.TagTasksFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateContainer;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
+
+import static com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment.State;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 
 public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, IMainDrawerView>
-    implements IMainDrawerView, ICalendarWalker, ITagViewOpener, IToolbarContainer,
+    implements IMainDrawerView, ICalendarWalker, IToolbarContainer, ITaskViewOpener,
     NavigationView.OnNavigationItemSelectedListener {
 
   private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
@@ -89,10 +96,10 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   protected void onStart() {
     super.onStart();
 
-    ((IMainDrawerPresenter) getPresenter()).onStart();
+    ((IMainDrawerPresenter) getPresenter()).onGetTags();
 
     if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
-      addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+      openDefaultDate();
     }
 
     setListeners();
@@ -137,7 +144,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
         public void run() {
           int id = item.getItemId();
           if (id == R.id.navigation_no_date) {
-            addFragment(NoDateTasksFragment.getInstance(), false);
+            addFragment(TypedTasksFragment.getInstance(State.Type.NoDate), false);
           } else if (id == R.id.navigation_week) {
             addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
           } else if (id == R.id.navigation_month) {
@@ -145,9 +152,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
           } else if (id == R.id.navigation_year) {
             addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentMonth(), Task.Type.Month), false);
           } else if (id == R.id.navigation_important) {
-            addFragment(ImportantTasksFragment.getInstance(), false);
+            addFragment(TypedTasksFragment.getInstance(State.Type.Important), false);
+          } else if (id == R.id.navigation_done) {
+            addFragment(TypedTasksFragment.getInstance(State.Type.Done), false);
           } else {
-            onTagClicked(item.getTitle().toString());
+            onOpenTagView(item.getTitle().toString());
           }
         }
       };
@@ -162,6 +171,25 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
 
   // ---------------------------------- IMainDrawerView -------------------------------------------
 
+  @Override
+  public void showSavedToast() {
+    Toast.makeText(this, getString(R.string.task_saved), Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public void showNotSavedToast() {
+    Toast.makeText(this, getString(R.string.task_not_saved), Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public void showTaskNotDeletedToast() {
+    Toast.makeText(this, getString(R.string.task_not_deleted), Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public void showTaskDeletedToast() {
+    Toast.makeText(this, getString(R.string.task_deleted), Toast.LENGTH_SHORT).show();
+  }
 
   @Override
   public void showTagAlreadyExists() {
@@ -202,8 +230,12 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     GetTagsUseCase getTagsUseCase = new GetTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
     SaveTagUseCase saveTagUseCase = new SaveTagUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
     DeleteTagUseCase deleteTagUseCase = new DeleteTagUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
+    DeleteDoneTasksUseCase deleteDoneTasksUseCase = new DeleteDoneTasksUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
+    SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
+    DeleteTaskUseCase deleteTaskUseCase = new DeleteTaskUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
 
-    return new MainDrawerPresenter.Factory(getTagsUseCase, saveTagUseCase, deleteTagUseCase);
+    return new MainDrawerPresenter.Factory(getTagsUseCase, saveTagUseCase, deleteTagUseCase,
+        deleteDoneTasksUseCase, saveTaskUseCase, deleteTaskUseCase);
   }
 
   @Override
@@ -227,10 +259,17 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     mImageToolbarDelete = (ImageView) findViewById(R.id.image_delete);
   }
 
-  // ------------------------------------- ITagOpener ---------------------------------------------
+  // ----------------------------------- ITaskViewOpener ------------------------------------------
 
   @Override
-  public void onTagClicked(String tagName) {
+  public void onOpenTaskView(Task.Type type, String UUID) {
+    addFragment(TaskFragment.getInstance(type, UUID), true);
+  }
+
+  // ----------------------------------- ITagViewOpener -------------------------------------------
+
+  @Override
+  public void onOpenTagView(String tagName) {
     addFragment(TagTasksFragment.getInstance(tagName), false);
   }
 
@@ -239,6 +278,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   @Override
   public void onOpenChildDate(String date, Task.Type type) {
     addFragment(TaskGroupsFragment.getInstance(date, type), true);
+  }
+
+  @Override
+  public void openDefaultDate() {
+    addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
   }
 
   // ---------------------------------- IToolbarContainer -----------------------------------------
@@ -310,10 +354,6 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   }
 
   private void showDeleteTagDialog(final String tagName) {
-    final EditText tagEditText = new EditText(this);
-    tagEditText.setHint(getString(R.string.tag_deletion));
-    tagEditText.setHintTextColor(ContextCompat.getColor(this, R.color.grey));
-
     AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
     alertDialog.setTitle(getString(R.string.tag_deletion));
     alertDialog.setMessage(getString(R.string.tag_deletion_message));
@@ -321,7 +361,31 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     alertDialog.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        ((IMainDrawerPresenter)getPresenter()).onDeleteTag(tagName);
+        ((IMainDrawerPresenter) getPresenter()).onDeleteTag(tagName);
+        addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+      }
+    });
+
+    alertDialog.setNegativeButton(getString(R.string.cancel),
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            dialog.cancel();
+          }
+        });
+
+    alertDialog.show();
+  }
+
+
+  private void showDeleteDoneTasksDialog() {
+    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+    alertDialog.setTitle(getString(R.string.done_deletion));
+    alertDialog.setMessage(getString(R.string.done_deletion_message));
+
+    alertDialog.setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        ((IMainDrawerPresenter) getPresenter()).onDeleteDoneTasks();
         addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
       }
     });
@@ -401,6 +465,14 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
           if (fragment instanceof ITagTasksView) {
             String tagName = ((ITagTasksView) fragment).getTagName();
             showDeleteTagDialog(tagName);
+          } else if (fragment instanceof ITypedTasksView && ((ITypedTasksView) fragment).getType() == State.Type.Done) {
+            showDeleteDoneTasksDialog();
+          } else if (fragment instanceof ITaskView) {
+            Task task = ((ITaskView) fragment).getCurrentTask();
+            if (task != null) {
+              ((IMainDrawerPresenter) getPresenter()).onDeleteTask(task.getType(), task.getUUID());
+              addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+            }
           } else {
             mImageToolbarDelete.setVisibility(View.GONE);
           }
@@ -408,6 +480,25 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
       }
     });
 
+    mImageToolbarDone.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment != null) {
+          if (fragment instanceof ITaskView) {
+            Task task = ((ITaskView) fragment).getCurrentTask();
+            if (task != null && task.isValid()) {
+              ((IMainDrawerPresenter) getPresenter()).onSaveTask(task);
+            } else {
+              Toast.makeText(MainDrawerActivity.this, getString(R.string.could_not_save_task),
+                  Toast.LENGTH_SHORT).show();
+            }
+          } else {
+            mImageToolbarDelete.setVisibility(View.GONE);
+          }
+        }
+      }
+    });
 
 
     mImageToolbarParent.setOnClickListener(new View.OnClickListener() {

@@ -39,7 +39,7 @@ public class SaveTagUseCase {
     PostExecuteListenerVoid saveTaskListener = new PostExecuteListenerVoid() {
       @Override
       public void onResult() {
-        callbacks.onSaveTagSuccess();
+        callbacks.onSaveTagSuccess(tag);
       }
 
       @Override
@@ -56,7 +56,7 @@ public class SaveTagUseCase {
 
   public interface Callbacks {
 
-    void onSaveTagSuccess();
+    void onSaveTagSuccess(String tag);
 
     void onSaveTagException(ExceptionBundle exceptionBundle);
 

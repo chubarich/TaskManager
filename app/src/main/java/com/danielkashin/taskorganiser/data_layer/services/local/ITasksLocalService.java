@@ -39,6 +39,15 @@ public interface ITasksLocalService {
   PreparedGetListOfObjects<TaskNoDate> getImportantNoDateTasks();
 
 
+  PreparedGetListOfObjects<TaskWeek> getDoneWeekTasks();
+
+  PreparedGetListOfObjects<TaskDay> getDoneDayTasks();
+
+  PreparedGetListOfObjects<TaskMonth> getDoneMonthTasks();
+
+  PreparedGetListOfObjects<TaskNoDate> getDoneNoDateTasks();
+
+
   PreparedGetListOfObjects<TaskWeek> getWeekTasks(String[] UUIDs);
 
   PreparedGetListOfObjects<TaskDay> getDayTasks(String[] UUIDs);

@@ -22,5 +22,7 @@ public interface ITaskGroupsAdapter {
 
     void onTagClicked(String tagName);
 
+    void onTaskClicked(Task task);
+
   }
 }

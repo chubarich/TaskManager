@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:background="@android:color/transparent">
-
 
     <TextView
         android:id="@+id/text_name"
@@ -14,4 +12,4 @@
         android:textStyle="italic"
         android:textColor="@android:color/black"/>
 
-</LinearLayout>
+</FrameLayout>
