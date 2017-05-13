@@ -1,9 +1,10 @@
 package com.danielkashin.taskorganiser.domain_layer.repository;
 
+import android.util.Pair;
+
 import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
@@ -18,7 +19,6 @@ import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -40,32 +40,39 @@ public class TasksRepository implements ITasksRepository {
   //                            -------------- get ----------------
 
   @Override
-  public Task getTask(Task.Type type, String UUID) throws ExceptionBundle {
+  public Pair<Task, ArrayList<String>> getTaskWithAllTags(Task.Type type, String UUID) throws ExceptionBundle {
     String[] UUIDs = new String[]{UUID};
+    Task task = null;
+
     if (type == Task.Type.Day) {
       List<TaskDay> tasks = tasksLocalService.getDayTasks(UUIDs)
           .executeAsBlocking();
       if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      return new Task(tasks.get(0));
+      task = new Task(tasks.get(0));
     } else if (type == Task.Type.Week) {
       List<TaskWeek> tasks = tasksLocalService.getWeekTasks(UUIDs)
           .executeAsBlocking();
       if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      return new Task(tasks.get(0));
+      task = new Task(tasks.get(0));
     } else if (type == Task.Type.Month) {
       List<TaskMonth> tasks = tasksLocalService.getMonthTasks(UUIDs)
           .executeAsBlocking();
       if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      return new Task(tasks.get(0));
+      task = new Task(tasks.get(0));
     } else if (type == Task.Type.NoDate) {
       List<TaskNoDate> tasks = tasksLocalService.getNoDateTasks(UUIDs)
           .executeAsBlocking();
       if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      return new Task(tasks.get(0));
+      task = new Task(tasks.get(0));
+    }
+
+    if (task != null) {
+      task.setTags(getTags(task.getUUID()));
+      return new Pair<>(task, getAllTags());
     } else {
       throw new IllegalStateException("");
     }
@@ -244,7 +251,7 @@ public class TasksRepository implements ITasksRepository {
   }
 
   @Override
-  public ArrayList<String> getTags() throws ExceptionBundle {
+  public ArrayList<String> getAllTags() throws ExceptionBundle {
     ArrayList<String> tags = new ArrayList<>();
 
     List<Tag> rawTags = tasksLocalService.getTags()
@@ -295,12 +302,6 @@ public class TasksRepository implements ITasksRepository {
           DatetimeHelper.getCurrentTimestamp());
 
       tasksLocalService.putMonthTask(taskMonth)
-          .executeAsBlocking();
-    } else if (task.getType() == Task.Type.Mini) {
-      TaskMini miniTask = new TaskMini(null, task.getName(), NumbersHelper.getInteger(task.getDone()),
-          task.getUUID(), null, 1, 0, DatetimeHelper.getCurrentTimestamp());
-
-      tasksLocalService.putMiniTask(miniTask)
           .executeAsBlocking();
     } else {
       throw new IllegalStateException("Such task type is not supported");
@@ -509,8 +510,10 @@ public class TasksRepository implements ITasksRepository {
   }
 
   private void saveTags(Task task) {
-    ArrayList<String> tagNames = task.getTags();
+    tasksLocalService.deleteTaskToTag(task.getUUID())
+        .executeAsBlocking();
 
+    ArrayList<String> tagNames = task.getTags();
     if (tagNames != null) {
       ArrayList<Long> tagIds = new ArrayList<>();
       for (String tagName : tagNames) {

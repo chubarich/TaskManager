@@ -156,7 +156,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
           } else if (id == R.id.navigation_done) {
             addFragment(TypedTasksFragment.getInstance(State.Type.Done), false);
           } else {
-            onOpenTagView(item.getTitle().toString());
+            addFragment(TagTasksFragment.getInstance(item.getTitle().toString()), false);
           }
         }
       };
@@ -270,7 +270,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
 
   @Override
   public void onOpenTagView(String tagName) {
-    addFragment(TagTasksFragment.getInstance(tagName), false);
+    addFragment(TagTasksFragment.getInstance(tagName), true);
   }
 
   // ----------------------------------- ICalendarWalker ------------------------------------------
@@ -362,7 +362,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
       @Override
       public void onClick(DialogInterface dialog, int which) {
         ((IMainDrawerPresenter) getPresenter()).onDeleteTag(tagName);
-        addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+          getSupportFragmentManager().popBackStack();
+        } else {
+          addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+        }
       }
     });
 
@@ -386,7 +390,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
       @Override
       public void onClick(DialogInterface dialog, int which) {
         ((IMainDrawerPresenter) getPresenter()).onDeleteDoneTasks();
-        addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+          getSupportFragmentManager().popBackStack();
+        } else {
+          addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+        }
       }
     });
 
@@ -417,8 +425,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     DialogInterface.OnClickListener positiveListener = new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
         final String tag = tagEditText.getText().toString().trim();
-        Pattern usernamePattern = Pattern.compile("\\p{L}+");
-        if (tag.length() > 2 && tag.length() < 16 && usernamePattern.matcher(tag).matches()) {
+        if (Task.tagIsValid(tag)) {
           ((IMainDrawerPresenter) getPresenter()).onSaveTag(tag);
         } else {
           showAlert(getString(R.string.tag_parse_error), null);
@@ -471,7 +478,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
             Task task = ((ITaskView) fragment).getCurrentTask();
             if (task != null) {
               ((IMainDrawerPresenter) getPresenter()).onDeleteTask(task.getType(), task.getUUID());
-              addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+              if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
+              } else {
+                addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+              }
             }
           } else {
             mImageToolbarDelete.setVisibility(View.GONE);

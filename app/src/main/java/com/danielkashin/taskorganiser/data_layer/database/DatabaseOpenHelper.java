@@ -9,7 +9,6 @@ import com.danielkashin.taskorganiser.BuildConfig;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.connections_tables.TaskToTagContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TagContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract;
-import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMiniContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskMonthContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskNoDateContract;
 import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskWeekContract;
@@ -27,7 +26,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     sqLiteDatabase.execSQL(TaskMonthContract.SQL_CREATE_TABLE);
     sqLiteDatabase.execSQL(TaskWeekContract.SQL_CREATE_TABLE);
     sqLiteDatabase.execSQL(TaskDayContract.SQL_CREATE_TABLE);
-    sqLiteDatabase.execSQL(TaskMiniContract.SQL_CREATE_TABLE);
     sqLiteDatabase.execSQL(TaskNoDateContract.SQL_CREATE_TABLE);
 
     // tags
@@ -42,7 +40,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     sqLiteDatabase.execSQL(TaskMonthContract.SQL_DELETE_TABLE);
     sqLiteDatabase.execSQL(TaskWeekContract.SQL_DELETE_TABLE);
     sqLiteDatabase.execSQL(TaskDayContract.SQL_DELETE_TABLE);
-    sqLiteDatabase.execSQL(TaskMiniContract.SQL_DELETE_TABLE);
     sqLiteDatabase.execSQL(TaskNoDateContract.SQL_DELETE_TABLE);
     sqLiteDatabase.execSQL(TagContract.SQL_DELETE_TABLE);
     sqLiteDatabase.execSQL(TaskToTagContract.SQL_DELETE_TABLE);

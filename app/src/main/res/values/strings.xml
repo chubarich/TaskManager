@@ -27,7 +27,7 @@
     <string name="tags">Теги</string>
     <string name="new_tag">Новый тег</string>
     <string name="tag">тег</string>
-    <string name="tag_parse_error">Тег должен состоять из одного слова длиной от 3 до 15 символов</string>
+    <string name="tag_parse_error">Длина тега должна быть от 2 до 25 символов</string>
     <string name="tag_already_exists">Тег уже существует</string>
     <string name="tag_saving">Сохранение тега</string>
     <string name="tag_deletion">Удаление тега</string>

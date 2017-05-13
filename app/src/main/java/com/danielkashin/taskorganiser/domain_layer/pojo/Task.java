@@ -181,6 +181,10 @@ public class Task implements Parcelable {
     return nameIsValid && noteIsValid;
   }
 
+  public static boolean tagIsValid(String tag) {
+    return tag != null && tag.length() < 26 && tag.length() > 1;
+  }
+
   public boolean equals(Task other) {
     return this.type == other.getType() && this.UUID.equals(other.getUUID());
   }
@@ -252,14 +256,10 @@ public class Task implements Parcelable {
   }
 
   public Long getDuration() {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     return duration;
   }
 
   public void setDuration(Long duration) {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     this.duration = duration;
   }
 
@@ -292,50 +292,34 @@ public class Task implements Parcelable {
   }
 
   public Long getNotificationTimestamp() {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     return notificationTimestamp;
   }
 
   public void setNotificationTimestamp(Long notificationTimestamp) {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     this.notificationTimestamp = notificationTimestamp;
   }
 
   public String getNote() {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     return note;
   }
 
   public void setNote(String note) {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     this.note = note;
   }
 
   public ArrayList<String> getTags() {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     return tags;
   }
 
   public void setTags(ArrayList<String> tags) {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     this.tags = tags;
   }
 
   public ArrayList<Long> getSubtasks() {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     return subtasks;
   }
 
   public void setSubtasks(ArrayList<Long> subtasks) {
-    ExceptionHelper.assertFalse("Unavailable operation", type == Type.Mini);
-
     this.subtasks = subtasks;
   }
 
@@ -350,14 +334,11 @@ public class Task implements Parcelable {
     task.setChangedLocal(changedLocal);
     task.setDeletedLocal(deletedLocal);
     task.setChangeOrDeleteLocalTimestamp(changeOrDeleteLocalTimestamp);
-
-    if (type != Type.Mini) {
-      task.setImportant(important);
-      task.setDuration(duration);
-      task.setNote(note);
-      task.setTags(tags);
-      task.setSubtasks(subtasks);
-    }
+    task.setImportant(important);
+    task.setDuration(duration);
+    task.setNote(note);
+    task.setTags(tags);
+    task.setSubtasks(subtasks);
 
     if (type == Type.Day) {
       task.setMinuteStart(minuteStart);
@@ -375,6 +356,12 @@ public class Task implements Parcelable {
       return 1;
     }
 
+    if (o1.getImportant() && !other.getImportant()) {
+      return 1;
+    } else if (other.getImportant() && !o1.getImportant()) {
+      return -1;
+    }
+
     if (o1.getType() != other.getType()) {
       if ((o1.getType() == Task.Type.Day && (other.getType() == Task.Type.Week || other.getType() == Task.Type.Month))
           || (o1.getType() == Task.Type.Week && other.getType() == Task.Type.Month)) {
@@ -388,6 +375,14 @@ public class Task implements Parcelable {
       if (o1.getMinuteStart() != null && other.getMinuteStart() == null) {
         return 1;
       } else if (other.getMinuteStart() != null && o1.getMinuteStart() == null) {
+        return -1;
+      }
+    }
+
+    if (o1.getChangeOrDeleteLocalTimestamp() != null && other.getChangeOrDeleteLocalTimestamp() != null) {
+      if (o1.getChangeOrDeleteLocalTimestamp() > other.getChangeOrDeleteLocalTimestamp()) {
+        return 1;
+      } else if (other.getChangeOrDeleteLocalTimestamp() > o1.getChangeOrDeleteLocalTimestamp()) {
         return -1;
       }
     }
@@ -459,7 +454,6 @@ public class Task implements Parcelable {
     Month,
     Week,
     Day,
-    Mini,
     NoDate
   }
 

@@ -1,5 +1,7 @@
 package com.danielkashin.taskorganiser.domain_layer.repository;
 
+import android.util.Pair;
+
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.RandomTaskGroup;
@@ -13,7 +15,7 @@ public interface ITasksRepository {
 
   // ---------------------------------------- get -------------------------------------------------
 
-  Task getTask(Task.Type type, String UUID) throws ExceptionBundle;
+  Pair<Task, ArrayList<String>> getTaskWithAllTags(Task.Type type, String UUID) throws ExceptionBundle;
 
   ArrayList<DateTypeTaskGroup> getDateTypeData(String date, Task.Type type) throws ExceptionBundle;
 
@@ -25,7 +27,7 @@ public interface ITasksRepository {
 
   TagTaskGroup getTagTaskGroup(String tag) throws ExceptionBundle;
 
-  ArrayList<String> getTags() throws ExceptionBundle;
+  ArrayList<String> getAllTags() throws ExceptionBundle;
 
   // ---------------------------------------- save ------------------------------------------------
 

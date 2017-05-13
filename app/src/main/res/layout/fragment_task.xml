@@ -2,10 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:background="@drawable/rounded"
+             android:background="@color/light_light_grey"
              android:orientation="vertical"
-             android:paddingEnd="7dp"
-             android:paddingStart="7dp">
+    >
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,33 +21,27 @@
                 android:id="@+id/layout_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/name_label"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18dp"/>
+                android:orientation="vertical"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp">
 
                 <EditText
                     android:id="@+id/edit_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
+                    android:background="@android:color/transparent"
                     android:hint="@string/name_label"
-                    android:paddingBottom="5dp"
-                    android:textSize="18dp"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimary"/>
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="20dp"/>
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"/>
 
             <!-- note -->
 
@@ -56,63 +49,67 @@
                 android:id="@+id/layout_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/note_label"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18dp"/>
+                android:orientation="vertical"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp">
 
                 <EditText
                     android:id="@+id/edit_note"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
+                    android:background="@android:color/transparent"
                     android:hint="@string/note_label"
-                    android:paddingBottom="5dp"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="20dp"
+                    android:textColor="@android:color/black"
                     android:textSize="18dp"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimary"/>
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"/>
 
             <!-- tags -->
 
             <LinearLayout
+                android:id="@+id/layout_tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_tags"
+                    android:paddingBottom="15dp"
+                    android:paddingTop="15dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="10dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Теги"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18dp"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimary"/>
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"/>
+
+
+
+
+
+
 
             <!-- duration -->
 
             <LinearLayout
+                android:id="@+id/layout_duration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -130,19 +127,21 @@
 
             </LinearLayout>
 
-            <!-- subtasks -->
+            <!-- start and end -->
 
             <LinearLayout
+                android:id="@+id/layout_start_and_end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp"
-                    android:text="Подзадачи"
+                    android:text="Временной промежуток"
                     android:textColor="@color/colorPrimary"
                     android:textSize="18dp"/>
 
@@ -153,19 +152,22 @@
 
             </LinearLayout>
 
-            <!-- start and end -->
+
+            <!-- notification -->
 
             <LinearLayout
+                android:id="@+id/layout_notification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp"
-                    android:text="Временной промежуток"
+                    android:text="Уведомления"
                     android:textColor="@color/colorPrimary"
                     android:textSize="18dp"/>
 

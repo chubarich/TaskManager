@@ -46,8 +46,6 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
   // --------------------------------------- getInstance ------------------------------------------
 
   public static TaskGroupsFragment getInstance(String date, Task.Type type) {
-    ExceptionHelper.assertFalse("Fragment does not support Task.Type.Mini", type == Task.Type.Mini);
-
     TaskGroupsFragment fragment = new TaskGroupsFragment();
 
     fragment.setArguments(State.wrap(date, type));

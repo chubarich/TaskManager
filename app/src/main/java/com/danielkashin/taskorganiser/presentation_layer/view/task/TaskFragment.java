@@ -2,18 +2,24 @@ package com.danielkashin.taskorganiser.presentation_layer.view.task;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskWithAllTagsUseCase;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.ITagsWithSelectionAdapter;
+import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.TagsWithSelectionAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.task.ITaskPresenter;
@@ -22,12 +28,18 @@ import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFrag
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
+import java.util.ArrayList;
+
 
 public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     implements ITaskView {
 
-  private EditText mNameEditText;
-  private EditText mNoteEditText;
+  private EditText mEditName;
+  private EditText mEditNote;
+  private LinearLayout mLayoutDuration;
+  private LinearLayout mLayoutStartAndEnd;
+  private LinearLayout mLayoutNotification;
+  private RecyclerView mRecyclerTags;
 
   private State mRestoredState;
 
@@ -63,27 +75,42 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.task_toolbar), false, false, true, true);
 
     if (!mRestoredState.isTaskInitialized()) {
-      ((ITaskPresenter)getPresenter()).onGetTask(mRestoredState.getType(), mRestoredState.getUUID());
+      ((ITaskPresenter) getPresenter()).onGetTask(mRestoredState.getType(), mRestoredState.getUUID());
     } else {
-      attachTask(mRestoredState.getStateTask());
+      attachTaskWithTags(mRestoredState.getStateTask(), mRestoredState.getTags());
     }
 
     setListeners();
   }
 
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mRestoredState.saveToOutState(outState);
+  }
+
   // --------------------------------------- ITaskView --------------------------------------------
 
   @Override
-  public void attachTask(Task task) {
+  public void attachTaskWithTags(Task task, ArrayList<String> tags) {
     mRestoredState.setTask(task);
+    mRestoredState.setTags(tags);
 
-    mNameEditText.setText(task.getName());
-    mNoteEditText.setText(task.getNote());
+    mEditName.setText(task.getName());
+    mEditNote.setText(task.getNote());
+    if (mRecyclerTags.getAdapter() != null) {
+      ((ITagsWithSelectionAdapter) mRecyclerTags.getAdapter()).initialize(tags, task.getTags());
+    }
   }
 
   @Override
   public Task getCurrentTask() {
-    return mRestoredState.getStateTask();
+    Task task = mRestoredState.getStateTask();
+    if (mRecyclerTags.getAdapter() != null) {
+      task.setTags(((ITagsWithSelectionAdapter)mRecyclerTags.getAdapter()).getSelectedTags());
+    }
+
+    return task;
   }
 
   // ------------------------------------ PresenterFragment ---------------------------------------
@@ -101,9 +128,9 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
     ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
 
-    GetTaskUseCase getTaskUseCase = new GetTaskUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
+    GetTaskWithAllTagsUseCase getTaskWithAllTagsUseCase = new GetTaskWithAllTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
 
-    return new TaskPresenter.Factory(getTaskUseCase);
+    return new TaskPresenter.Factory(getTaskWithAllTagsUseCase);
   }
 
   @Override
@@ -118,20 +145,23 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
   @Override
   protected void initializeView(View view) {
-    mNameEditText = (EditText) view.findViewById(R.id.edit_name);
-    mNoteEditText = (EditText) view.findViewById(R.id.edit_note);
+    mEditName = (EditText) view.findViewById(R.id.edit_name);
+    mEditNote = (EditText) view.findViewById(R.id.edit_note);
+    mRecyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
+    mRecyclerTags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+    mRecyclerTags.setAdapter(new TagsWithSelectionAdapter());
+    //mRecyclerTags.addItemDecoration(new SpacingItemDecoration(30, 0));
   }
 
   // ------------------------------------------ private -------------------------------------------
 
   private boolean checkTask() {
     Task task = mRestoredState.getStateTask();
-
     return task != null && task.isValid();
   }
 
   private void setListeners() {
-    mNameEditText.addTextChangedListener(new TextWatcher() {
+    mEditName.addTextChangedListener(new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -146,7 +176,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       public void afterTextChanged(Editable s) {
         if (s.toString().length() >= Task.MAX_NAME_LENGTH) {
           Toast.makeText(getContext(), getString(R.string.task_name_too_long), Toast.LENGTH_SHORT).show();
-          mNameEditText.setText(s.toString().substring(0, Task.MAX_NAME_LENGTH - 1));
+          mEditName.setText(s.toString().substring(0, Task.MAX_NAME_LENGTH - 1));
         } else if (s.toString().trim().length() == 0) {
           Toast.makeText(getContext(), getString(R.string.task_name_too_short), Toast.LENGTH_SHORT).show();
         } else {
@@ -155,7 +185,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       }
     });
 
-    mNoteEditText.addTextChangedListener(new TextWatcher() {
+    mEditNote.addTextChangedListener(new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -165,7 +195,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       public void onTextChanged(CharSequence s, int start, int before, int count) {
         if (s.toString().length() >= Task.MAX_NOTE_LENGTH) {
           Toast.makeText(getContext(), getString(R.string.task_note_too_long), Toast.LENGTH_SHORT).show();
-          mNoteEditText.setText(s.toString().substring(0, Task.MAX_NOTE_LENGTH - 1));
+          mEditNote.setText(s.toString().substring(0, Task.MAX_NOTE_LENGTH - 1));
         } else {
           mRestoredState.setTaskNote(s.toString().trim());
         }
@@ -185,10 +215,12 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     private static final String KEY_TYPE = "KEY_TYPE";
     private static final String KEY_UUID = "KEY_UUID";
     private static final String KEY_TASK = "KEY_TASK";
+    private static final String KEY_TAGS = "KEY_TAGS";
 
     private Task.Type type;
     private String UUID;
     private Task task;
+    private ArrayList<String> tags;
 
     private State() {
     }
@@ -198,8 +230,12 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
         UUID = bundle.getString(KEY_UUID);
         type = (Task.Type) bundle.getSerializable(KEY_TYPE);
 
-        if (bundle.containsKey(KEY_TASK)) {
-         task = bundle.getParcelable(KEY_TASK);
+        if (bundle.containsKey(KEY_TASK) && bundle.containsKey(KEY_TAGS)) {
+          task = bundle.getParcelable(KEY_TASK);
+          tags = bundle.getStringArrayList(KEY_TAGS);
+        } else {
+          task = null;
+          tags = null;
         }
       } else {
         UUID = null;
@@ -210,6 +246,10 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
     private void setTask(Task task) {
       this.task = task;
+    }
+
+    private void setTags(ArrayList<String> tags) {
+      this.tags = tags;
     }
 
     private void setTaskName(String name) {
@@ -225,11 +265,15 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     }
 
     private boolean isTaskInitialized() {
-      return task != null;
+      return task != null && tags != null;
     }
 
     private Task getStateTask() {
       return task;
+    }
+
+    private ArrayList<String> getTags() {
+      return tags;
     }
 
     private Task.Type getType() {
@@ -248,6 +292,11 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       if (isInitialized()) {
         outState.putSerializable(KEY_TYPE, type);
         outState.putString(KEY_UUID, UUID);
+
+        if (isTaskInitialized()) {
+          outState.putParcelable(KEY_TASK, task);
+          outState.putStringArrayList(KEY_TAGS, tags);
+        }
       }
     }
 

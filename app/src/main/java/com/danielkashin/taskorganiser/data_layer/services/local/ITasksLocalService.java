@@ -3,13 +3,10 @@ package com.danielkashin.taskorganiser.data_layer.services.local;
 import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.pushtorefresh.storio.sqlite.operations.delete.PreparedDeleteByQuery;
-import com.pushtorefresh.storio.sqlite.operations.delete.PreparedDeleteObject;
-import com.pushtorefresh.storio.sqlite.operations.get.PreparedGet;
 import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetListOfObjects;
 import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetObject;
 import com.pushtorefresh.storio.sqlite.operations.put.PreparedPutObject;
@@ -74,8 +71,6 @@ public interface ITasksLocalService {
 
   PreparedPutObject<TaskDay> putDayTask(TaskDay dayTask);
 
-  PreparedPutObject<TaskMini> putMiniTask(TaskMini taskMini);
-
   PreparedPutObject<TaskNoDate> putNoDateTask(TaskNoDate taskNoDate);
 
   PreparedPutObject<Tag> putTag(Tag tag);
@@ -83,6 +78,8 @@ public interface ITasksLocalService {
   PreparedPutObject<TaskToTag> putTaskToTag(TaskToTag taskToTag);
 
   // --------------------------------------- delete -----------------------------------------------
+
+  PreparedDeleteByQuery deleteTaskToTag(String taskUUID);
 
   PreparedDeleteByQuery deleteTaskToTag(Long tagId);
 

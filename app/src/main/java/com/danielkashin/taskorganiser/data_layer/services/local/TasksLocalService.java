@@ -9,7 +9,6 @@ import com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.Tas
 import com.danielkashin.taskorganiser.data_layer.entities.local.connections.TaskToTag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.Tag;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
@@ -17,7 +16,6 @@ import com.danielkashin.taskorganiser.data_layer.services.base.DatabaseService;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.pushtorefresh.storio.sqlite.StorIOSQLite;
 import com.pushtorefresh.storio.sqlite.operations.delete.PreparedDeleteByQuery;
-import com.pushtorefresh.storio.sqlite.operations.delete.PreparedDeleteObject;
 import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetListOfObjects;
 import com.pushtorefresh.storio.sqlite.operations.get.PreparedGetObject;
 import com.pushtorefresh.storio.sqlite.operations.put.PreparedPutObject;
@@ -321,13 +319,6 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
   }
 
   @Override
-  public PreparedPutObject<TaskMini> putMiniTask(TaskMini taskMini) {
-    return getSQLite().put()
-        .object(taskMini)
-        .prepare();
-  }
-
-  @Override
   public PreparedPutObject<Tag> putTag(Tag tag) {
     return getSQLite().put()
         .object(tag)
@@ -349,6 +340,18 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
   }
 
   // ------------------------------------- delete -------------------------------------------------
+
+
+  @Override
+  public PreparedDeleteByQuery deleteTaskToTag(String taskUUID) {
+    return getSQLite().delete()
+        .byQuery(DeleteQuery.builder()
+            .table(TaskToTagContract.TABLE_NAME)
+            .where(TaskToTagContract.COLUMN_NAME_TASK_UUID + " = ?")
+            .whereArgs(taskUUID)
+            .build())
+        .prepare();
+  }
 
   @Override
   public PreparedDeleteByQuery deleteTaskToTag(Long tagId) {

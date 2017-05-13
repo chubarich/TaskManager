@@ -14,10 +14,6 @@ import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDayStorIOSQLiteDeleteResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDayStorIOSQLiteGetResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDayStorIOSQLitePutResolver;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMini;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMiniStorIOSQLiteDeleteResolver;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMiniStorIOSQLiteGetResolver;
-import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMiniStorIOSQLitePutResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonthStorIOSQLiteDeleteResolver;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonthStorIOSQLiteGetResolver;
@@ -57,11 +53,6 @@ public class SQLiteFactory {
             .putResolver(new TaskDayStorIOSQLitePutResolver())
             .getResolver(new TaskDayStorIOSQLiteGetResolver())
             .deleteResolver(new TaskDayStorIOSQLiteDeleteResolver())
-            .build())
-        .addTypeMapping(TaskMini.class, SQLiteTypeMapping.<TaskMini>builder()
-            .putResolver(new TaskMiniStorIOSQLitePutResolver())
-            .getResolver(new TaskMiniStorIOSQLiteGetResolver())
-            .deleteResolver(new TaskMiniStorIOSQLiteDeleteResolver())
             .build())
         .addTypeMapping(TaskNoDate.class, SQLiteTypeMapping.<TaskNoDate>builder()
             .putResolver(new TaskNoDateStorIOSQLitePutResolver())

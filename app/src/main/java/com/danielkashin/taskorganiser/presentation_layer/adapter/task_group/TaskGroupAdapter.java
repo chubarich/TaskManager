@@ -218,7 +218,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       toggleImportant = (ToggleButton) view.findViewById(R.id.toggle_important);
       recyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
       recyclerTags.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-      recyclerTags.addItemDecoration(new SpacingItemDecoration(18, 0));
+      recyclerTags.addItemDecoration(new SpacingItemDecoration(25, 0));
       recyclerTags.setAdapter(new TagsAdapter());
       setOnToggleDoneClickedListenerLocal();
     }

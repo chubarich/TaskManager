@@ -4,17 +4,18 @@
     <group android:checkableBehavior="none">
 
         <item
-            android:id="@+id/navigation_week"
-            android:icon="@drawable/ic_week"
-            android:title="@string/drawer_week"/>
+            android:id="@+id/navigation_year"
+            android:icon="@drawable/ic_year"
+            android:title="@string/drawer_year"/>
         <item
             android:id="@+id/navigation_month"
             android:icon="@drawable/ic_month"
             android:title="@string/drawer_month"/>
         <item
-            android:id="@+id/navigation_year"
-            android:icon="@drawable/ic_year"
-            android:title="@string/drawer_year"/>
+            android:id="@+id/navigation_week"
+            android:icon="@drawable/ic_week"
+            android:title="@string/drawer_week"/>
+
 
         <item
             android:id="@+id/navigation_no_date"

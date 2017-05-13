@@ -1,23 +1,28 @@
 package com.danielkashin.taskorganiser.presentation_layer.presenter.task;
 
+import android.util.Pair;
+
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskUseCase;
+import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskWithAllTagsUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.Presenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
+import java.util.ArrayList;
+
 
 public class TaskPresenter extends Presenter<ITaskView> implements
-    ITaskPresenter, GetTaskUseCase.Callbacks {
+    ITaskPresenter, GetTaskWithAllTagsUseCase.Callbacks {
 
-  private final GetTaskUseCase mGetTaskUseCase;
+  private final GetTaskWithAllTagsUseCase mGetTaskWithAllTagsUseCase;
 
-  public TaskPresenter(GetTaskUseCase getTaskUseCase) {
-    ExceptionHelper.checkAllObjectsNonNull("", getTaskUseCase);
 
-    mGetTaskUseCase = getTaskUseCase;
+  public TaskPresenter(GetTaskWithAllTagsUseCase getTaskWithAllTagsUseCase) {
+    ExceptionHelper.checkAllObjectsNonNull("", getTaskWithAllTagsUseCase);
+
+    mGetTaskWithAllTagsUseCase = getTaskWithAllTagsUseCase;
   }
 
   // --------------------------------------- lifecycle --------------------------------------------
@@ -41,15 +46,15 @@ public class TaskPresenter extends Presenter<ITaskView> implements
 
   @Override
   public void onGetTask(Task.Type type, String UUID) {
-    mGetTaskUseCase.run(this, type, UUID);
+    mGetTaskWithAllTagsUseCase.run(this, type, UUID);
   }
 
-  // ----------------------------------- GetTaskUseCase.Callbacks ---------------------------------
+  // ----------------------------------- GetTaskWithAllTagsUseCase.Callbacks ---------------------------------
 
   @Override
-  public void onGetTaskSuccess(Task task) {
+  public void onGetTaskSuccess(Pair<Task,ArrayList<String>> result) {
     if (getView() != null) {
-      getView().attachTask(task);
+      getView().attachTaskWithTags(result.first, result.second);
     }
   }
 
@@ -62,15 +67,15 @@ public class TaskPresenter extends Presenter<ITaskView> implements
 
   public static class Factory implements IPresenterFactory<TaskPresenter, ITaskView> {
 
-    private final GetTaskUseCase getTaskUseCase;
+    private final GetTaskWithAllTagsUseCase getTaskWithAllTagsUseCase;
 
-    public Factory(GetTaskUseCase getTaskUseCase) {
-      this.getTaskUseCase = getTaskUseCase;
+    public Factory(GetTaskWithAllTagsUseCase getTaskWithAllTagsUseCase) {
+      this.getTaskWithAllTagsUseCase = getTaskWithAllTagsUseCase;
     }
 
     @Override
     public TaskPresenter create() {
-      return new TaskPresenter(getTaskUseCase);
+      return new TaskPresenter(getTaskWithAllTagsUseCase);
     }
   }
 }

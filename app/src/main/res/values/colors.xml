@@ -5,6 +5,7 @@
     <color name="colorAccent">#78c98c</color>
 
     <color name="light_light_grey">#f5f5f5</color>
+    <color name="task_pressed">#7889c196</color>
 
     <color name="main_text">#000000</color>
 

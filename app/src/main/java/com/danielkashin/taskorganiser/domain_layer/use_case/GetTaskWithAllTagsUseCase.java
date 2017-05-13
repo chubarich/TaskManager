@@ -1,26 +1,30 @@
 package com.danielkashin.taskorganiser.domain_layer.use_case;
 
 
+import android.util.Pair;
+
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse;
-import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
+import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse.RepositoryRunnableResponse;
+import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse.PostExecuteListenerResponse;
+
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 
-public class GetTaskUseCase {
+public class GetTaskWithAllTagsUseCase {
 
   private final ITasksRepository tasksRepository;
   private final Executor executor;
 
-  private RepositoryAsyncTaskResponse<Task> getTask;
+  private RepositoryAsyncTaskResponse<Pair<Task,ArrayList<String>>> getTask;
 
 
-  public GetTaskUseCase(ITasksRepository tasksRepository, Executor executor) {
+  public GetTaskWithAllTagsUseCase(ITasksRepository tasksRepository, Executor executor) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter objects must be non null",
         tasksRepository, executor);
 
@@ -31,18 +35,18 @@ public class GetTaskUseCase {
   public void run(final Callbacks callbacks, final Task.Type type, final String UUID) {
     ExceptionHelper.checkAllObjectsNonNull("All use case run() arguments must be non null", callbacks);
 
-    RepositoryAsyncTaskResponse.RepositoryRunnableResponse<Task> getTaskRunnable =
-        new RepositoryAsyncTaskResponse.RepositoryRunnableResponse<Task>() {
+    RepositoryRunnableResponse<Pair<Task,ArrayList<String>>> getTaskRunnable =
+        new RepositoryRunnableResponse<Pair<Task,ArrayList<String>>>() {
           @Override
-          public Task run() throws ExceptionBundle {
-            return tasksRepository.getTask(type, UUID);
+          public Pair<Task,ArrayList<String>> run() throws ExceptionBundle {
+            return tasksRepository.getTaskWithAllTags(type, UUID);
           }
         };
 
-    RepositoryAsyncTaskResponse.PostExecuteListenerResponse<Task> getTaskListener =
-        new RepositoryAsyncTaskResponse.PostExecuteListenerResponse<Task>() {
+    PostExecuteListenerResponse<Pair<Task,ArrayList<String>>> getTaskListener =
+        new PostExecuteListenerResponse<Pair<Task,ArrayList<String>>>() {
           @Override
-          public void onResult(Task result) {
+          public void onResult(Pair<Task,ArrayList<String>> result) {
             callbacks.onGetTaskSuccess(result);
           }
 
@@ -60,7 +64,7 @@ public class GetTaskUseCase {
 
   public interface Callbacks {
 
-    void onGetTaskSuccess(Task task);
+    void onGetTaskSuccess(Pair<Task,ArrayList<String>> task);
 
     void onGetTaskException(ExceptionBundle exceptionBundle);
 

@@ -92,7 +92,6 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
     mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
     mRecyclerView.setLayoutManager(layoutManager);
     mRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
-    mRecyclerView.setNestedScrollingEnabled(false);
   }
 
 

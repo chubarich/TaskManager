@@ -45,7 +45,7 @@ public class GetTagsUseCase {
         new RepositoryRunnableResponse<ArrayList<String>>() {
           @Override
           public ArrayList<String> run() throws ExceptionBundle {
-            return tasksRepository.getTags();
+            return tasksRepository.getAllTags();
           }
         };
 

@@ -39,16 +39,11 @@ public class TaskDayContract implements TaskDateContract {
       + COLUMN_NAME_MINUTE_END + " INTEGER, "
       + COLUMN_NAME_NOTIFICATION_DATE + " DATETIME, "
 
-      // connections
-      + COLUMN_NAME_TASK_WEEK_ID + " INTEGER, "
-
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "
-      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP, "
+      + COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP + " TIMESTAMP "
 
-      + "FOREIGN KEY (" + COLUMN_NAME_TASK_WEEK_ID + ") REFERENCES "
-      + TaskWeekContract.TABLE_NAME + "(" + TaskWeekContract.COLUMN_NAME_ID + ")"
       + ");";
 
   public static String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
