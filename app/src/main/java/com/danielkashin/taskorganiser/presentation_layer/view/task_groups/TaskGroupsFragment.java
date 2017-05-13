@@ -32,6 +32,10 @@ import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolb
 
 import static com.danielkashin.taskorganiser.util.DatetimeHelper.Day;
 import static com.danielkashin.taskorganiser.util.DatetimeHelper.Month;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.getDayLabel;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.getMonthLabel;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.getWeekLabel;
+import static com.danielkashin.taskorganiser.util.DatetimeHelper.getYearLabel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -278,39 +282,6 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     }
 
     return new Pair<>(labels, highlightIndex);
-  }
-
-  private String getDayLabel(String[] months, String[] days, String dayDate) {
-    Day day = DatetimeHelper.getDay(dayDate);
-    String label = days[day.getDayOfWeek() - 1] + ", " + day.getDayOfMonth() + " "
-        + months[day.getMonth() - 1];
-
-    return label;
-  }
-
-  private String getWeekLabel(String[] months, String weekDate) {
-    Pair<Day, Day> firstAndLastDays = DatetimeHelper.getFirstAndLastDaysOfWeek(weekDate);
-    String firstDayMonth = months[firstAndLastDays.first.getMonth() - 1];
-    String lastDayMonth = months[firstAndLastDays.second.getMonth() - 1];
-
-    String label = firstAndLastDays.first.getDayOfMonth()
-        + (firstDayMonth.equals(lastDayMonth) ? "" : " " + firstDayMonth) + " - "
-        + firstAndLastDays.second.getDayOfMonth() + " "
-        + lastDayMonth;
-
-    return label;
-  }
-
-  private String getMonthLabel(String[] months, String monthDate) {
-    Month month = DatetimeHelper.getMonth(monthDate);
-    String label = months[month.getMonth() - 1] + ", " + month.getYear();
-
-    return label;
-  }
-
-  private String getYearLabel(String yearDate) {
-    int year = DatetimeHelper.getYear(yearDate);
-    return "" + year;
   }
 
   private void showActivityLabel() {

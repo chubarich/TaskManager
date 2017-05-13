@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
@@ -26,6 +27,7 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.task.ITaskPre
 import com.danielkashin.taskorganiser.presentation_layer.presenter.task.TaskPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
+import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     implements ITaskView {
 
+  private TextView mTextDate;
   private EditText mEditName;
   private EditText mEditNote;
   private LinearLayout mLayoutDuration;
@@ -96,11 +99,11 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mRestoredState.setTask(task);
     mRestoredState.setTags(tags);
 
-    mEditName.setText(task.getName());
-    mEditNote.setText(task.getNote());
     if (mRecyclerTags.getAdapter() != null) {
       ((ITagsWithSelectionAdapter) mRecyclerTags.getAdapter()).initialize(tags, task.getTags());
     }
+
+    refreshView();
   }
 
   @Override
@@ -145,15 +148,42 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
   @Override
   protected void initializeView(View view) {
+    mTextDate = (TextView) view.findViewById(R.id.text_date);
     mEditName = (EditText) view.findViewById(R.id.edit_name);
     mEditNote = (EditText) view.findViewById(R.id.edit_note);
     mRecyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
     mRecyclerTags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
     mRecyclerTags.setAdapter(new TagsWithSelectionAdapter());
-    //mRecyclerTags.addItemDecoration(new SpacingItemDecoration(30, 0));
   }
 
   // ------------------------------------------ private -------------------------------------------
+
+  private void refreshView() {
+    Task task = mRestoredState.getStateTask();
+
+    mEditName.setText(task.getName());
+    mEditNote.setText(task.getNote());
+
+    String[] months = getResources().getStringArray(R.array.months);
+    String[] days = getResources().getStringArray(R.array.days);
+
+    String text = null;
+    if (task.getType() == Task.Type.Day) {
+      text = getString(R.string.task_for_day) + ": " + DatetimeHelper.getDayLabel(months, days, task.getDate());
+    } else if (task.getType() == Task.Type.Week) {
+      text = getString(R.string.task_for_week) + ": " + DatetimeHelper.getWeekLabel(months, task.getDate());
+    } else if (task.getType()== Task.Type.Month) {
+      text = getString(R.string.task_for_month) + ": " + DatetimeHelper.getMonthLabel(months, task.getDate());
+    } else if (task.getType()== Task.Type.NoDate) {
+      text = getString(R.string.task_no_date);
+    }
+
+    if (text == null) {
+      throw new IllegalStateException("Unhandled task date");
+    } else {
+      mTextDate.setText(text);
+    }
+  }
 
   private boolean checkTask() {
     Task task = mRestoredState.getStateTask();

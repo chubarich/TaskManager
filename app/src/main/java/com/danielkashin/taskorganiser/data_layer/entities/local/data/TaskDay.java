@@ -62,10 +62,6 @@ public class TaskDay {
   @StorIOSQLiteColumn(name = COLUMN_NAME_NOTIFICATION_DATE)
   Long notificationTimestamp;
 
-  // connections
-
-  @StorIOSQLiteColumn(name = COLUMN_NAME_TASK_WEEK_ID)
-  Long taskWeekId;
 
   // synchronization
 
@@ -97,7 +93,6 @@ public class TaskDay {
     this.minuteStart = minuteStart;
     this.minuteEnd = minuteEnd;
     this.notificationTimestamp = notificationTimestamp;
-    this.taskWeekId = taskWeekId;
     this.changedLocal = changedLocal;
     this.deletedLocal = deletedLocal;
     this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
@@ -153,10 +148,6 @@ public class TaskDay {
 
   public Long getNotificationTimestamp() {
     return notificationTimestamp;
-  }
-
-  public Long getTaskWeekId() {
-    return taskWeekId;
   }
 
   public Integer getChangedLocal() {

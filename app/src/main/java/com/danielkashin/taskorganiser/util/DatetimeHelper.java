@@ -358,6 +358,43 @@ public class DatetimeHelper {
   }
 
 
+
+
+  public static String getDayLabel(String[] months, String[] days, String dayDate) {
+    Day day = DatetimeHelper.getDay(dayDate);
+    String label = days[day.getDayOfWeek() - 1] + ", " + day.getDayOfMonth() + " "
+        + months[day.getMonth() - 1];
+
+    return label;
+  }
+
+  public static String getWeekLabel(String[] months, String weekDate) {
+    Pair<Day, Day> firstAndLastDays = DatetimeHelper.getFirstAndLastDaysOfWeek(weekDate);
+    String firstDayMonth = months[firstAndLastDays.first.getMonth() - 1];
+    String lastDayMonth = months[firstAndLastDays.second.getMonth() - 1];
+
+    String label = firstAndLastDays.first.getDayOfMonth()
+        + (firstDayMonth.equals(lastDayMonth) ? "" : " " + firstDayMonth) + " - "
+        + firstAndLastDays.second.getDayOfMonth() + " "
+        + lastDayMonth;
+
+    return label;
+  }
+
+  public static String getMonthLabel(String[] months, String monthDate) {
+    Month month = DatetimeHelper.getMonth(monthDate);
+    String label = months[month.getMonth() - 1] + ", " + month.getYear();
+
+    return label;
+  }
+
+  public static String getYearLabel(String yearDate) {
+    int year = DatetimeHelper.getYear(yearDate);
+    return "" + year;
+  }
+
+
+
   public static class Month {
 
     private final int year;

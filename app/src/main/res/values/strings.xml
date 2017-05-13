@@ -18,6 +18,11 @@
     <string name="tasks_for_month">Задачи на месяц</string>
     <string name="tasks_for_year">Задачи на год</string>
 
+    <string name="task_for_day">Задача на день</string>
+    <string name="task_for_week">Задача на неделю</string>
+    <string name="task_for_month">Задача на месяц</string>
+    <string name="task_no_date">Задача без даты</string>
+
     <string name="not_registered">Не выполнен вход</string>
 
     <string name="new_task">новая задача</string>

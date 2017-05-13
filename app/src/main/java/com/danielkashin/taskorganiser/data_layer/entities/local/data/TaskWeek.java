@@ -47,11 +47,6 @@ public class TaskWeek {
   @StorIOSQLiteColumn(name = COLUMN_NAME_IMPORTANT)
   Integer important;
 
-  // connections
-
-  @StorIOSQLiteColumn(name = COLUMN_NAME_TASK_MONTH_ID)
-  Long taskWeekId;
-
   // synchronization
 
   @StorIOSQLiteColumn(name = TaskDayContract.COLUMN_NAME_CHANGED_LOCAL)
@@ -78,7 +73,6 @@ public class TaskWeek {
     this.duration = duration;
     this.done = done;
     this.important = important;
-    this.taskWeekId = taskWeekId;
     this.changedLocal = changedLocal;
     this.deletedLocal = deletedLocal;
     this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
