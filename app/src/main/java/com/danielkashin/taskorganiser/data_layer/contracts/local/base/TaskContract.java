@@ -13,6 +13,8 @@ public interface TaskContract {
 
   String COLUMN_NAME_IMPORTANT = "important";
 
+  String COLUMN_NAME_NOTIFICATION_TIMESTAMP = "notification";
+
   // -------------------------------- synchronization ---------------------------------------------
 
   String COLUMN_NAME_UUID = "uuid";

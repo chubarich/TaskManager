@@ -110,7 +110,8 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
         labelsAndHighlightIndex.first,
         labelsAndHighlightIndex.second,
         ContextCompat.getColor(getContext(), R.color.colorAccent),
-        ContextCompat.getColor(getContext(), R.color.main_text)));
+        ContextCompat.getColor(getContext(), R.color.main_text),
+        ContextCompat.getColor(getContext(), R.color.grey)));
     ((ITaskGroupsAdapter) mRecyclerView.getAdapter()).attachCallbacks(this);
   }
 

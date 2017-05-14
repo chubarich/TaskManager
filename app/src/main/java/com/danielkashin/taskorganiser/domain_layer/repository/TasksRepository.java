@@ -279,9 +279,8 @@ public class TasksRepository implements ITasksRepository {
 
     if (task.getType() == Task.Type.NoDate) {
       TaskNoDate taskNoDate = new TaskNoDate(null, task.getName(), task.getNote(), task.getUUID(),
-          NumbersHelper.getInteger(task.getDone()),
-          task.getDuration(),
-          NumbersHelper.getInteger(task.getImportant()), 1, 0,
+          NumbersHelper.getInteger(task.getDone()), task.getDuration(),
+          NumbersHelper.getInteger(task.getImportant()), task.getNotificationTimestamp(),  1, 0,
           DatetimeHelper.getCurrentTimestamp());
 
       tasksLocalService.putNoDateTask(taskNoDate)
@@ -298,7 +297,7 @@ public class TasksRepository implements ITasksRepository {
     } else if (task.getType() == Task.Type.Week) {
       TaskWeek taskWeek = new TaskWeek(null, task.getName(), task.getDate(), task.getNote(),
           task.getUUID(), task.getDuration(), NumbersHelper.getInteger(task.getDone()),
-          NumbersHelper.getInteger(task.getImportant()), null, 1, 0,
+          NumbersHelper.getInteger(task.getImportant()), task.getNotificationTimestamp(), 1, 0,
           DatetimeHelper.getCurrentTimestamp());
 
       tasksLocalService.putWeekTask(taskWeek)
@@ -306,7 +305,7 @@ public class TasksRepository implements ITasksRepository {
     } else if (task.getType() == Task.Type.Month) {
       TaskMonth taskMonth = new TaskMonth(null, task.getName(), task.getDate(), task.getNote(),
           task.getUUID(), task.getDuration(), NumbersHelper.getInteger(task.getDone()),
-          NumbersHelper.getInteger(task.getImportant()), 1, 0,
+          NumbersHelper.getInteger(task.getImportant()), task.getNotificationTimestamp(), 1, 0,
           DatetimeHelper.getCurrentTimestamp());
 
       tasksLocalService.putMonthTask(taskMonth)

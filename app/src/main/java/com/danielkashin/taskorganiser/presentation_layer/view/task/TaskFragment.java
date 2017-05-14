@@ -1,5 +1,6 @@
 package com.danielkashin.taskorganiser.presentation_layer.view.task;
 
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,8 +12,10 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
@@ -53,9 +56,15 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
   private TextView mTextChooseDay;
   private TextView mTextChooseWeek;
   private TextView mTextChooseMonth;
+  private TextView mTextChooseDuration;
+  private TextView mTextChooseZeroDuration;
+  private TextView mTextChooseStart;
+  private TextView mTextChooseEnd;
+  private TextView mTextChooseZeroStart;
+  private TextView mTextChooseZeroEnd;
 
-  private LinearLayout mLayoutDuration;
-  private LinearLayout mLayoutStartAndEnd;
+  private HorizontalScrollView mLayoutDuration;
+  private HorizontalScrollView mLayoutStartAndEnd;
   private RecyclerView mRecyclerTags;
 
   private State mRestoredState;
@@ -186,17 +195,55 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mTextChooseDay = (TextView) view.findViewById(R.id.text_choose_day);
     mTextChooseWeek = (TextView) view.findViewById(R.id.text_choose_week);
     mTextChooseMonth = (TextView) view.findViewById(R.id.text_choose_month);
+    mTextChooseDuration = (TextView) view.findViewById(R.id.text_choose_duration);
+    mTextChooseZeroDuration = (TextView) view.findViewById(R.id.text_choose_zero_duration);
+    mTextChooseZeroStart = (TextView) view.findViewById(R.id.text_choose_zero_start);
+    mTextChooseZeroEnd = (TextView) view.findViewById(R.id.text_choose_zero_end);
+    mTextChooseStart = (TextView) view.findViewById(R.id.text_choose_start);
+    mTextChooseEnd = (TextView) view.findViewById(R.id.text_choose_end);
 
-    mLayoutDuration = (LinearLayout) view.findViewById(R.id.layout_duration);
+    mLayoutDuration = (HorizontalScrollView) view.findViewById(R.id.layout_duration);
+    mLayoutStartAndEnd = (HorizontalScrollView) view.findViewById(R.id.layout_start_and_end);
   }
 
   // ------------------------------------------ private -------------------------------------------
+
+  private void setTaskStart(Long start) {
+    if (mRestoredState.isTaskInitialized()) {
+      Task task = mRestoredState.getStateTask();
+      if (!task.setMinuteStart(start)) {
+        Toast.makeText(getContext(), getString(R.string.wrong_start_and_end), Toast.LENGTH_SHORT).show();
+      } else {
+        refreshView();
+      }
+    }
+  }
+
+  private void setTaskEnd(Long end) {
+    if (mRestoredState.isTaskInitialized()) {
+      Task task = mRestoredState.getStateTask();
+      if (!task.setMinuteEnd(end)) {
+        Toast.makeText(getContext(), getString(R.string.wrong_start_and_end), Toast.LENGTH_SHORT).show();
+      } else {
+        refreshView();
+      }
+    }
+  }
 
   private void setTaskTypeAndDate(Task.Type type, String date) {
     if (mRestoredState.isTaskInitialized()) {
       Task task = mRestoredState.getStateTask();
       task.setType(type);
       task.setDate(date);
+
+      refreshView();
+    }
+  }
+
+  private void setTaskDuration(Long duration) {
+    if (mRestoredState.isTaskInitialized()) {
+      Task task = mRestoredState.getStateTask();
+      task.setDuration(duration);
 
       refreshView();
     }
@@ -212,10 +259,11 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       // set duration
       boolean showDurationLayout = task.canSetDuration();
       mLayoutDuration.setVisibility(showDurationLayout ? View.VISIBLE : View.GONE);
-      String time = task.getTimeToString(getString(R.string.from), getString(R.string.to),
-          getString(R.string.duration), getString(R.string.time), getString(R.string.duration_not_set));
+      String time = task.getTimeAndIsPeriod(getString(R.string.from), getString(R.string.to),
+          getString(R.string.duration), getString(R.string.duration_not_set), getString(R.string.time)).first;
       mTextTime.setText(time);
 
+      mLayoutStartAndEnd.setVisibility(task.getType() == Task.Type.Day ? View.VISIBLE : View.GONE);
 
       // set date label
       String[] months = getResources().getStringArray(R.array.months_simple);
@@ -253,13 +301,95 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mTextToThisMonth.setOnClickListener(patternListener);
     mTextToNextMonth.setOnClickListener(patternListener);
 
-    View.OnClickListener walkerListener = getChooseDateListener();
-    mTextChooseDay.setOnClickListener(walkerListener);
-    mTextChooseWeek.setOnClickListener(walkerListener);
-    mTextChooseMonth.setOnClickListener(walkerListener);
+    View.OnClickListener chooseDateListener = getChooseDateListener();
+    mTextChooseDay.setOnClickListener(chooseDateListener);
+    mTextChooseWeek.setOnClickListener(chooseDateListener);
+    mTextChooseMonth.setOnClickListener(chooseDateListener);
+
+    mTextChooseDuration.setOnClickListener(getChooseDurationListener());
+    mTextChooseZeroDuration.setOnClickListener(getChooseDurationZeroListener());
+
+    View.OnClickListener chooseStartAndEndZeroListener = getChooseStartAndEndZeroListener();
+    mTextChooseZeroStart.setOnClickListener(chooseStartAndEndZeroListener);
+    mTextChooseZeroEnd.setOnClickListener(chooseStartAndEndZeroListener);
+
+    View.OnClickListener chooseStartAndEndListener = getChooseStartAndEndListener();
+    mTextChooseStart.setOnClickListener(chooseStartAndEndListener);
+    mTextChooseEnd.setOnClickListener(chooseStartAndEndListener);
 
     mEditName.addTextChangedListener(getNameWatcher());
     mEditNote.addTextChangedListener(getNoteWatcher());
+  }
+
+  private View.OnClickListener getChooseStartAndEndZeroListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(final View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseZeroStart || v == mTextChooseZeroEnd);
+
+        if (mRestoredState.isTaskInitialized()) {
+          if (v == mTextChooseZeroStart) {
+            setTaskStart(null);
+          } else {
+            setTaskEnd(null);
+          }
+        }
+      }
+    };
+  }
+
+  private View.OnClickListener getChooseStartAndEndListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseStart || v == mTextChooseEnd);
+        final boolean isChoosingStart = v == mTextChooseStart;
+
+        if (mRestoredState.isTaskInitialized()) {
+          final Task task = mRestoredState.getStateTask();
+          Long duration = isChoosingStart ? task.getMinuteStart() : task.getMinuteEnd();
+
+          int hour = 0;
+          int minute = 0;
+          if (duration != null) {
+            hour = (int) (duration / 60);
+            minute = (int) (duration % 60);
+          }
+
+          TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+              Long minutes = hourOfDay * 60L + minute;
+              if (isChoosingStart) {
+                setTaskStart(minutes);
+              } else {
+                setTaskEnd(minutes);
+              }
+            }
+          };
+
+
+          TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+              onTimeSetListener, hour, minute, true);
+          timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              // do nothing
+            }
+          });
+          timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+              // do nothing
+            }
+          });
+          timePickerDialog.setMessage(isChoosingStart ? getString(R.string.please_choose_start)
+              : getString(R.string.please_choose_end));
+          timePickerDialog.setTitle(null);
+          timePickerDialog.show();
+        }
+      }
+    };
   }
 
   private TextWatcher getNoteWatcher() {
@@ -286,6 +416,59 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     };
   }
 
+  private View.OnClickListener getChooseDurationZeroListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        setTaskDuration(null);
+      }
+    };
+  }
+
+  private View.OnClickListener getChooseDurationListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(final View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseDuration);
+
+        if (mRestoredState.isTaskInitialized()) {
+          int hour = 0;
+          int minute = 0;
+          if (mRestoredState.getStateTask().getDuration() != null) {
+            hour = hour / 60;
+            minute = hour % 60;
+          }
+
+          TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+              setTaskDuration(hourOfDay * 60L + minute);
+            }
+          };
+
+
+          TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+              onTimeSetListener, hour, minute, true);
+          timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              // do nothing
+            }
+          });
+          timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+              // do nothing
+            }
+          });
+          timePickerDialog.setMessage(getString(R.string.please_choose_duration));
+          timePickerDialog.setTitle(null);
+          timePickerDialog.show();
+        }
+      }
+    };
+  }
+
   private View.OnClickListener getChooseDateListener() {
     return new View.OnClickListener() {
       @Override
@@ -294,7 +477,6 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
             || v == mTextChooseMonth || v == mTextChooseWeek);
 
         if (mRestoredState.isTaskInitialized()) {
-
           final int year = DatetimeHelper.getCurrentYearNumber();
           final int month = DatetimeHelper.getCurrentMonthNumber();
           final int day = DatetimeHelper.getCurrentDayOfMonthNumber();
@@ -303,7 +485,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
           datePicker.updateDate(year, month, day);
 
           new AlertDialog.Builder(getContext())
-              .setTitle(getString(R.string.choose_date))
+              .setMessage(getString(R.string.please_choose_date))
               .setPositiveButton(R.string.choose, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

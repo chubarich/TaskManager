@@ -23,24 +23,31 @@
     <string name="task_for_month">На месяц</string>
     <string name="task_no_date">Без даты</string>
 
-    <string name="to_this_week">На эту неделю</string>
-    <string name="to_next_week">На следующую неделю</string>
-    <string name="to_this_month">На этот месяц</string>
-    <string name="to_next_month">На следующий месяц</string>
-    <string name="to_this_day">На сегодня</string>
-    <string name="to_next_day">На завтра</string>
-    <string name="to_no_date">Убрать дату</string>
+    <string name="to_this_week">Эта неделя</string>
+    <string name="to_next_week">Следующая неделя</string>
+    <string name="to_this_month">Этот месяц</string>
+    <string name="to_next_month">Следующий месяц</string>
+    <string name="to_this_day">Сегодня</string>
+    <string name="to_next_day">Завтра</string>
+    <string name="to_no_date">Обнулить дату</string>
     <string name="choose_day">Выбрать день</string>
     <string name="choose_week">Выбрать неделю</string>
     <string name="choose_month">Выбрать месяц</string>
     <string name="choose_duration">Выбрать длительность</string>
     <string name="choose_zero_duration">Обнулить длительность</string>
     <string name="choose">Выбрать</string>
+    <string name="choose_start">Выбрать время начала</string>
+    <string name="choose_end">Выбрать время завершения</string>
+    <string name="choose_zero_start">Обнулить начало</string>
+    <string name="choose_zero_end">Обнулить завершение</string>
 
-
+    <string name="wrong_start_and_end">Неверный выбор времени</string>
     <string name="changes_not_accepted">Изменения не приняты</string>
     <string name="not_registered">Не выполнен вход</string>
-    <string name="choose_date">Выберите дату в пределах нужного интервала </string>
+    <string name="please_choose_date">Выбор даты</string>
+    <string name="please_choose_duration">Выбор длительности</string>
+    <string name="please_choose_start">Выбор начала</string>
+    <string name="please_choose_end">Выбор завершения</string>
 
     <string name="new_task">новая задача</string>
     <string name="today">Сегодня</string>
@@ -49,7 +56,7 @@
     <string name="time">Время</string>
     <string name="from">с</string>
     <string name="to">по</string>
-    <string name="duration_not_set">не выставлена</string>
+    <string name="duration_not_set">не установлена</string>
 
     <string name="tags">Теги</string>
     <string name="new_tag">Новый тег</string>

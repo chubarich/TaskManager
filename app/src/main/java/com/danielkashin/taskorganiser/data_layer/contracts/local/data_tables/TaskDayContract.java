@@ -12,13 +12,9 @@ public class TaskDayContract implements TaskDateContract {
 
   public static final String TABLE_NAME = "task_days";
 
-  public static final String COLUMN_NAME_TASK_WEEK_ID = "task_week_id";
-
   public static final String COLUMN_NAME_MINUTE_START = "minute_start";
 
   public static final String COLUMN_NAME_MINUTE_END = "minute_end";
-
-  public static final String COLUMN_NAME_NOTIFICATION_DATE = "notification_timestamp";
 
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
@@ -37,7 +33,7 @@ public class TaskDayContract implements TaskDateContract {
       // TaskDayContract
       + COLUMN_NAME_MINUTE_START + " INTEGER, "
       + COLUMN_NAME_MINUTE_END + " INTEGER, "
-      + COLUMN_NAME_NOTIFICATION_DATE + " DATETIME, "
+      + COLUMN_NAME_NOTIFICATION_TIMESTAMP + " TIMESTAMP, "
 
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "

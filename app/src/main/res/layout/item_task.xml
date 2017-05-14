@@ -36,38 +36,37 @@
             android:textColor="@android:color/black"
             android:textSize="17dp"/>
 
+        <TextView
+            android:id="@+id/text_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/toggle_important"
+            android:paddingStart="5dp"
+            android:layout_marginEnd="3dp"
+            android:textAlignment="center"
+            android:textColor="@color/grey"
+            android:textSize="12dp"/>
 
         <ToggleButton
             android:id="@+id/toggle_important"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/text_time"
             android:background="@drawable/selector_important"
             android:hint=""
             android:text=""
             android:textOff=""
             android:textOn=""/>
 
-        <TextView
-            android:id="@+id/text_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="3dp"
-            android:paddingStart="5dp"
-            android:textAlignment="center"
-            android:textColor="@color/colorAccent"
-            android:textSize="12dp"/>
-
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_tags"
-        android:paddingTop="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="35dp"/>
+        android:paddingStart="35dp"
+        android:paddingTop="5dp"/>
 
 </LinearLayout>

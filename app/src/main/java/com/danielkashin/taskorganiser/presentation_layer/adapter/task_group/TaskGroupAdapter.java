@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.ITagsAdapt
 import com.danielkashin.taskorganiser.presentation_layer.adapter.tags.TagsAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -37,17 +39,22 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
   private ITaskGroupAdapter.Callbacks mCallbacks;
   private ITaskGroup mTaskGroup;
   private boolean mShowEditText;
+  private int mHighlightColor;
+  private int mCommonColor;
 
-
-  public TaskGroupAdapter(boolean showEditText) {
+  public TaskGroupAdapter(boolean showEditText, int highlightColor, int commonColor) {
     mShowEditText = showEditText;
+    mHighlightColor = highlightColor;
+    mCommonColor = commonColor;
   }
 
-  public TaskGroupAdapter(ITaskGroup taskGroup, boolean showEditText) {
+  public TaskGroupAdapter(ITaskGroup taskGroup, boolean showEditText, int highlightColor, int commonColor) {
     ExceptionHelper.checkAllObjectsNonNull("All adapter arguments must be non null", taskGroup);
 
     mTaskGroup = taskGroup;
     mShowEditText = showEditText;
+    mHighlightColor = highlightColor;
+    mCommonColor = commonColor;
   }
 
   // -------------------------------- ITagsAdapter.Callbacks --------------------------------------
@@ -126,12 +133,14 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       taskViewHolder.setTextName(task.getName());
 
       // set time
-      if (mTaskGroup instanceof DateTypeTaskGroup) {
-        if (((DateTypeTaskGroup) mTaskGroup).getType() == Task.Type.Day) {
-          taskViewHolder.setTextTime(task.getTimeToString("с", "по", null, null, null));
-        } else {
-          taskViewHolder.setTextTime("");
-        }
+      Pair<String, Boolean> timeAndIsPeriod = task.getTimeAndIsPeriod("с", "по", null, null, null);
+      Boolean isPeriod = timeAndIsPeriod.second;
+      String time = timeAndIsPeriod.first;
+      boolean showTime = time != null && !time.isEmpty() && (!isPeriod
+          || (mTaskGroup instanceof DateTypeTaskGroup
+          && ((DateTypeTaskGroup) mTaskGroup).getType() != Task.Type.NoDate));
+      if (showTime) {
+        taskViewHolder.setTextTime(timeAndIsPeriod.first, timeAndIsPeriod.second ? mCommonColor : mHighlightColor);
       }
 
       // set tags
@@ -227,8 +236,9 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       textName.setText(name);
     }
 
-    private void setTextTime(String time) {
+    private void setTextTime(String time, int color) {
       textTime.setText(time);
+      //textTime.setTextColor(color);
     }
 
     private void setTags(ArrayList<String> tags, ITagsAdapter.Callbacks callbacks) {

@@ -2,6 +2,7 @@ package com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -73,7 +74,7 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
       ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.drawer_done), false, false, false, true);
     }
 
-    ((TypedTasksPresenter)getPresenter()).onGetTaskGroupData();
+    ((TypedTasksPresenter) getPresenter()).onGetTaskGroupData();
   }
 
   @Override
@@ -135,7 +136,10 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
   @Override
   public void initializeAdapter(ITaskGroup taskGroup) {
     if (mRecyclerView.getAdapter() == null) {
-      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup, mRestoredState.getType() != State.Type.Done));
+      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup,
+          mRestoredState.getType() != State.Type.Done,
+          ContextCompat.getColor(getContext(), R.color.colorAccent),
+          ContextCompat.getColor(getContext(), R.color.grey)));
     } else {
       ((ITaskGroupAdapter) mRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
     }

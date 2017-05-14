@@ -27,6 +27,8 @@ public class TaskMonthContract implements TaskDateContract {
       + COLUMN_NAME_DONE + " INTEGER NOT NULL, "
       + COLUMN_NAME_IMPORTANT + " INTEGER NOT NULL, "
 
+      + COLUMN_NAME_NOTIFICATION_TIMESTAMP + " TIMESTAMP, "
+
       // synchronization
       + COLUMN_NAME_CHANGED_LOCAL + " INTEGER NOT NULL, "
       + COLUMN_NAME_DELETED_LOCAL + " INTEGER NOT NULL, "

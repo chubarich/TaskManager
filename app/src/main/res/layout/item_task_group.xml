@@ -55,14 +55,9 @@
     </net.cachapa.expandablelayout.ExpandableLayout>
 
     <View
-        android:background="@android:color/transparent"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"/>
-
-    <View
         android:id="@+id/view_highlighter"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:visibility="gone"
         android:background="@color/grey"/>
 

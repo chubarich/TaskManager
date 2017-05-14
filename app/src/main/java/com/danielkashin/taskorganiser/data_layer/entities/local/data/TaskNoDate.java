@@ -8,6 +8,7 @@ import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract.COLUMN_NAME_ID;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DATE;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DURATION;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskNoDateContract.COLUMN_NAME_CHANGED_LOCAL;
@@ -48,6 +49,9 @@ public class TaskNoDate {
   @StorIOSQLiteColumn(name = COLUMN_NAME_IMPORTANT)
   Integer important;
 
+  @StorIOSQLiteColumn(name = COLUMN_NAME_NOTIFICATION_TIMESTAMP)
+  Long notificationTimestamp;
+
   // synchronization
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_CHANGED_LOCAL)
@@ -64,7 +68,7 @@ public class TaskNoDate {
   }
 
   public TaskNoDate(Long id, String name, String note, String UUID, Integer done, Long duration,
-                    Integer important, Integer changedLocal, Integer deletedLocal,
+                    Integer important, Long notificationTimestamp, Integer changedLocal, Integer deletedLocal,
                     Long changeOrDeleteLocalTimestamp) {
     this.id = id;
     this.name = name;
@@ -73,6 +77,7 @@ public class TaskNoDate {
     this.done = done;
     this.duration = duration;
     this.important = important;
+    this.notificationTimestamp = notificationTimestamp;
     this.changedLocal = changedLocal;
     this.deletedLocal = deletedLocal;
     this.changeOrDeleteLocalTimestamp = changeOrDeleteLocalTimestamp;
@@ -112,6 +117,10 @@ public class TaskNoDate {
 
   public Integer getChangedLocal() {
     return changedLocal;
+  }
+
+  public Long getNotificationTimestamp() {
+    return notificationTimestamp;
   }
 
   public Integer getDeletedLocal() {

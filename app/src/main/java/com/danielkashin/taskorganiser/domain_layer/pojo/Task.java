@@ -2,6 +2,7 @@ package com.danielkashin.taskorganiser.domain_layer.pojo;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Pair;
 
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
@@ -17,7 +18,7 @@ import java.util.Comparator;
 public class Task implements Parcelable {
 
   public static final int MAX_NAME_LENGTH = 200;
-  public static final int MAX_NOTE_LENGTH = 1000;
+  public static final int MAX_NOTE_LENGTH = 3000;
 
   // ---------------------------------------- main info -------------------------------------------
 
@@ -44,8 +45,6 @@ public class Task implements Parcelable {
   private String note;
 
   private ArrayList<String> tags;
-
-  private ArrayList<Long> subtasks;
 
   private Boolean done;
 
@@ -127,7 +126,6 @@ public class Task implements Parcelable {
     note = parcel.readString();
     tags = new ArrayList<>();
     parcel.readStringList(tags);
-    subtasks = (ArrayList<Long>) parcel.readSerializable();
     done = (Boolean) parcel.readSerializable();
     important = (Boolean) parcel.readSerializable();
     changedLocal = (Boolean) parcel.readSerializable();
@@ -152,7 +150,6 @@ public class Task implements Parcelable {
     parcel.writeSerializable(notificationTimestamp);
     parcel.writeString(note);
     parcel.writeStringList(tags);
-    parcel.writeSerializable(subtasks);
     parcel.writeSerializable(done);
     parcel.writeSerializable(important);
     parcel.writeSerializable(changedLocal);
@@ -175,7 +172,7 @@ public class Task implements Parcelable {
   // ----------------------------------- getters/setters ------------------------------------------
 
   public boolean canSetDuration() {
-    return getType() != Task.Type.Day || (getMinuteStart() == null && getMinuteEnd() == null);
+    return type != Task.Type.Day || minuteStart == null || minuteEnd == null;
   }
 
   public boolean isValid() {
@@ -232,25 +229,35 @@ public class Task implements Parcelable {
     return true;
   }
 
-  public String getTimeToString(String from, String to, String durationLabel, String notSet, String timeLabel) {
+  public Pair<String, Boolean> getTimeAndIsPeriod(String from, String to, String durationLabel,
+                                                  String notSet, String timeLabel) {
     from = (from == null) ? "" : (from + " ");
     to = (to == null) ? "" : (to + " ");
     timeLabel = (timeLabel == null) ? "" : (timeLabel + ": ");
     durationLabel = (durationLabel == null) ? "" : (durationLabel + ": ");
     notSet = (notSet == null) ? "" : notSet;
 
+    String time;
+    Boolean isPeriod;
     if (type == Type.Day && minuteStart != null && minuteEnd != null) {
-      return timeLabel + String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
+      time = timeLabel + String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
           minuteEnd / 60, minuteEnd % 60);
+      isPeriod = true;
     } else if (type == Type.Day && minuteStart != null) {
-      return timeLabel + String.format("%02d:%02d", minuteStart / 60, minuteStart % 60);
+      time = timeLabel + from + String.format("%02d:%02d", minuteStart / 60, minuteStart % 60);
+      isPeriod = true;
     } else if (type == Type.Day && minuteEnd != null) {
-      return timeLabel + String.format("%02d:%02d", minuteEnd / 60, minuteEnd % 60);
+      time = timeLabel + to + String.format("%02d:%02d", minuteEnd / 60, minuteEnd % 60);
+      isPeriod = true;
     } else if (duration != null) {
-      return durationLabel + String.format("%02d:%02d", duration / 60, duration % 60);
+      time = durationLabel + String.format("%01d:%02d", duration / 60, duration % 60);
+      isPeriod = false;
     } else {
-      return durationLabel + notSet;
+      time = durationLabel + notSet;
+      isPeriod = false;
     }
+
+    return new Pair<>(time, isPeriod);
   }
 
   public String getUUID() {
@@ -274,7 +281,7 @@ public class Task implements Parcelable {
   }
 
   public void setDuration(Long duration) {
-    this.duration = duration;
+    this.duration = (duration == null || duration == 0) ? null : duration;
   }
 
   public Long getMinuteStart() {
@@ -295,22 +302,58 @@ public class Task implements Parcelable {
     this.name = name;
   }
 
-  public void setMinuteStart(Long minuteStart) {
-    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
+  public boolean setMinuteStart(Long minuteStart) {
+    if (minuteStart == null) {
+      this.minuteStart = null;
+      return true;
+    } else if (minuteEnd == null) {
+      this.minuteStart = minuteStart;
+      if (duration != null && (minuteStart + duration < 24 * 60)) {
+        this.minuteEnd = minuteStart + duration;
+      } else {
+        this.duration = null;
+      }
+      return true;
+    } else if (minuteEnd - minuteStart > 0) {
+      this.minuteStart = minuteStart;
+      this.duration = minuteEnd - minuteStart;
+      return true;
+    } else {
+      this.minuteStart = minuteStart;
+      this.duration = null;
+      this.minuteEnd = null;
+      return true;
+    }
+  }
 
-    this.minuteStart = minuteStart;
+  public boolean setMinuteEnd(Long minuteEnd) {
+    if (minuteEnd == null) {
+      this.minuteEnd = null;
+      return true;
+    } else if (minuteStart == null) {
+      this.minuteEnd = minuteEnd;
+      if (duration != null && (minuteEnd - duration >= 0)) {
+        this.minuteStart = minuteEnd - duration;
+      } else {
+        this.duration = null;
+      }
+      return true;
+    } else if (minuteEnd - minuteStart > 0) {
+      this.minuteEnd = minuteEnd;
+      this.duration = minuteEnd - minuteStart;
+      return true;
+    } else {
+      this.minuteEnd = minuteEnd;
+      this.minuteStart = null;
+      this.duration = null;
+      return true;
+    }
   }
 
   public Long getMinuteEnd() {
     ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
 
     return minuteEnd;
-  }
-
-  public void setMinuteEnd(Long minuteEnd) {
-    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
-
-    this.minuteEnd = minuteEnd;
   }
 
   public Long getNotificationTimestamp() {
@@ -337,14 +380,6 @@ public class Task implements Parcelable {
     this.tags = tags;
   }
 
-  public ArrayList<Long> getSubtasks() {
-    return subtasks;
-  }
-
-  public void setSubtasks(ArrayList<Long> subtasks) {
-    this.subtasks = subtasks;
-  }
-
   public Boolean getDone() {
     return done != null && done;
   }
@@ -360,7 +395,6 @@ public class Task implements Parcelable {
     task.setDuration(duration);
     task.setNote(note);
     task.setTags(tags);
-    task.setSubtasks(subtasks);
 
     if (type == Type.Day) {
       task.setMinuteStart(minuteStart);

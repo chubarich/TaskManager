@@ -25,17 +25,12 @@ import java.util.ArrayList;
 public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.TaskGroupHolder>
     implements ITaskGroupsAdapter, ITaskGroupAdapter.Callbacks {
 
-  private static final String KEY_LABELS = "LABELS";
-  private static final String KEY_HIGHLIGHT_INDEX = "HIGHLIGHT_INDEX";
-  private static final String KEY_HIGHLIGHT_COLOR = "HIGHLIGHT_COLOR";
-  private static final String KEY_COMMON_COLOR = "COMMON_COLOR";
-  private static final String KEY_CHECKED_POSITIONS = "CHECKED_POSITIONS";
-
   private ArrayList<DateTypeTaskGroup> mTaskGroups;
   private ArrayList<String> mLabels;
   private int mHighlightIndex;
   private int mHighlightColor;
   private int mCommonColor;
+  private int mSecondaryTextColor;
   private boolean[] mCheckedPositions;
   private boolean[] mShowExpandable;
   private ITaskGroupsAdapter.Callbacks mCallbacks;
@@ -45,7 +40,8 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
                            ArrayList<String> labels,
                            int highlightIndex,
                            int highlightColor,
-                           int commonColor) {
+                           int commonColor,
+                           int secondaryTextColor) {
     ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null", taskGroups, labels);
     ExceptionHelper.assertTrue("Labels and groups sizes must be equal", taskGroups.size() == labels.size());
 
@@ -54,6 +50,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
     mHighlightIndex = highlightIndex;
     mHighlightColor = highlightColor;
     mCommonColor = commonColor;
+    mSecondaryTextColor = secondaryTextColor;
 
     mCheckedPositions = new boolean[mTaskGroups.size()];
     mShowExpandable = new boolean[mTaskGroups.size()];
@@ -134,7 +131,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
 
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(parent.getContext());
 
-    return new TaskGroupHolder(view, linearLayoutManager);
+    return new TaskGroupHolder(view, linearLayoutManager, mHighlightColor, mSecondaryTextColor);
   }
 
   @Override
@@ -215,7 +212,8 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
     private final ImageView imageExpand;
     private final View viewHighlighter;
 
-    private TaskGroupHolder(View view, RecyclerView.LayoutManager layoutManager) {
+    private TaskGroupHolder(View view, RecyclerView.LayoutManager layoutManager,
+                            int highlightColor, int commonColor) {
       super(view);
       ExceptionHelper.checkAllObjectsNonNull("All arguments must be non null", view, layoutManager);
 
@@ -225,7 +223,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       viewHighlighter = view.findViewById(R.id.view_highlighter);
 
       tasksRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_tasks);
-      tasksRecyclerView.setAdapter(new TaskGroupAdapter(true));
+      tasksRecyclerView.setAdapter(new TaskGroupAdapter(true, highlightColor, commonColor));
       tasksRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
       tasksRecyclerView.setLayoutManager(layoutManager);
 

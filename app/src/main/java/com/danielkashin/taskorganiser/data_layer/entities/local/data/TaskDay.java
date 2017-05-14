@@ -4,6 +4,7 @@ import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteType;
 
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract.COLUMN_NAME_ID;
+import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_CHANGED_LOCAL;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_DATE;
@@ -16,8 +17,6 @@ import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.Tas
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskDateContract.COLUMN_NAME_UUID;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract.COLUMN_NAME_MINUTE_END;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract.COLUMN_NAME_MINUTE_START;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract.COLUMN_NAME_NOTIFICATION_DATE;
-import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract.COLUMN_NAME_TASK_WEEK_ID;
 import static com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables.TaskDayContract.TABLE_NAME;
 
 @StorIOSQLiteType(table = TABLE_NAME)
@@ -51,6 +50,9 @@ public class TaskDay {
   @StorIOSQLiteColumn(name = COLUMN_NAME_IMPORTANT)
   Integer important;
 
+  @StorIOSQLiteColumn(name = COLUMN_NAME_NOTIFICATION_TIMESTAMP)
+  Long notificationTimestamp;
+
   // TaskDayContract
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_MINUTE_START)
@@ -58,9 +60,6 @@ public class TaskDay {
 
   @StorIOSQLiteColumn(name = COLUMN_NAME_MINUTE_END)
   Long minuteEnd;
-
-  @StorIOSQLiteColumn(name = COLUMN_NAME_NOTIFICATION_DATE)
-  Long notificationTimestamp;
 
 
   // synchronization
