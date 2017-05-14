@@ -30,8 +30,6 @@ import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ICalen
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITagViewOpener;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
 
-import static com.danielkashin.taskorganiser.util.DatetimeHelper.Day;
-import static com.danielkashin.taskorganiser.util.DatetimeHelper.Month;
 import static com.danielkashin.taskorganiser.util.DatetimeHelper.getDayLabel;
 import static com.danielkashin.taskorganiser.util.DatetimeHelper.getMonthLabel;
 import static com.danielkashin.taskorganiser.util.DatetimeHelper.getWeekLabel;
@@ -123,7 +121,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     if (mRestoredState.getType() == Task.Type.Week) {
       return new Pair<>(mRestoredState.getDate(), Task.Type.Month);
     } else if (mRestoredState.getType() == Task.Type.Day) {
-      String firstDayOfMonth = DatetimeHelper.getFirstDayOfMonth(mRestoredState.getDate());
+      String firstDayOfMonth = DatetimeHelper.getMonthDate(mRestoredState.getDate());
       return new Pair<>(firstDayOfMonth, Task.Type.Week);
     } else {
       return null;

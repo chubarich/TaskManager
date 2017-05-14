@@ -268,11 +268,19 @@ public class TasksRepository implements ITasksRepository {
 
   @Override
   public void saveTask(Task task) throws ExceptionBundle {
+    // delete tasks matching the save UUID
+    deleteTask(Task.Type.NoDate, task.getUUID());
+    deleteTask(Task.Type.Day, task.getUUID());
+    deleteTask(Task.Type.Week, task.getUUID());
+    deleteTask(Task.Type.Month, task.getUUID());
+
+    // save task tags
     saveTags(task);
 
     if (task.getType() == Task.Type.NoDate) {
       TaskNoDate taskNoDate = new TaskNoDate(null, task.getName(), task.getNote(), task.getUUID(),
           NumbersHelper.getInteger(task.getDone()),
+          task.getDuration(),
           NumbersHelper.getInteger(task.getImportant()), 1, 0,
           DatetimeHelper.getCurrentTimestamp());
 
@@ -329,32 +337,36 @@ public class TasksRepository implements ITasksRepository {
     String[] UUIDs = new String[]{UUID};
     if (type == Task.Type.Day) {
       List<TaskDay> tasks = tasksLocalService.getDayTasks(UUIDs).executeAsBlocking();
-      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      tasks.get(0).setDeletedLocal(true);
-      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
-      tasksLocalService.putDayTask(tasks.get(0)).executeAsBlocking();
+      if (tasks.size() != 0) {
+        tasks.get(0).setDeletedLocal(true);
+        tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+        tasksLocalService.putDayTask(tasks.get(0)).executeAsBlocking();
+      }
     } else if (type == Task.Type.Week) {
       List<TaskWeek> tasks = tasksLocalService.getWeekTasks(UUIDs).executeAsBlocking();
-      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      tasks.get(0).setDeletedLocal(true);
-      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
-      tasksLocalService.putWeekTask(tasks.get(0)).executeAsBlocking();
+      if (tasks.size() != 0) {
+        tasks.get(0).setDeletedLocal(true);
+        tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+        tasksLocalService.putWeekTask(tasks.get(0)).executeAsBlocking();
+      }
     } else if (type == Task.Type.Month) {
       List<TaskMonth> tasks = tasksLocalService.getMonthTasks(UUIDs).executeAsBlocking();
-      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      tasks.get(0).setDeletedLocal(true);
-      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
-      tasksLocalService.putMonthTask(tasks.get(0)).executeAsBlocking();
+      if (tasks.size() != 0) {
+        tasks.get(0).setDeletedLocal(true);
+        tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+        tasksLocalService.putMonthTask(tasks.get(0)).executeAsBlocking();
+      }
     } else if (type == Task.Type.NoDate) {
       List<TaskNoDate> tasks = tasksLocalService.getNoDateTasks(UUIDs).executeAsBlocking();
-      if (tasks.size() == 0) throw new ExceptionBundle(ExceptionBundle.Reason.NULL_POINTER);
 
-      tasks.get(0).setDeletedLocal(true);
-      tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
-      tasksLocalService.putNoDateTask(tasks.get(0)).executeAsBlocking();
+      if (tasks.size() != 0) {
+        tasks.get(0).setDeletedLocal(true);
+        tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
+        tasksLocalService.putNoDateTask(tasks.get(0)).executeAsBlocking();
+      }
     } else {
       throw new IllegalStateException("");
     }
@@ -457,7 +469,7 @@ public class TasksRepository implements ITasksRepository {
 
     // setup output dates and types
     ArrayList<DateTypeTaskGroup> output = new ArrayList<>();
-    output.add(new DateTypeTaskGroup(DatetimeHelper.getFirstDayOfMonth(date), Task.Type.Month));
+    output.add(new DateTypeTaskGroup(DatetimeHelper.getMonthDate(date), Task.Type.Month));
     for (int i = 0; i < firstDaysOfWeeks.size(); ++i) {
       output.add(new DateTypeTaskGroup(firstDaysOfWeeks.get(i), Task.Type.Week));
     }
@@ -510,6 +522,7 @@ public class TasksRepository implements ITasksRepository {
   }
 
   private void saveTags(Task task) {
+    // clear last connections
     tasksLocalService.deleteTaskToTag(task.getUUID())
         .executeAsBlocking();
 

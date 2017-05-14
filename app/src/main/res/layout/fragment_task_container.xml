@@ -3,13 +3,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="@color/light_light_grey"
+              android:focusableInTouchMode="true"
               android:orientation="vertical">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:focusableInTouchMode="true"
         android:layout_height="match_parent"
+        android:focusableInTouchMode="true"
         android:paddingBottom="5dp"
         android:paddingEnd="12dp"
         android:paddingStart="12dp"

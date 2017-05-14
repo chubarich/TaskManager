@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusableInTouchMode="true"
             android:orientation="vertical">
 
             <!-- name -->
@@ -23,28 +24,44 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorAccent"
                 android:hint="@string/name_label"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
+                android:paddingEnd="15dp"
+                android:paddingStart="20dp"
                 android:paddingTop="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="22dp"/>
+                android:textColor="@android:color/white"
+                android:textCursorDrawable="@null"
+                android:textSize="22dp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/text_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="10dp"
                 android:background="@color/colorAccent"
-                android:paddingStart="10dp"
+                android:paddingBottom="15dp"
+                android:paddingEnd="15dp"
+                android:paddingStart="20dp"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:textColor="@color/grey"
-                android:textSize="16dp"/>
+                android:textColor="@color/task_pressed"
+                android:textSize="16dp"
+                android:textStyle="italic"/>
+
+            <TextView
+                android:id="@+id/text_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent"
+                android:paddingBottom="15dp"
+                android:paddingEnd="15dp"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/task_pressed"
+                android:textSize="16dp"
+                android:textStyle="italic"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/task_pressed"/>
+                android:background="@color/light_grey"/>
 
 
             <!-- note -->
@@ -53,19 +70,19 @@
                 android:id="@+id/edit_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
                 android:background="@android:color/transparent"
                 android:hint="@string/note_label"
-                android:paddingBottom="20dp"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
-                android:paddingTop="20dp"
                 android:textColor="@android:color/black"
                 android:textSize="18dp"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/task_pressed"/>
+                android:background="@color/light_grey"/>
 
 
             <!-- tags -->
@@ -75,57 +92,199 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:paddingEnd="5dp"
-                android:paddingStart="5dp"
-                android:paddingTop="10dp"/>
+                android:paddingEnd="10dp"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/task_pressed"/>
+                android:background="@color/light_grey"/>
 
 
-            <!-- type and date-->
-
-            <LinearLayout
-                android:id="@+id/layout_type_and_date"
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:padding="10dp"
+                android:scrollbars="none">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/task_pressed"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/text_to_no_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_no_date"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_this_day"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_this_day"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_next_day"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_next_day"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_this_week"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_this_week"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_next_week"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_next_week"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_this_month"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_this_month"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_to_next_month"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/to_next_month"
+                            android:textSize="15dp"/>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_date_walker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/text_choose_day"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/choose_day"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_choose_week"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/choose_week"
+                            android:textSize="15dp"/>
+
+                        <TextView
+                            android:id="@+id/text_choose_month"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/rounded_pattern"
+                            android:padding="10dp"
+                            android:text="@string/choose_month"
+                            android:textSize="15dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_grey"/>
 
 
             <!-- duration -->
 
-            <LinearLayout
-                android:id="@+id/layout_duration"
+
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:scrollbars="none"
                 android:visibility="gone">
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/layout_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Оцениваемая длительность"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18dp"/>
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:visibility="visible">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimary"/>
+                    <TextView
+                        android:id="@+id/text_choose_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/rounded_pattern"
+                        android:padding="10dp"
+                        android:text="@string/choose_duration"
+                        android:textSize="15dp"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/text_choose_zero_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/rounded_pattern"
+                        android:padding="10dp"
+                        android:text="@string/choose_zero_duration"
+                        android:textSize="15dp"/>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_grey"/>
 
             <!-- start and end -->
 

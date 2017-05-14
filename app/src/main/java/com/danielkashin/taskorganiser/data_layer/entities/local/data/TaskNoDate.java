@@ -36,6 +36,9 @@ public class TaskNoDate {
   @StorIOSQLiteColumn(name = COLUMN_NAME_NOTE)
   String note;
 
+  @StorIOSQLiteColumn(name = COLUMN_NAME_DURATION)
+  Long duration;
+
   @StorIOSQLiteColumn(name = COLUMN_NAME_UUID)
   String UUID;
 
@@ -60,13 +63,15 @@ public class TaskNoDate {
   TaskNoDate() {
   }
 
-  public TaskNoDate(Long id, String name, String note, String UUID, Integer done, Integer important,
-                    Integer changedLocal, Integer deletedLocal, Long changeOrDeleteLocalTimestamp) {
+  public TaskNoDate(Long id, String name, String note, String UUID, Integer done, Long duration,
+                    Integer important, Integer changedLocal, Integer deletedLocal,
+                    Long changeOrDeleteLocalTimestamp) {
     this.id = id;
     this.name = name;
     this.note = note;
     this.UUID = UUID;
     this.done = done;
+    this.duration = duration;
     this.important = important;
     this.changedLocal = changedLocal;
     this.deletedLocal = deletedLocal;
@@ -80,7 +85,6 @@ public class TaskNoDate {
   public void setChangeOrDeleteLocalTimestamp(Long timestamp) {
     this.changeOrDeleteLocalTimestamp = timestamp;
   }
-
 
   public Long getId() {
     return id;

@@ -128,7 +128,7 @@ public class TaskGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
       // set time
       if (mTaskGroup instanceof DateTypeTaskGroup) {
         if (((DateTypeTaskGroup) mTaskGroup).getType() == Task.Type.Day) {
-          taskViewHolder.setTextTime(task.getTimeToString());
+          taskViewHolder.setTextTime(task.getTimeToString("с", "по", null, null, null));
         } else {
           taskViewHolder.setTextTime("");
         }

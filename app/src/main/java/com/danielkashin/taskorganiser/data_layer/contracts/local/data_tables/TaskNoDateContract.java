@@ -1,9 +1,10 @@
 package com.danielkashin.taskorganiser.data_layer.contracts.local.data_tables;
 
-
 import com.danielkashin.taskorganiser.data_layer.contracts.local.base.IdContract;
+import com.danielkashin.taskorganiser.data_layer.contracts.local.base.TaskContract;
 
-public class TaskNoDateContract implements IdContract {
+
+public class TaskNoDateContract implements IdContract, TaskContract {
 
   private TaskNoDateContract() {
   }
@@ -12,32 +13,17 @@ public class TaskNoDateContract implements IdContract {
 
   public static final String TABLE_NAME = "no_date_tasks";
 
-  public static final String COLUMN_NAME_NAME = "name";
-
-  public static final String COLUMN_NAME_NOTE = "note";
-
-  public static final String COLUMN_NAME_DONE = "done";
-
-  public static final String COLUMN_NAME_IMPORTANT = "important";
-
-  public static final String COLUMN_NAME_UUID = "uuid";
-
-  public static final String COLUMN_NAME_CHANGED_LOCAL = "changed_local";
-
-  public static final String COLUMN_NAME_DELETED_LOCAL = "deleted_local";
-
-  public static final String COLUMN_NAME_CHANGE_OR_DELETE_LOCAL_TIMESTAMP = "change_or_delete_date";
-
 
   public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
 
       // id
       + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
 
-      // TaskDateContract
+      // TaskContract
       + COLUMN_NAME_NAME + " TEXT NOT NULL, "
       + COLUMN_NAME_NOTE + " TEXT, "
       + COLUMN_NAME_UUID + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE, "
+      + COLUMN_NAME_DURATION + " INTEGER, "
       + COLUMN_NAME_DONE + " INTEGER, "
       + COLUMN_NAME_IMPORTANT + " INTEGER, "
 

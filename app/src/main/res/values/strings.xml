@@ -18,16 +18,38 @@
     <string name="tasks_for_month">Задачи на месяц</string>
     <string name="tasks_for_year">Задачи на год</string>
 
-    <string name="task_for_day">Задача на день</string>
-    <string name="task_for_week">Задача на неделю</string>
-    <string name="task_for_month">Задача на месяц</string>
-    <string name="task_no_date">Задача без даты</string>
+    <string name="task_for_day">На день</string>
+    <string name="task_for_week">На неделю</string>
+    <string name="task_for_month">На месяц</string>
+    <string name="task_no_date">Без даты</string>
 
+    <string name="to_this_week">На эту неделю</string>
+    <string name="to_next_week">На следующую неделю</string>
+    <string name="to_this_month">На этот месяц</string>
+    <string name="to_next_month">На следующий месяц</string>
+    <string name="to_this_day">На сегодня</string>
+    <string name="to_next_day">На завтра</string>
+    <string name="to_no_date">Убрать дату</string>
+    <string name="choose_day">Выбрать день</string>
+    <string name="choose_week">Выбрать неделю</string>
+    <string name="choose_month">Выбрать месяц</string>
+    <string name="choose_duration">Выбрать длительность</string>
+    <string name="choose_zero_duration">Обнулить длительность</string>
+    <string name="choose">Выбрать</string>
+
+
+    <string name="changes_not_accepted">Изменения не приняты</string>
     <string name="not_registered">Не выполнен вход</string>
+    <string name="choose_date">Выберите дату в пределах нужного интервала </string>
 
     <string name="new_task">новая задача</string>
     <string name="today">Сегодня</string>
     <string name="current_week">Текущая неделя</string>
+    <string name="duration">Длительность</string>
+    <string name="time">Время</string>
+    <string name="from">с</string>
+    <string name="to">по</string>
+    <string name="duration_not_set">не выставлена</string>
 
     <string name="tags">Теги</string>
     <string name="new_tag">Новый тег</string>

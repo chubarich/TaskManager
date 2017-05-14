@@ -21,15 +21,15 @@ public class Task implements Parcelable {
 
   // ---------------------------------------- main info -------------------------------------------
 
-  private String name;
-
   private final String UUID;
 
-  private final Type type;
+  private String name;
 
-  // ----------------------------------------- time -----------------------------------------------
+  private Type type;
 
   private String date;
+
+  // ----------------------------------------- time -----------------------------------------------
 
   private Long duration;
 
@@ -174,6 +174,10 @@ public class Task implements Parcelable {
 
   // ----------------------------------- getters/setters ------------------------------------------
 
+  public boolean canSetDuration() {
+    return getType() != Task.Type.Day || (getMinuteStart() == null && getMinuteEnd() == null);
+  }
+
   public boolean isValid() {
     boolean nameIsValid = name != null && name.length() < MAX_NAME_LENGTH && name.trim().length() > 0;
     boolean noteIsValid = note == null || note.length() < MAX_NOTE_LENGTH;
@@ -228,15 +232,25 @@ public class Task implements Parcelable {
     return true;
   }
 
-  public String getTimeToString() {
-    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
+  public String getTimeToString(String from, String to, String durationLabel, String notSet, String timeLabel) {
+    from = (from == null) ? "" : (from + " ");
+    to = (to == null) ? "" : (to + " ");
+    timeLabel = (timeLabel == null) ? "" : (timeLabel + ": ");
+    durationLabel = (durationLabel == null) ? "" : (durationLabel + ": ");
+    notSet = (notSet == null) ? "" : notSet;
 
-    if (this.minuteStart == null || this.minuteEnd == null) {
-      return null;
+    if (type == Type.Day && minuteStart != null && minuteEnd != null) {
+      return timeLabel + String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
+          minuteEnd / 60, minuteEnd % 60);
+    } else if (type == Type.Day && minuteStart != null) {
+      return timeLabel + String.format("%02d:%02d", minuteStart / 60, minuteStart % 60);
+    } else if (type == Type.Day && minuteEnd != null) {
+      return timeLabel + String.format("%02d:%02d", minuteEnd / 60, minuteEnd % 60);
+    } else if (duration != null) {
+      return durationLabel + String.format("%02d:%02d", duration / 60, duration % 60);
+    } else {
+      return durationLabel + notSet;
     }
-
-    return String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
-        minuteEnd / 60, minuteEnd % 60);
   }
 
   public String getUUID() {
@@ -267,6 +281,14 @@ public class Task implements Parcelable {
     ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
 
     return minuteStart;
+  }
+
+  public void setType(Task.Type type) {
+    this.type = type;
+  }
+
+  public void setDate(String date) {
+    this.date = date;
   }
 
   public void setName(String name) {

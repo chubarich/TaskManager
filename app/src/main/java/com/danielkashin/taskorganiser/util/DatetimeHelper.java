@@ -157,7 +157,53 @@ public class DatetimeHelper {
     return output;
   }
 
+  public static String getUpDay(String date) {
+    int year = Integer.valueOf(date.split("-")[0]);
+    int month = Integer.valueOf(date.split("-")[1]);
+    int day = Integer.valueOf(date.split("-")[2]);
 
+    Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
+    calendar.setMinimalDaysInFirstWeek(1);
+    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.MONTH, month - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, day);
+    calendar.getTime();
+
+    calendar.add(Calendar.DAY_OF_YEAR, 1);
+    calendar.getTime();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    simpleDateFormat.setTimeZone(calendar.getTimeZone());
+
+    String output = simpleDateFormat.format(calendar.getTime());
+    return output;
+  }
+
+  public static String getDownDay(String date) {
+    int year = Integer.valueOf(date.split("-")[0]);
+    int month = Integer.valueOf(date.split("-")[1]);
+    int day = Integer.valueOf(date.split("-")[2]);
+
+    Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
+    calendar.setMinimalDaysInFirstWeek(1);
+    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.MONTH, month - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, day);
+    calendar.getTime();
+
+    calendar.add(Calendar.DAY_OF_YEAR, -1);
+    calendar.getTime();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    simpleDateFormat.setTimeZone(calendar.getTimeZone());
+
+    String output = simpleDateFormat.format(calendar.getTime());
+    return output;
+  }
 
   public static int getYear(String date) {
     return Integer.valueOf(date.split("-")[0]);
@@ -247,7 +293,7 @@ public class DatetimeHelper {
     return firstDaysOfWeeks;
   }
 
-  public static String getFirstDayOfMonth(String monthDate) {
+  public static String getMonthDate(String monthDate) {
     Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
     calendar.setMinimalDaysInFirstWeek(1);
     calendar.setFirstDayOfWeek(Calendar.MONDAY);
@@ -331,6 +377,29 @@ public class DatetimeHelper {
     calendar.setFirstDayOfWeek(Calendar.MONDAY);
 
     calendar.set(Calendar.DAY_OF_WEEK, dayOfWeekStartingMonday(1));
+    calendar.getTime();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    simpleDateFormat.setTimeZone(calendar.getTimeZone());
+
+    return simpleDateFormat.format(calendar.getTime());
+  }
+
+  public static String getWeekDate(String date) {
+    Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
+    calendar.setMinimalDaysInFirstWeek(1);
+    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+    int year = Integer.valueOf(date.split("-")[0]);
+    int month = Integer.valueOf(date.split("-")[1]);
+    int dayOfMonth = Integer.valueOf(date.split("-")[2]);
+
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.MONTH, month - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+    calendar.getTime();
+    calendar.set(Calendar.DAY_OF_WEEK, dayOfWeekStartingMonday(1));
+    calendar.getTime();
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
@@ -346,18 +415,6 @@ public class DatetimeHelper {
 
     return simpleDateFormat.format(calendar.getTime());
   }
-
-  // ---------------------------------------- private ---------------------------------------------
-
-  private static int dayOfWeekStartingMonday(int dayOfWeek) {
-    return (dayOfWeek + 2) % 7 - 1;
-  }
-
-  public static int dayOfWeekStartingSunday(int dayOfWeek) {
-    return (dayOfWeek + 5) % 7 + 1;
-  }
-
-
 
 
   public static String getDayLabel(String[] months, String[] days, String dayDate) {
@@ -393,6 +450,44 @@ public class DatetimeHelper {
     return "" + year;
   }
 
+  public static int getCurrentDayOfMonthNumber() {
+    return Calendar.getInstance(new Locale("ru","ru")).get(Calendar.DAY_OF_MONTH);
+  }
+
+  public static int getCurrentMonthNumber() {
+    return Calendar.getInstance(new Locale("ru","ru")).get(Calendar.MONTH);
+  }
+
+  public static int getCurrentYearNumber() {
+    return Calendar.getInstance(new Locale("ru","ru")).get(Calendar.YEAR);
+  }
+
+  public static String getDate(int year, int month, int day) {
+    Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
+    calendar.setMinimalDaysInFirstWeek(1);
+    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.MONTH, month - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, day);
+    calendar.getTime();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    simpleDateFormat.setTimeZone(calendar.getTimeZone());
+
+    String output = simpleDateFormat.format(calendar.getTime());
+    return output;
+  }
+
+  // ---------------------------------------- private ---------------------------------------------
+
+  private static int dayOfWeekStartingMonday(int dayOfWeek) {
+    return (dayOfWeek + 2) % 7 - 1;
+  }
+
+  public static int dayOfWeekStartingSunday(int dayOfWeek) {
+    return (dayOfWeek + 5) % 7 + 1;
+  }
 
 
   public static class Month {

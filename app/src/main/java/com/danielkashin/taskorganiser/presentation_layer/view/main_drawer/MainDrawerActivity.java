@@ -172,6 +172,15 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   // ---------------------------------- IMainDrawerView -------------------------------------------
 
   @Override
+  public void closeCurrentFragment() {
+    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+      getSupportFragmentManager().popBackStack();
+    } else {
+      addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
+    }
+  }
+
+  @Override
   public void showSavedToast() {
     Toast.makeText(this, getString(R.string.task_saved), Toast.LENGTH_SHORT).show();
   }
@@ -325,9 +334,6 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     }
   }
 
-  // ----------------------------------- PresenterActivity ----------------------------------------
-
-
   // --------------------------------------- private ----------------------------------------------
 
   private void showAlert(String message, String title) {
@@ -478,11 +484,6 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
             Task task = ((ITaskView) fragment).getCurrentTask();
             if (task != null) {
               ((IMainDrawerPresenter) getPresenter()).onDeleteTask(task.getType(), task.getUUID());
-              if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                getSupportFragmentManager().popBackStack();
-              } else {
-                addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
-              }
             }
           } else {
             mImageToolbarDelete.setVisibility(View.GONE);

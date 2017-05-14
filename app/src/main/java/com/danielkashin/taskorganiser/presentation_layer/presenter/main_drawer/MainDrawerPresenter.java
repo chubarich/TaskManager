@@ -104,6 +104,7 @@ public class MainDrawerPresenter extends Presenter<IMainDrawerView>
   public void onDeleteTaskSuccess() {
     if (getView() != null) {
       getView().showTaskDeletedToast();
+      getView().closeCurrentFragment();
     }
   }
 

@@ -1,18 +1,20 @@
 package com.danielkashin.taskorganiser.presentation_layer.view.task;
 
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
@@ -39,9 +41,21 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
   private TextView mTextDate;
   private EditText mEditName;
   private EditText mEditNote;
+  private TextView mTextTime;
+
+  private TextView mTextToNoDate;
+  private TextView mTextToThisDay;
+  private TextView mTextToNextDay;
+  private TextView mTextToThisWeek;
+  private TextView mTextToNextWeek;
+  private TextView mTextToThisMonth;
+  private TextView mTextToNextMonth;
+  private TextView mTextChooseDay;
+  private TextView mTextChooseWeek;
+  private TextView mTextChooseMonth;
+
   private LinearLayout mLayoutDuration;
   private LinearLayout mLayoutStartAndEnd;
-  private LinearLayout mLayoutNotification;
   private RecyclerView mRecyclerTags;
 
   private State mRestoredState;
@@ -89,7 +103,11 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    mRestoredState.saveToOutState(outState);
+    if (mRestoredState != null && mRestoredState.isTaskInitialized() && mRecyclerTags.getAdapter() != null) {
+      ArrayList<String> tags = ((ITagsWithSelectionAdapter) mRecyclerTags.getAdapter()).getSelectedTags();
+      mRestoredState.getStateTask().setTags(tags);
+      mRestoredState.saveToOutState(outState);
+    }
   }
 
   // --------------------------------------- ITaskView --------------------------------------------
@@ -99,7 +117,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mRestoredState.setTask(task);
     mRestoredState.setTags(tags);
 
-    if (mRecyclerTags.getAdapter() != null) {
+    if (mRecyclerTags.getAdapter() != null && tags != null && task != null) {
       ((ITagsWithSelectionAdapter) mRecyclerTags.getAdapter()).initialize(tags, task.getTags());
     }
 
@@ -108,12 +126,13 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
   @Override
   public Task getCurrentTask() {
-    Task task = mRestoredState.getStateTask();
-    if (mRecyclerTags.getAdapter() != null) {
-      task.setTags(((ITagsWithSelectionAdapter)mRecyclerTags.getAdapter()).getSelectedTags());
+    if (mRestoredState.isTaskInitialized() && mRecyclerTags.getAdapter() != null) {
+      Task task = mRestoredState.getStateTask();
+      task.setTags(((ITagsWithSelectionAdapter) mRecyclerTags.getAdapter()).getSelectedTags());
+      return task;
+    } else {
+      return null;
     }
-
-    return task;
   }
 
   // ------------------------------------ PresenterFragment ---------------------------------------
@@ -151,37 +170,71 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mTextDate = (TextView) view.findViewById(R.id.text_date);
     mEditName = (EditText) view.findViewById(R.id.edit_name);
     mEditNote = (EditText) view.findViewById(R.id.edit_note);
+    mTextTime = (TextView) view.findViewById(R.id.text_time);
+
     mRecyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
     mRecyclerTags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
     mRecyclerTags.setAdapter(new TagsWithSelectionAdapter());
+
+    mTextToNoDate = (TextView) view.findViewById(R.id.text_to_no_date);
+    mTextToThisDay = (TextView) view.findViewById(R.id.text_to_this_day);
+    mTextToNextDay = (TextView) view.findViewById(R.id.text_to_next_day);
+    mTextToThisWeek = (TextView) view.findViewById(R.id.text_to_this_week);
+    mTextToNextWeek = (TextView) view.findViewById(R.id.text_to_next_week);
+    mTextToThisMonth = (TextView) view.findViewById(R.id.text_to_this_month);
+    mTextToNextMonth = (TextView) view.findViewById(R.id.text_to_next_month);
+    mTextChooseDay = (TextView) view.findViewById(R.id.text_choose_day);
+    mTextChooseWeek = (TextView) view.findViewById(R.id.text_choose_week);
+    mTextChooseMonth = (TextView) view.findViewById(R.id.text_choose_month);
+
+    mLayoutDuration = (LinearLayout) view.findViewById(R.id.layout_duration);
   }
 
   // ------------------------------------------ private -------------------------------------------
 
+  private void setTaskTypeAndDate(Task.Type type, String date) {
+    if (mRestoredState.isTaskInitialized()) {
+      Task task = mRestoredState.getStateTask();
+      task.setType(type);
+      task.setDate(date);
+
+      refreshView();
+    }
+  }
+
   private void refreshView() {
     Task task = mRestoredState.getStateTask();
 
-    mEditName.setText(task.getName());
-    mEditNote.setText(task.getNote());
+    if (task != null) {
+      mEditName.setText(task.getName());
+      mEditNote.setText(task.getNote());
 
-    String[] months = getResources().getStringArray(R.array.months);
-    String[] days = getResources().getStringArray(R.array.days);
+      // set duration
+      boolean showDurationLayout = task.canSetDuration();
+      mLayoutDuration.setVisibility(showDurationLayout ? View.VISIBLE : View.GONE);
+      String time = task.getTimeToString(getString(R.string.from), getString(R.string.to),
+          getString(R.string.duration), getString(R.string.time), getString(R.string.duration_not_set));
+      mTextTime.setText(time);
 
-    String text = null;
-    if (task.getType() == Task.Type.Day) {
-      text = getString(R.string.task_for_day) + ": " + DatetimeHelper.getDayLabel(months, days, task.getDate());
-    } else if (task.getType() == Task.Type.Week) {
-      text = getString(R.string.task_for_week) + ": " + DatetimeHelper.getWeekLabel(months, task.getDate());
-    } else if (task.getType()== Task.Type.Month) {
-      text = getString(R.string.task_for_month) + ": " + DatetimeHelper.getMonthLabel(months, task.getDate());
-    } else if (task.getType()== Task.Type.NoDate) {
-      text = getString(R.string.task_no_date);
-    }
 
-    if (text == null) {
-      throw new IllegalStateException("Unhandled task date");
-    } else {
-      mTextDate.setText(text);
+      // set date label
+      String[] months = getResources().getStringArray(R.array.months_simple);
+      String[] days = getResources().getStringArray(R.array.days);
+      String text = null;
+      if (task.getType() == Task.Type.Day) {
+        text = getString(R.string.task_for_day) + ": " + DatetimeHelper.getDayLabel(months, days, task.getDate());
+      } else if (task.getType() == Task.Type.Week) {
+        text = getString(R.string.task_for_week) + ": " + DatetimeHelper.getWeekLabel(months, task.getDate());
+      } else if (task.getType() == Task.Type.Month) {
+        text = getString(R.string.task_for_month) + ": " + DatetimeHelper.getMonthLabel(months, task.getDate());
+      } else if (task.getType() == Task.Type.NoDate) {
+        text = getString(R.string.task_no_date);
+      }
+      if (text == null) {
+        throw new IllegalStateException("Unhandled task date");
+      } else {
+        mTextDate.setText(text);
+      }
     }
   }
 
@@ -191,7 +244,140 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
   }
 
   private void setListeners() {
-    mEditName.addTextChangedListener(new TextWatcher() {
+    View.OnClickListener patternListener = getPatternListener();
+    mTextToNoDate.setOnClickListener(patternListener);
+    mTextToThisDay.setOnClickListener(patternListener);
+    mTextToNextDay.setOnClickListener(patternListener);
+    mTextToThisWeek.setOnClickListener(patternListener);
+    mTextToNextWeek.setOnClickListener(patternListener);
+    mTextToThisMonth.setOnClickListener(patternListener);
+    mTextToNextMonth.setOnClickListener(patternListener);
+
+    View.OnClickListener walkerListener = getChooseDateListener();
+    mTextChooseDay.setOnClickListener(walkerListener);
+    mTextChooseWeek.setOnClickListener(walkerListener);
+    mTextChooseMonth.setOnClickListener(walkerListener);
+
+    mEditName.addTextChangedListener(getNameWatcher());
+    mEditNote.addTextChangedListener(getNoteWatcher());
+  }
+
+  private TextWatcher getNoteWatcher() {
+    return new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (s.toString().length() >= Task.MAX_NOTE_LENGTH) {
+          Toast.makeText(getContext(), getString(R.string.task_note_too_long), Toast.LENGTH_SHORT).show();
+          mEditNote.setText(s.toString().substring(0, Task.MAX_NOTE_LENGTH - 1));
+        } else {
+          mRestoredState.setTaskNote(s.toString().trim());
+        }
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+
+      }
+    };
+  }
+
+  private View.OnClickListener getChooseDateListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(final View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseDay
+            || v == mTextChooseMonth || v == mTextChooseWeek);
+
+        if (mRestoredState.isTaskInitialized()) {
+
+          final int year = DatetimeHelper.getCurrentYearNumber();
+          final int month = DatetimeHelper.getCurrentMonthNumber();
+          final int day = DatetimeHelper.getCurrentDayOfMonthNumber();
+
+          final DatePicker datePicker = new DatePicker(getContext());
+          datePicker.updateDate(year, month, day);
+
+          new AlertDialog.Builder(getContext())
+              .setTitle(getString(R.string.choose_date))
+              .setPositiveButton(R.string.choose, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  Task.Type type = null;
+                  String date = DatetimeHelper.getDate(datePicker.getYear(),
+                      datePicker.getMonth() + 1, datePicker.getDayOfMonth());
+                  if (v == mTextChooseDay) {
+                    type = Task.Type.Day;
+                    date = date;
+                  } else if (v == mTextChooseWeek) {
+                    type = Task.Type.Week;
+                    date = DatetimeHelper.getWeekDate(date);
+                  } else {
+                    type = Task.Type.Month;
+                    date = DatetimeHelper.getMonthDate(date);
+                  }
+                  ;
+
+                  setTaskTypeAndDate(type, date);
+                }
+              })
+              .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  // do nothing
+                }
+              })
+              .setView(datePicker)
+              .show();
+        }
+      }
+    };
+  }
+
+  private View.OnClickListener getPatternListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Task.Type type = null;
+        String date = null;
+        if (v == mTextToNoDate) {
+          type = Task.Type.NoDate;
+          date = null;
+        } else if (v == mTextToThisDay) {
+          type = Task.Type.Day;
+          date = DatetimeHelper.getCurrentDay();
+        } else if (v == mTextToNextDay) {
+          type = Task.Type.Day;
+          date = DatetimeHelper.getUpDay(DatetimeHelper.getCurrentDay());
+        } else if (v == mTextToThisWeek) {
+          type = Task.Type.Week;
+          date = DatetimeHelper.getCurrentWeek();
+        } else if (v == mTextToNextWeek) {
+          type = Task.Type.Week;
+          date = DatetimeHelper.getUpWeek(DatetimeHelper.getCurrentWeek());
+        } else if (v == mTextToThisMonth) {
+          type = Task.Type.Month;
+          date = DatetimeHelper.getCurrentMonth();
+        } else if (v == mTextToNextMonth) {
+          type = Task.Type.Month;
+          date = DatetimeHelper.getUpMonth(DatetimeHelper.getCurrentMonth());
+        }
+
+        if (type != null) {
+          setTaskTypeAndDate(type, date);
+        } else {
+          throw new IllegalStateException("Illegal pattern button");
+        }
+      }
+    };
+  }
+
+  private TextWatcher getNameWatcher() {
+    return new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -213,32 +399,10 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
           mRestoredState.setTaskName(s.toString().trim());
         }
       }
-    });
-
-    mEditNote.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-      }
-
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (s.toString().length() >= Task.MAX_NOTE_LENGTH) {
-          Toast.makeText(getContext(), getString(R.string.task_note_too_long), Toast.LENGTH_SHORT).show();
-          mEditNote.setText(s.toString().substring(0, Task.MAX_NOTE_LENGTH - 1));
-        } else {
-          mRestoredState.setTaskNote(s.toString().trim());
-        }
-      }
-
-      @Override
-      public void afterTextChanged(Editable s) {
-
-      }
-    });
+    };
   }
 
-  // ---------------------------------------- inner types -----------------------------------------
+// ---------------------------------------- inner types -----------------------------------------
 
   public static class State {
 

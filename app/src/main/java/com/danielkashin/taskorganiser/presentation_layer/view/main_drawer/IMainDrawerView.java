@@ -19,4 +19,6 @@ public interface IMainDrawerView extends ITagViewOpener, IView {
 
   void showTaskDeletedToast();
 
+  void closeCurrentFragment();
+
 }
