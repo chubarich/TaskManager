@@ -271,8 +271,6 @@ public class Task implements Parcelable {
   }
 
   public Long getMinuteStart() {
-    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
-
     return minuteStart;
   }
 
@@ -337,8 +335,6 @@ public class Task implements Parcelable {
   }
 
   public Long getMinuteEnd() {
-    ExceptionHelper.assertTrue("Unavailable operation", type == Type.Day);
-
     return minuteEnd;
   }
 
