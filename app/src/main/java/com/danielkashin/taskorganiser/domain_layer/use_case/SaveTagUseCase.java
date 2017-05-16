@@ -3,7 +3,7 @@ package com.danielkashin.taskorganiser.domain_layer.use_case;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskVoid;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 
 import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskVoid.RepositoryRunnableVoid;
 import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskVoid.PostExecuteListenerVoid;

@@ -27,6 +27,15 @@ public interface ITasksLocalService {
   PreparedGetListOfObjects<TaskToTag> getTaskToTags(Long tagId);
 
 
+  PreparedGetListOfObjects<TaskWeek> getNotificationWeekTasks();
+
+  PreparedGetListOfObjects<TaskDay> getNotificationDayTasks();
+
+  PreparedGetListOfObjects<TaskMonth> getNotificationMonthTasks();
+
+  PreparedGetListOfObjects<TaskNoDate> getNotificationNoDateTasks();
+
+
   PreparedGetListOfObjects<TaskWeek> getImportantWeekTasks();
 
   PreparedGetListOfObjects<TaskDay> getImportantDayTasks();

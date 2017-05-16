@@ -5,7 +5,7 @@ import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 
 import java.util.concurrent.Executor;
 

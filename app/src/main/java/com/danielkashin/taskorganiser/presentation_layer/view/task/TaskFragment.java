@@ -3,6 +3,7 @@ package com.danielkashin.taskorganiser.presentation_layer.view.task;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,19 +11,22 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
+import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskWithAllTagsUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.ITagsWithSelectionAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.TagsWithSelectionAdapter;
@@ -35,16 +39,20 @@ import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolb
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 
 
 public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     implements ITaskView {
 
+  private FrameLayout mRootLayout;
+
   private TextView mTextDate;
   private EditText mEditName;
   private EditText mEditNote;
   private TextView mTextTime;
+  private TextView mTextNotification;
 
   private TextView mTextToNoDate;
   private TextView mTextToThisDay;
@@ -62,6 +70,9 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
   private TextView mTextChooseEnd;
   private TextView mTextChooseZeroStart;
   private TextView mTextChooseZeroEnd;
+  private TextView mTextChooseNotification;
+  private TextView mTextChooseZeroNotification;
+
 
   private HorizontalScrollView mLayoutDuration;
   private HorizontalScrollView mLayoutStartAndEnd;
@@ -156,8 +167,11 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getActivity()
         .getApplication())
         .getTasksLocalService();
+    INotificationManager notificationManager = new NotificationManager(getContext());
 
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(
+        tasksLocalService,
+        notificationManager);
 
     GetTaskWithAllTagsUseCase getTaskWithAllTagsUseCase = new GetTaskWithAllTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -176,10 +190,13 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
 
   @Override
   protected void initializeView(View view) {
+    mRootLayout = (FrameLayout) view.findViewById(R.id.root_layout);
+
     mTextDate = (TextView) view.findViewById(R.id.text_date);
     mEditName = (EditText) view.findViewById(R.id.edit_name);
     mEditNote = (EditText) view.findViewById(R.id.edit_note);
     mTextTime = (TextView) view.findViewById(R.id.text_time);
+    mTextNotification = (TextView) view.findViewById(R.id.text_notification);
 
     mRecyclerTags = (RecyclerView) view.findViewById(R.id.recycler_tags);
     mRecyclerTags.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -201,12 +218,23 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mTextChooseZeroEnd = (TextView) view.findViewById(R.id.text_choose_zero_end);
     mTextChooseStart = (TextView) view.findViewById(R.id.text_choose_start);
     mTextChooseEnd = (TextView) view.findViewById(R.id.text_choose_end);
+    mTextChooseNotification = (TextView) view.findViewById(R.id.text_choose_notification);
+    mTextChooseZeroNotification = (TextView) view.findViewById(R.id.text_choose_zero_notification);
 
     mLayoutDuration = (HorizontalScrollView) view.findViewById(R.id.layout_duration);
     mLayoutStartAndEnd = (HorizontalScrollView) view.findViewById(R.id.layout_start_and_end);
   }
 
   // ------------------------------------------ private -------------------------------------------
+
+  private void setTaskNotification(Long timestamp) {
+    if (mRestoredState.isTaskInitialized()) {
+      Task task = mRestoredState.getStateTask();
+      task.setNotificationTimestamp(timestamp);
+
+      refreshView();
+    }
+  }
 
   private void setTaskStart(Long start) {
     if (mRestoredState.isTaskInitialized()) {
@@ -259,14 +287,20 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       // set duration
       boolean showDurationLayout = task.canSetDuration();
       mLayoutDuration.setVisibility(showDurationLayout ? View.VISIBLE : View.GONE);
-      String time = task.getTimeAndIsPeriod(getString(R.string.from), getString(R.string.to),
-          getString(R.string.duration), getString(R.string.duration_not_set), getString(R.string.time)).first;
+
+      String time = task.getTimeToString(getString(R.string.from), getString(R.string.to),
+          getString(R.string.duration), getString(R.string.duration_not_set), getString(R.string.time), false);
       mTextTime.setText(time);
+
+      String notificationTime = task.getNotificationTimestampToString(getString(R.string.notification),
+          getString(R.string.notification_not_set));
+      mTextNotification.setText(notificationTime);
 
       mLayoutStartAndEnd.setVisibility(task.getType() == Task.Type.Day ? View.VISIBLE : View.GONE);
 
       // set date label
-      String[] months = getResources().getStringArray(R.array.months_simple);
+      String[] months = getResources().getStringArray(R.array.months);
+      String[] simpleMonths = getResources().getStringArray(R.array.months_simple);
       String[] days = getResources().getStringArray(R.array.days);
       String text = null;
       if (task.getType() == Task.Type.Day) {
@@ -274,7 +308,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
       } else if (task.getType() == Task.Type.Week) {
         text = getString(R.string.task_for_week) + ": " + DatetimeHelper.getWeekLabel(months, task.getDate());
       } else if (task.getType() == Task.Type.Month) {
-        text = getString(R.string.task_for_month) + ": " + DatetimeHelper.getMonthLabel(months, task.getDate());
+        text = getString(R.string.task_for_month) + ": " + DatetimeHelper.getMonthLabel(simpleMonths, task.getDate());
       } else if (task.getType() == Task.Type.NoDate) {
         text = getString(R.string.task_no_date);
       }
@@ -284,6 +318,8 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
         mTextDate.setText(text);
       }
     }
+
+    mRootLayout.setVisibility(View.VISIBLE);
   }
 
   private boolean checkTask() {
@@ -317,8 +353,69 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
     mTextChooseStart.setOnClickListener(chooseStartAndEndListener);
     mTextChooseEnd.setOnClickListener(chooseStartAndEndListener);
 
+    mTextChooseZeroNotification.setOnClickListener(getChooseZeroNotificationListener());
+    mTextChooseNotification.setOnClickListener(getChooseNotificationListener());
+
     mEditName.addTextChangedListener(getNameWatcher());
     mEditNote.addTextChangedListener(getNoteWatcher());
+  }
+
+  private View.OnClickListener getChooseZeroNotificationListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseZeroNotification);
+        setTaskNotification(null);
+      }
+    };
+  }
+
+  private View.OnClickListener getChooseNotificationListener() {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        ExceptionHelper.assertTrue("Button is illegal", v == mTextChooseNotification);
+        final View dialogView = View.inflate(getContext(), R.layout.datetime_picker_layout, null);
+        final DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+        final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+        timePicker.setIs24HourView(true);
+        Button doneButton = (Button) dialogView.findViewById(R.id.button_done);
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+        alertDialog.setTitle(getString(R.string.please_choose_notification));
+        alertDialog.setView(dialogView);
+
+        doneButton.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            alertDialog.cancel();
+
+            int hour = -1;
+            int minute = -1;
+            if (Build.VERSION.SDK_INT >= 23) {
+              hour = timePicker.getHour();
+              minute = timePicker.getMinute();
+            } else {
+              hour = timePicker.getCurrentHour();
+              minute = timePicker.getCurrentMinute();
+            }
+
+            Long timestamp = DatetimeHelper.getTimestamp(datePicker.getYear(),
+                datePicker.getMonth() + 1, datePicker.getDayOfMonth(), hour, minute);
+            if (DatetimeHelper.isGreaterThanNow(timestamp, 0)) {
+              setTaskNotification(timestamp);
+            } else {
+              Toast.makeText(getContext(), getString(R.string.notification_not_set_message),
+                  Toast.LENGTH_SHORT).show();
+            }
+
+
+          }
+        });
+
+        alertDialog.show();
+      }
+    };
   }
 
   private View.OnClickListener getChooseStartAndEndZeroListener() {
@@ -374,15 +471,18 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
           timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-              // do nothing
+              dialog.cancel();
+              dialog.dismiss();
             }
           });
           timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-              // do nothing
+              dialog.cancel();
+              dialog.dismiss();
             }
           });
+          timePickerDialog.setCanceledOnTouchOutside(true);
           timePickerDialog.setMessage(isChoosingStart ? getString(R.string.please_choose_start)
               : getString(R.string.please_choose_end));
           timePickerDialog.setTitle(null);
@@ -446,21 +546,21 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
             }
           };
 
-
           TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
               onTimeSetListener, hour, minute, true);
           timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-              // do nothing
+              dialog.cancel();
             }
           });
           timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-              // do nothing
+              dialog.cancel();
             }
           });
+          timePickerDialog.setCanceledOnTouchOutside(true);
           timePickerDialog.setMessage(getString(R.string.please_choose_duration));
           timePickerDialog.setTitle(null);
           timePickerDialog.show();
@@ -485,7 +585,7 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
           datePicker.updateDate(year, month, day);
 
           new AlertDialog.Builder(getContext())
-              .setMessage(getString(R.string.please_choose_date))
+              .setTitle(getString(R.string.please_choose_date))
               .setPositiveButton(R.string.choose, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

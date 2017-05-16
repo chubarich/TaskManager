@@ -4,6 +4,7 @@ import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 
 public class TagTaskGroup implements ITaskGroup {
@@ -46,7 +47,7 @@ public class TagTaskGroup implements ITaskGroup {
 
   @Override
   public void sort() {
-    Collections.sort(tasks, Task.getComparator());
+    Collections.sort(tasks, getComparator());
   }
 
   @Override
@@ -104,5 +105,14 @@ public class TagTaskGroup implements ITaskGroup {
     ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
 
     return tasks.remove(position);
+  }
+
+  private Comparator<Task> getComparator() {
+    return new Comparator<Task>() {
+      @Override
+      public int compare(Task o1, Task o2) {
+        return Task.compareInRandomGroup(o1, o2);
+      }
+    };
   }
 }

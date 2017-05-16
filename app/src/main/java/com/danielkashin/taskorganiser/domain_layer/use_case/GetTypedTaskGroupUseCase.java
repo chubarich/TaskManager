@@ -6,7 +6,7 @@ import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTas
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 
 import java.util.concurrent.Executor;
 

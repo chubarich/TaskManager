@@ -223,7 +223,7 @@ public class TaskGroupsAdapter extends RecyclerView.Adapter<TaskGroupsAdapter.Ta
       viewHighlighter = view.findViewById(R.id.view_highlighter);
 
       tasksRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_tasks);
-      tasksRecyclerView.setAdapter(new TaskGroupAdapter(true, highlightColor, commonColor));
+      tasksRecyclerView.setAdapter(new TaskGroupAdapter(true, false));
       tasksRecyclerView.addItemDecoration(new SpacingItemDecoration(0, 10));
       tasksRecyclerView.setLayoutManager(layoutManager);
 

@@ -1,4 +1,4 @@
-package com.danielkashin.taskorganiser.domain_layer.repository;
+package com.danielkashin.taskorganiser.data_layer.repository;
 
 import android.util.Pair;
 
@@ -9,8 +9,10 @@ import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
+import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.util.NumbersHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.RandomTaskGroup;
@@ -25,19 +27,95 @@ import java.util.List;
 public class TasksRepository implements ITasksRepository {
 
   private ITasksLocalService tasksLocalService;
+  private INotificationManager notificationManager;
 
 
-  private TasksRepository(ITasksLocalService tasksLocalService) {
-    if (tasksLocalService == null) {
-      throw new IllegalStateException("All repository arguments must be non null");
-    }
+  private TasksRepository(ITasksLocalService tasksLocalService, INotificationManager notificationManager) {
+    ExceptionHelper.checkAllObjectsNonNull("All repository arguments must be non null",
+        tasksLocalService, notificationManager);
 
     this.tasksLocalService = tasksLocalService;
+    this.notificationManager = notificationManager;
   }
 
   // ---------------------------------------- public ----------------------------------------------
 
   //                            -------------- get ----------------
+
+  @Override
+  public ArrayList<Task> getAllTasksWithNotifications() throws ExceptionBundle {
+    ArrayList<Task> notificationTasks = new ArrayList<>();
+
+    // setup month task group
+    List<TaskMonth> monthTasks = tasksLocalService.getNotificationMonthTasks()
+        .executeAsBlocking();
+    for (int i = 0; i < monthTasks.size(); ++i) {
+      Task task = new Task(monthTasks.get(i));
+      task.setTags(getTags(task.getUUID()));
+
+      if (task.getNotificationTimestamp() != null &&
+          DatetimeHelper.isGreaterThanNow(task.getNotificationTimestamp(), 0)) {
+        notificationTasks.add(task);
+      } else {
+        task.setNotificationTimestamp(null);
+      }
+
+      saveTask(task);
+    }
+
+    // setup week task group
+    List<TaskWeek> weekTasks = tasksLocalService.getNotificationWeekTasks()
+        .executeAsBlocking();
+    for (TaskWeek taskWeek : weekTasks) {
+      Task task = new Task(taskWeek);
+      task.setTags(getTags(task.getUUID()));
+
+      if (task.getNotificationTimestamp() != null &&
+          DatetimeHelper.isGreaterThanNow(task.getNotificationTimestamp(), 0)) {
+        notificationTasks.add(task);
+      } else {
+        task.setNotificationTimestamp(null);
+      }
+
+      saveTask(task);
+    }
+
+    // setup day task group
+    List<TaskDay> dayTasks = tasksLocalService.getNotificationDayTasks()
+        .executeAsBlocking();
+    for (TaskDay taskDay : dayTasks) {
+      Task task = new Task(taskDay);
+      task.setTags(getTags(task.getUUID()));
+
+      if (task.getNotificationTimestamp() != null &&
+          DatetimeHelper.isGreaterThanNow(task.getNotificationTimestamp(), 0)) {
+        notificationTasks.add(task);
+      } else {
+        task.setNotificationTimestamp(null);
+      }
+
+      saveTask(task);
+    }
+
+    // setup no date task group
+    List<TaskNoDate> noDateTasks = tasksLocalService.getNotificationNoDateTasks()
+        .executeAsBlocking();
+    for (TaskNoDate taskNoDate : noDateTasks) {
+      Task task = new Task(taskNoDate);
+      task.setTags(getTags(task.getUUID()));
+
+      if (task.getNotificationTimestamp() != null &&
+          DatetimeHelper.isGreaterThanNow(task.getNotificationTimestamp(), 0)) {
+        notificationTasks.add(task);
+      } else {
+        task.setNotificationTimestamp(null);
+      }
+
+      saveTask(task);
+    }
+
+    return notificationTasks;
+  }
 
   @Override
   public Pair<Task, ArrayList<String>> getTaskWithAllTags(Task.Type type, String UUID) throws ExceptionBundle {
@@ -274,13 +352,20 @@ public class TasksRepository implements ITasksRepository {
     deleteTask(Task.Type.Week, task.getUUID());
     deleteTask(Task.Type.Month, task.getUUID());
 
+    if (task.getNotificationTimestamp() != null &&
+        DatetimeHelper.isGreaterThanNow(task.getNotificationTimestamp(), 0)) {
+      notificationManager.registerAlarm(task.getUUID(), task.getNotificationTimestamp(), task.getName());
+    } else {
+      task.setNotificationTimestamp(null);
+    }
+
     // save task tags
     saveTags(task);
 
     if (task.getType() == Task.Type.NoDate) {
       TaskNoDate taskNoDate = new TaskNoDate(null, task.getName(), task.getNote(), task.getUUID(),
           NumbersHelper.getInteger(task.getDone()), task.getDuration(),
-          NumbersHelper.getInteger(task.getImportant()), task.getNotificationTimestamp(),  1, 0,
+          NumbersHelper.getInteger(task.getImportant()), task.getNotificationTimestamp(), 1, 0,
           DatetimeHelper.getCurrentTimestamp());
 
       tasksLocalService.putNoDateTask(taskNoDate)
@@ -338,6 +423,10 @@ public class TasksRepository implements ITasksRepository {
       List<TaskDay> tasks = tasksLocalService.getDayTasks(UUIDs).executeAsBlocking();
 
       if (tasks.size() != 0) {
+        if (tasks.get(0).getNotificationTimestamp() != null) {
+          notificationManager.unregisterAlarm(UUID, tasks.get(0).getName());
+        }
+
         tasks.get(0).setDeletedLocal(true);
         tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
         tasksLocalService.putDayTask(tasks.get(0)).executeAsBlocking();
@@ -346,6 +435,10 @@ public class TasksRepository implements ITasksRepository {
       List<TaskWeek> tasks = tasksLocalService.getWeekTasks(UUIDs).executeAsBlocking();
 
       if (tasks.size() != 0) {
+        if (tasks.get(0).getNotificationTimestamp() != null) {
+          notificationManager.unregisterAlarm(UUID, tasks.get(0).getName());
+        }
+
         tasks.get(0).setDeletedLocal(true);
         tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
         tasksLocalService.putWeekTask(tasks.get(0)).executeAsBlocking();
@@ -354,6 +447,10 @@ public class TasksRepository implements ITasksRepository {
       List<TaskMonth> tasks = tasksLocalService.getMonthTasks(UUIDs).executeAsBlocking();
 
       if (tasks.size() != 0) {
+        if (tasks.get(0).getNotificationTimestamp() != null) {
+          notificationManager.unregisterAlarm(UUID, tasks.get(0).getName());
+        }
+
         tasks.get(0).setDeletedLocal(true);
         tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
         tasksLocalService.putMonthTask(tasks.get(0)).executeAsBlocking();
@@ -362,6 +459,10 @@ public class TasksRepository implements ITasksRepository {
       List<TaskNoDate> tasks = tasksLocalService.getNoDateTasks(UUIDs).executeAsBlocking();
 
       if (tasks.size() != 0) {
+        if (tasks.get(0).getNotificationTimestamp() != null) {
+          notificationManager.unregisterAlarm(UUID, tasks.get(0).getName());
+        }
+
         tasks.get(0).setDeletedLocal(true);
         tasks.get(0).setChangeOrDeleteLocalTimestamp(currentTimestamp);
         tasksLocalService.putNoDateTask(tasks.get(0)).executeAsBlocking();
@@ -573,9 +674,9 @@ public class TasksRepository implements ITasksRepository {
     private Factory() {
     }
 
-
-    public static ITasksRepository create(ITasksLocalService tasksLocalService) {
-      return new TasksRepository(tasksLocalService);
+    public static ITasksRepository create(ITasksLocalService tasksLocalService,
+                                          INotificationManager notificationManager) {
+      return new TasksRepository(tasksLocalService, notificationManager);
     }
   }
 }

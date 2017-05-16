@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/toggle_done"
-            android:layout_toStartOf="@+id/toggle_important"
+            android:layout_toStartOf="@+id/text_time"
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingStart="7dp"

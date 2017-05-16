@@ -5,6 +5,7 @@ import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 
 public class RandomTaskGroup implements ITaskGroup {
@@ -43,7 +44,7 @@ public class RandomTaskGroup implements ITaskGroup {
 
   @Override
   public void sort() {
-    Collections.sort(tasks, Task.getComparator());
+    Collections.sort(tasks, getComparator());
   }
 
   @Override
@@ -100,4 +101,12 @@ public class RandomTaskGroup implements ITaskGroup {
     return tasks.remove(position);
   }
 
+  private Comparator<Task> getComparator() {
+    return new Comparator<Task>() {
+      @Override
+      public int compare(Task o1, Task o2) {
+        return Task.compareInRandomGroup(o1, o2);
+      }
+    };
+  }
 }

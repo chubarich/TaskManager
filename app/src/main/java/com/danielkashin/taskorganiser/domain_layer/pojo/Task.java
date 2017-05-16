@@ -8,6 +8,7 @@ import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
+import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
@@ -67,49 +68,53 @@ public class Task implements Parcelable {
     this.date = date;
   }
 
-  public Task(TaskMonth taskMonth) {
-    this.name = taskMonth.getName();
-    this.UUID = taskMonth.getUUID();
+  public Task(TaskMonth task) {
+    this.name = task.getName();
+    this.UUID = task.getUUID();
     this.type = Type.Month;
-    this.date = taskMonth.getDate();
-    this.duration = taskMonth.getDuration();
-    this.done = taskMonth.getDone() == 1;
-    this.note = taskMonth.getNote();
-    this.important = taskMonth.getImportant() == 1;
+    this.date = task.getDate();
+    this.duration = task.getDuration();
+    this.done = task.getDone() == 1;
+    this.note = task.getNote();
+    this.important = task.getImportant() == 1;
+    this.notificationTimestamp = task.getNotificationTimestamp();
   }
 
-  public Task(TaskWeek taskWeek) {
-    this.name = taskWeek.getName();
-    this.UUID = taskWeek.getUUID();
+  public Task(TaskWeek task) {
+    this.name = task.getName();
+    this.UUID = task.getUUID();
     this.type = Type.Week;
-    this.date = taskWeek.getDate();
-    this.duration = taskWeek.getDuration();
-    this.done = taskWeek.getDone() == 1;
-    this.note = taskWeek.getNote();
-    this.important = taskWeek.getImportant() == 1;
+    this.date = task.getDate();
+    this.duration = task.getDuration();
+    this.done = task.getDone() == 1;
+    this.note = task.getNote();
+    this.important = task.getImportant() == 1;
+    this.notificationTimestamp = task.getNotificationTimestamp();
   }
 
-  public Task(TaskDay taskDay) {
-    this.name = taskDay.getName();
-    this.UUID = taskDay.getUUID();
+  public Task(TaskDay task) {
+    this.name = task.getName();
+    this.UUID = task.getUUID();
     this.type = Type.Day;
-    this.date = taskDay.getDate();
-    this.duration = taskDay.getDuration();
-    this.done = taskDay.getDone() == 1;
-    this.note = taskDay.getNote();
-    this.important = taskDay.getImportant() == 1;
-    this.minuteStart = taskDay.getMinuteStart();
-    this.minuteEnd = taskDay.getMinuteEnd();
-    this.notificationTimestamp = taskDay.getNotificationTimestamp();
+    this.date = task.getDate();
+    this.duration = task.getDuration();
+    this.done = task.getDone() == 1;
+    this.note = task.getNote();
+    this.important = task.getImportant() == 1;
+    this.minuteStart = task.getMinuteStart();
+    this.minuteEnd = task.getMinuteEnd();
+    this.notificationTimestamp = task.getNotificationTimestamp();
   }
 
-  public Task(TaskNoDate taskNoDate) {
-    this.name = taskNoDate.getName();
-    this.UUID = taskNoDate.getUUID();
+  public Task(TaskNoDate task) {
+    this.name = task.getName();
+    this.UUID = task.getUUID();
     this.type = Type.NoDate;
-    this.done = taskNoDate.getDone() == 1;
-    this.note = taskNoDate.getNote();
-    this.important = taskNoDate.getImportant() == 1;
+    this.duration = task.getDuration();
+    this.done = task.getDone() == 1;
+    this.note = task.getNote();
+    this.important = task.getImportant() == 1;
+    this.notificationTimestamp = task.getNotificationTimestamp();
   }
 
   // ----------------------------------------- Parcelable -----------------------------------------
@@ -190,47 +195,19 @@ public class Task implements Parcelable {
     return this.type == other.getType() && this.UUID.equals(other.getUUID());
   }
 
-  public boolean equalsWithAdditionalInformation(Task other) {
-    if (!this.equals(other)) {
-      return false;
+  public String getNotificationTimestampToString(String label, String notSet) {
+    label = (label == null) ? "" : (label + ": ");
+    notSet = (notSet == null) ? "" : notSet;
+
+    if (notificationTimestamp != null) {
+      return label + DatetimeHelper.getDatetimeFromTimestamp(notificationTimestamp);
+    } else {
+      return label + notSet;
     }
-
-    if (this.tags == null && other.tags != null || this.tags != null && other.tags == null) {
-      return false;
-    }
-
-    if (this.tags != null) {
-      if (this.tags.size() != other.tags.size()) {
-        return false;
-      }
-
-      Collections.sort(this.tags);
-      Collections.sort(other.tags);
-
-      for (int i = 0; i < this.tags.size(); ++i) {
-        if (!this.tags.get(i).equals(other.tags.get(i))) {
-          return false;
-        }
-      }
-    }
-
-    if (this.minuteStart == null && other.minuteStart != null
-        || this.minuteStart != null && other.minuteStart == null
-        || this.minuteEnd == null && other.minuteEnd != null
-        || this.minuteEnd != null && other.minuteEnd == null) {
-      return false;
-    }
-
-    if (type == Type.Day && this.minuteStart != null && this.minuteEnd != null
-        && (!this.minuteStart.equals(other.minuteStart) || !this.minuteEnd.equals(other.minuteEnd))) {
-      return false;
-    }
-
-    return true;
   }
 
-  public Pair<String, Boolean> getTimeAndIsPeriod(String from, String to, String durationLabel,
-                                                  String notSet, String timeLabel) {
+  public String getTimeToString(String from, String to, String durationLabel,
+                                String notSet, String timeLabel, boolean forceDuration) {
     from = (from == null) ? "" : (from + " ");
     to = (to == null) ? "" : (to + " ");
     timeLabel = (timeLabel == null) ? "" : (timeLabel + ": ");
@@ -238,26 +215,35 @@ public class Task implements Parcelable {
     notSet = (notSet == null) ? "" : notSet;
 
     String time;
-    Boolean isPeriod;
     if (type == Type.Day && minuteStart != null && minuteEnd != null) {
-      time = timeLabel + String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
-          minuteEnd / 60, minuteEnd % 60);
-      isPeriod = true;
+      if (!forceDuration) {
+        time = timeLabel + String.format("%02d:%02d - %02d:%02d", minuteStart / 60, minuteStart % 60,
+            minuteEnd / 60, minuteEnd % 60);
+      } else {
+        Long duration = minuteEnd - minuteStart;
+        time = durationLabel + String.format("%01d:%02d", duration / 60, duration % 60);
+      }
+    } else if (duration != null && forceDuration) {
+      time = durationLabel + String.format("%01d:%02d", duration / 60, duration % 60);
     } else if (type == Type.Day && minuteStart != null) {
-      time = timeLabel + from + String.format("%02d:%02d", minuteStart / 60, minuteStart % 60);
-      isPeriod = true;
+      if (!forceDuration) {
+        time = timeLabel + from + String.format("%02d:%02d", minuteStart / 60, minuteStart % 60);
+      } else {
+        return "";
+      }
     } else if (type == Type.Day && minuteEnd != null) {
-      time = timeLabel + to + String.format("%02d:%02d", minuteEnd / 60, minuteEnd % 60);
-      isPeriod = true;
+      if (!forceDuration) {
+        time = timeLabel + to + String.format("%02d:%02d", minuteEnd / 60, minuteEnd % 60);
+      } else {
+        return "";
+      }
     } else if (duration != null) {
       time = durationLabel + String.format("%01d:%02d", duration / 60, duration % 60);
-      isPeriod = false;
     } else {
       time = durationLabel + notSet;
-      isPeriod = false;
     }
 
-    return new Pair<>(time, isPeriod);
+    return time;
   }
 
   public String getUUID() {
@@ -405,7 +391,7 @@ public class Task implements Parcelable {
     return task;
   }
 
-  public static int compare(Task o1, Task other) {
+  public static int compareInRandomGroup(Task o1, Task other) {
     if (o1.getDone() && !other.getDone()) {
       return -1;
     } else if (other.getDone() && !o1.getDone()) {
@@ -418,21 +404,10 @@ public class Task implements Parcelable {
       return -1;
     }
 
-    if (o1.getType() != other.getType()) {
-      if ((o1.getType() == Task.Type.Day && (other.getType() == Task.Type.Week || other.getType() == Task.Type.Month))
-          || (o1.getType() == Task.Type.Week && other.getType() == Task.Type.Month)) {
-        return -1;
-      } else {
-        return 1;
-      }
-    }
-
-    if (o1.getType() == Task.Type.Day) {
-      if (o1.getMinuteStart() != null && other.getMinuteStart() == null) {
-        return 1;
-      } else if (other.getMinuteStart() != null && o1.getMinuteStart() == null) {
-        return -1;
-      }
+    if (o1.getDuration() != null && other.getDuration() == null) {
+      return 1;
+    } else if (other.getDuration() != null && o1.getDuration() == null) {
+      return -1;
     }
 
     if (o1.getChangeOrDeleteLocalTimestamp() != null && other.getChangeOrDeleteLocalTimestamp() != null) {
@@ -446,25 +421,50 @@ public class Task implements Parcelable {
     return 0;
   }
 
-  public static Comparator<Task> getComparator() {
-    return new Comparator<Task>() {
-      @Override
-      public int compare(Task o1, Task o2) {
-        return Task.compare(o1, o2);
-      }
-    };
-  }
-
-  public static int addTaskToList(Task task, ArrayList<Task> tasks) {
-    ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task, tasks);
-
-    int position = tasks.size() - 1;
-    while (position > 0 && getComparator().compare(task, tasks.get(position)) < 0) {
-      position--;
+  public static int compareInDateTypeGroup(Task o1, Task other) {
+    if (o1.getDone() && !other.getDone()) {
+      return -1;
+    } else if (other.getDone() && !o1.getDone()) {
+      return 1;
     }
-    tasks.add(position + 1, task);
 
-    return position;
+    boolean o1HasTime = o1.getMinuteStart() != null || o1.getMinuteEnd() != null;
+    boolean otherHasTime = other.getMinuteStart() != null || other.getMinuteEnd() != null;
+    if (o1HasTime && !otherHasTime) {
+      return 1;
+    } else if (!o1HasTime && otherHasTime) {
+      return -1;
+    }
+
+    if (o1HasTime && otherHasTime) {
+      if (o1.getMinuteStart() > other.getMinuteStart()) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }
+
+    if (o1.getImportant() && !other.getImportant()) {
+      return 1;
+    } else if (other.getImportant() && !o1.getImportant()) {
+      return -1;
+    }
+
+    if (o1.getDuration() != null && other.getDuration() == null) {
+      return 1;
+    } else if (o1.getDuration() == null && other.getDuration() != null) {
+      return -1;
+    }
+
+    if (o1.getChangeOrDeleteLocalTimestamp() != null && other.getChangeOrDeleteLocalTimestamp() != null) {
+      if (o1.getChangeOrDeleteLocalTimestamp() > other.getChangeOrDeleteLocalTimestamp()) {
+        return 1;
+      } else if (other.getChangeOrDeleteLocalTimestamp() > o1.getChangeOrDeleteLocalTimestamp()) {
+        return -1;
+      }
+    }
+
+    return 0;
   }
 
   public void setDone(Boolean done) {

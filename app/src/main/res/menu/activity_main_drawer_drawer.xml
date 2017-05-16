@@ -32,6 +32,11 @@
             android:icon="@drawable/ic_done"
             android:title="@string/drawer_done"/>
 
+        <item
+            android:id="@+id/navigation_notification"
+            android:icon="@drawable/ic_notification"
+            android:title="@string/drawer_notifications"/>
+
     </group>
 
 </menu>

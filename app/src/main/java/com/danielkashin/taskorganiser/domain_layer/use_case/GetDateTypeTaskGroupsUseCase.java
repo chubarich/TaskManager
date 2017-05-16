@@ -5,7 +5,7 @@ import com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTas
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 
 import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse.RepositoryRunnableResponse;
 import static com.danielkashin.taskorganiser.domain_layer.async_task.RepositoryAsyncTaskResponse.PostExecuteListenerResponse;

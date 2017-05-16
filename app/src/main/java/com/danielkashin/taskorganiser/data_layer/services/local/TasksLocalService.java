@@ -90,6 +90,60 @@ public class TasksLocalService extends DatabaseService implements ITasksLocalSer
         .prepare();
   }
 
+
+  @Override
+  public PreparedGetListOfObjects<TaskWeek> getNotificationWeekTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskWeek.class)
+        .withQuery(Query.builder()
+            .table(TaskWeekContract.TABLE_NAME)
+            .where(TaskWeekContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP + " IS NOT NULL AND "
+                + TaskWeekContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskDay> getNotificationDayTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskDay.class)
+        .withQuery(Query.builder()
+            .table(TaskDayContract.TABLE_NAME)
+            .where(TaskDayContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP + " IS NOT NULL AND "
+                + TaskDayContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskMonth> getNotificationMonthTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskMonth.class)
+        .withQuery(Query.builder()
+            .table(TaskMonthContract.TABLE_NAME)
+            .where(TaskMonthContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP + " IS NOT NULL AND "
+                + TaskMonthContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(0)
+            .build())
+        .prepare();
+  }
+
+  @Override
+  public PreparedGetListOfObjects<TaskNoDate> getNotificationNoDateTasks() {
+    return getSQLite().get()
+        .listOfObjects(TaskNoDate.class)
+        .withQuery(Query.builder()
+            .table(TaskNoDateContract.TABLE_NAME)
+            .where(TaskNoDateContract.COLUMN_NAME_NOTIFICATION_TIMESTAMP + " IS NOT NULL AND "
+                + TaskNoDateContract.COLUMN_NAME_DELETED_LOCAL + " = ?")
+            .whereArgs(0)
+            .build())
+        .prepare();
+  }
+
+
   @Override
   public PreparedGetListOfObjects<TaskWeek> getImportantWeekTasks() {
     return getSQLite().get()

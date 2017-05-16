@@ -9,14 +9,16 @@ import android.util.Pair;
 import android.view.View;
 
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
+import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetDateTypeTaskGroupsUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_groups.ITaskGroupsAdapter;
@@ -201,8 +203,11 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getActivity()
         .getApplication())
         .getTasksLocalService();
+    INotificationManager notificationManager = new NotificationManager(getContext());
 
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(
+        tasksLocalService,
+        notificationManager);
 
     GetDateTypeTaskGroupsUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupsUseCase(
         tasksRepository,
@@ -224,7 +229,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
   @Override
   protected int getLayoutRes() {
-    return R.layout.fragment_task_container;
+    return R.layout.fragment_recycler_container;
   }
 
   @Override

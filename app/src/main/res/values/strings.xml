@@ -1,4 +1,9 @@
 <resources>
+    <string name="notification_title">Напоминание о задаче</string>
+    <string name="notification_default">Напоминание о задаче</string>
+
+
+
     <string name="app_name">TaskOrganiser</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -13,6 +18,7 @@
     <string name="drawer_week">Неделя</string>
     <string name="drawer_month">Месяц</string>
     <string name="drawer_year">Год</string>
+    <string name="drawer_notifications">Напоминания</string>
 
     <string name="tasks_for_week">Задачи на неделю</string>
     <string name="tasks_for_month">Задачи на месяц</string>
@@ -23,6 +29,8 @@
     <string name="task_for_month">На месяц</string>
     <string name="task_no_date">Без даты</string>
 
+    <string name="choose_notification">Установить напоминание</string>
+    <string name="choose_zero_notification">Обнулить напоминание</string>
     <string name="to_this_week">Эта неделя</string>
     <string name="to_next_week">Следующая неделя</string>
     <string name="to_this_month">Этот месяц</string>
@@ -35,7 +43,7 @@
     <string name="choose_month">Выбрать месяц</string>
     <string name="choose_duration">Выбрать длительность</string>
     <string name="choose_zero_duration">Обнулить длительность</string>
-    <string name="choose">Выбрать</string>
+    <string name="choose">Готово</string>
     <string name="choose_start">Выбрать время начала</string>
     <string name="choose_end">Выбрать время завершения</string>
     <string name="choose_zero_start">Обнулить начало</string>
@@ -44,10 +52,11 @@
     <string name="wrong_start_and_end">Неверный выбор времени</string>
     <string name="changes_not_accepted">Изменения не приняты</string>
     <string name="not_registered">Не выполнен вход</string>
-    <string name="please_choose_date">Выбор даты</string>
-    <string name="please_choose_duration">Выбор длительности</string>
-    <string name="please_choose_start">Выбор начала</string>
-    <string name="please_choose_end">Выбор завершения</string>
+    <string name="please_choose_date">Дата</string>
+    <string name="please_choose_duration">Длительность</string>
+    <string name="please_choose_start">Время начала</string>
+    <string name="please_choose_end">Время завершения</string>
+    <string name="please_choose_notification">Время напоминания</string>
 
     <string name="new_task">новая задача</string>
     <string name="today">Сегодня</string>
@@ -67,12 +76,18 @@
     <string name="tag_deletion">Удаление тега</string>
     <string name="tag_deletion_message">Вы действительно хотите удалить тег? При удалении тега все задачи сохранятся</string>
 
+
     <string name="done_deletion">Удаление выполненных задач</string>
     <string name="done_deletion_message">Вы действительно хотите очистить список выполненых задач? Это действие необратимо</string>
 
     <string name="save">Сохранить</string>
     <string name="delete">Удалить</string>
     <string name="cancel">Отмена</string>
+
+    <string name="notification_not_deleted">Не удалось удалить напоминание</string>
+    <string name="notification_not_set">не установлено</string>
+    <string name="notification_not_set_message">Выбранное время уведомления должно быть хотя бы на час больше текущего</string>
+
 
     <string name="task_toolbar">Задача</string>
     <string name="task_saved">Задача сохранена</string>
@@ -87,6 +102,7 @@
 
     <string name="note_label">Заметка</string>
     <string name="name_label">Название</string>
+    <string name="notification">Напоминание</string>
 
     <array name="days">
         <item>Понедельник</item>

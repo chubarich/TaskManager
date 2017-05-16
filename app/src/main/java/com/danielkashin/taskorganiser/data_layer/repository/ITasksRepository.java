@@ -1,4 +1,4 @@
-package com.danielkashin.taskorganiser.domain_layer.repository;
+package com.danielkashin.taskorganiser.data_layer.repository;
 
 import android.util.Pair;
 
@@ -14,6 +14,8 @@ import java.util.ArrayList;
 public interface ITasksRepository {
 
   // ---------------------------------------- get -------------------------------------------------
+
+  ArrayList<Task> getAllTasksWithNotifications() throws ExceptionBundle;
 
   Pair<Task, ArrayList<String>> getTaskWithAllTags(Task.Type type, String UUID) throws ExceptionBundle;
 

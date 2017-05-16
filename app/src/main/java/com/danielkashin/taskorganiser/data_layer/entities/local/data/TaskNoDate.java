@@ -91,6 +91,10 @@ public class TaskNoDate {
     this.changeOrDeleteLocalTimestamp = timestamp;
   }
 
+  public Long getDuration() {
+    return duration;
+  }
+
   public Long getId() {
     return id;
   }

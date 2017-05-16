@@ -30,19 +30,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
+import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteDoneTasksUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTagUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTaskUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
+import com.danielkashin.taskorganiser.presentation_layer.view.notifications.NotificationsFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
 import com.danielkashin.taskorganiser.presentation_layer.view.task.TaskFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
 import com.danielkashin.taskorganiser.util.ColorHelper;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTagsUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTagUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
@@ -59,7 +62,6 @@ import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGr
 import static com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment.State;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 
 public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, IMainDrawerView>
@@ -155,6 +157,8 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
             addFragment(TypedTasksFragment.getInstance(State.Type.Important), false);
           } else if (id == R.id.navigation_done) {
             addFragment(TypedTasksFragment.getInstance(State.Type.Done), false);
+          } else if (id == R.id.navigation_notification) {
+            addFragment(NotificationsFragment.getInstance(), false);
           } else {
             addFragment(TagTasksFragment.getInstance(item.getTitle().toString()), false);
           }
@@ -233,8 +237,11 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   protected IPresenterFactory<MainDrawerPresenter, IMainDrawerView> getPresenterFactory() {
     ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getApplication())
         .getTasksLocalService();
+    INotificationManager notificationManager = new NotificationManager(this);
 
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(
+        tasksLocalService,
+        notificationManager);
 
     GetTagsUseCase getTagsUseCase = new GetTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
     SaveTagUseCase saveTagUseCase = new SaveTagUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);

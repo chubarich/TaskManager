@@ -2,23 +2,23 @@ package com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
+import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTypedTaskGroupUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.typed_tasks.ITypedTasksPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
-import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.ITaskGroupAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.TaskGroupAdapter;
@@ -137,9 +137,7 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
   public void initializeAdapter(ITaskGroup taskGroup) {
     if (mRecyclerView.getAdapter() == null) {
       mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup,
-          mRestoredState.getType() != State.Type.Done,
-          ContextCompat.getColor(getContext(), R.color.colorAccent),
-          ContextCompat.getColor(getContext(), R.color.grey)));
+          mRestoredState.getType() != State.Type.Done, true));
     } else {
       ((ITaskGroupAdapter) mRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
     }
@@ -159,8 +157,11 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
     ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getActivity()
         .getApplication())
         .getTasksLocalService();
+    INotificationManager notificationManager = new NotificationManager(getContext());
 
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(
+        tasksLocalService,
+        notificationManager);
 
     GetTypedTaskGroupUseCase getTaskGroupUseCase = new GetTypedTaskGroupUseCase(
         mRestoredState.getType(),
@@ -181,7 +182,7 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
 
   @Override
   protected int getLayoutRes() {
-    return R.layout.fragment_task_container;
+    return R.layout.fragment_recycler_container;
   }
 
   @Override

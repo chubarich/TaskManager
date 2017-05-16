@@ -5,12 +5,42 @@ import android.util.Pair;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 
 public class DatetimeHelper {
 
-  public static final String PATTERN = "yyyy-MM-dd";
+  public static final String DATE_PATTERN = "yyyy-MM-dd";
+  public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm";
+
+
+  public static String getDatetimeFromTimestamp(Long timestamp) {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATETIME_PATTERN);
+
+    return simpleDateFormat.format(new Date(timestamp * 1000));
+  }
+
+  public static boolean isGreaterThanNow(long timestamp, int neededHalfHourDifference) {
+    long now = new Date().getTime() / 1000;
+
+    return now + (neededHalfHourDifference * 30 * 60) < timestamp;
+  }
+
+  public static Long getTimestamp(int year, int month, int day, int hour, int minute) {
+    Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
+    calendar.setMinimalDaysInFirstWeek(1);
+    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.MONTH, month - 1);
+    calendar.set(Calendar.DAY_OF_MONTH, day);
+    calendar.set(Calendar.HOUR_OF_DAY, hour);
+    calendar.set(Calendar.MINUTE, minute);
+    calendar.getTime();
+
+    return calendar.getTimeInMillis() / 1000;
+  }
 
 
 
@@ -28,7 +58,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.DAY_OF_MONTH, day);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -50,7 +80,7 @@ public class DatetimeHelper {
     calendar.getTime();
 
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -76,7 +106,7 @@ public class DatetimeHelper {
     calendar.getTime();
 
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -102,7 +132,7 @@ public class DatetimeHelper {
     calendar.getTime();
 
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -126,7 +156,7 @@ public class DatetimeHelper {
     calendar.add(Calendar.WEEK_OF_YEAR, 1);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -150,7 +180,7 @@ public class DatetimeHelper {
     calendar.add(Calendar.WEEK_OF_YEAR, -1);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -174,7 +204,7 @@ public class DatetimeHelper {
     calendar.add(Calendar.DAY_OF_YEAR, 1);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -198,7 +228,7 @@ public class DatetimeHelper {
     calendar.add(Calendar.DAY_OF_YEAR, -1);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -276,7 +306,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.YEAR, year);
     calendar.set(Calendar.MONTH, month - 1);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     int countOfWeeks = calendar.getActualMaximum(Calendar.WEEK_OF_MONTH);
@@ -306,7 +336,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.DAY_OF_MONTH, 1);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());
@@ -333,7 +363,7 @@ public class DatetimeHelper {
     calendar.setMinimalDaysInFirstWeek(1);
     calendar.setFirstDayOfWeek(Calendar.MONDAY);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
 
@@ -365,7 +395,7 @@ public class DatetimeHelper {
 
     calendar.set(Calendar.DAY_OF_MONTH, 1);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     return simpleDateFormat.format(calendar.getTime());
@@ -379,7 +409,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.DAY_OF_WEEK, dayOfWeekStartingMonday(1));
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     return simpleDateFormat.format(calendar.getTime());
@@ -401,7 +431,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.DAY_OF_WEEK, dayOfWeekStartingMonday(1));
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     return simpleDateFormat.format(calendar.getTime());
@@ -410,7 +440,7 @@ public class DatetimeHelper {
   public static String getCurrentDay() {
     Calendar calendar = Calendar.getInstance(new Locale("ru", "ru"));
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     return simpleDateFormat.format(calendar.getTime());
@@ -472,7 +502,7 @@ public class DatetimeHelper {
     calendar.set(Calendar.DAY_OF_MONTH, day);
     calendar.getTime();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN);
     simpleDateFormat.setTimeZone(calendar.getTimeZone());
 
     String output = simpleDateFormat.format(calendar.getTime());

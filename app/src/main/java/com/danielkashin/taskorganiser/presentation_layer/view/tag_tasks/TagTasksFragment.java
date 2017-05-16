@@ -2,21 +2,22 @@ package com.danielkashin.taskorganiser.presentation_layer.view.tag_tasks;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.danielkashin.taskorganiser.R;
+import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
+import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.domain_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
+import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTagTaskGroupUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.task_group.ITaskGroupAdapter;
@@ -59,8 +60,11 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
     ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getActivity()
         .getApplication())
         .getTasksLocalService();
+    INotificationManager notificationManager = new NotificationManager(getContext());
 
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(tasksLocalService);
+    ITasksRepository tasksRepository = TasksRepository.Factory.create(
+        tasksLocalService,
+        notificationManager);
 
     GetTagTaskGroupUseCase getTaskGroupUseCase = new GetTagTaskGroupUseCase(
         tasksRepository,
@@ -81,7 +85,7 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
 
   @Override
   protected int getLayoutRes() {
-    return R.layout.fragment_task_container;
+    return R.layout.fragment_recycler_container;
   }
 
   @Override
@@ -181,9 +185,7 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
   @Override
   public void initializeAdapter(ITaskGroup taskGroup) {
     if (mRecyclerView.getAdapter() == null) {
-      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup, true,
-          ContextCompat.getColor(getContext(), R.color.colorAccent),
-          ContextCompat.getColor(getContext(), R.color.grey)));
+      mRecyclerView.setAdapter(new TaskGroupAdapter(taskGroup, true, true));
     } else {
       ((ITaskGroupAdapter) mRecyclerView.getAdapter()).changeTaskGroup(taskGroup);
     }
