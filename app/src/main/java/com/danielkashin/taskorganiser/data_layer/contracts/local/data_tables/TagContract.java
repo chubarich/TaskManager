@@ -19,7 +19,7 @@ public class TagContract implements IdContract {
       + COLUMN_NAME_ID + " INTEGER NOT NULL PRIMARY KEY, "
 
       // TagContract
-      + COLUMN_NAME_NAME + " INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE "
+      + COLUMN_NAME_NAME + " TEXT NOT NULL UNIQUE ON CONFLICT IGNORE "
 
       + ");";
 
