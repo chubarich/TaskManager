@@ -34,8 +34,6 @@ import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
 import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.data_layer.services.preferences.PreferencesService;
-import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
-import com.danielkashin.taskorganiser.data_layer.services.remote.TasksRemoteService;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteDoneTasksUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTagUseCase;
 import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTaskUseCase;
@@ -45,7 +43,6 @@ import com.danielkashin.taskorganiser.presentation_layer.view.notifications.Noti
 import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
 import com.danielkashin.taskorganiser.presentation_layer.view.task.TaskFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
-import com.danielkashin.taskorganiser.presentation_layer.view.user.UserFragment;
 import com.danielkashin.taskorganiser.util.ColorHelper;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
@@ -182,20 +179,6 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
   // ---------------------------------- IMainDrawerView -------------------------------------------
 
   @Override
-  public void clearUser() {
-    PreferencesService preferencesService = new PreferencesService(this);
-    preferencesService.onDeleteLastUser();
-    refreshHeader();
-    addFragment(TaskGroupsFragment.getInstance(DatetimeHelper.getCurrentWeek(), Task.Type.Day), false);
-  }
-
-  @Override
-  public void openUserPage() {
-    refreshHeader();
-    addFragment(UserFragment.getInstance(), true);
-  }
-
-  @Override
   public void closeCurrentFragment() {
     if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
       getSupportFragmentManager().popBackStack();
@@ -259,11 +242,9 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
         .getTasksLocalService();
     INotificationManager notificationManager = new NotificationManager(this);
 
-    ITasksRemoteService tasksRemoteService = new TasksRemoteService();
 
     ITasksRepository tasksRepository = TasksRepository.Factory.create(
         tasksLocalService,
-        tasksRemoteService,
         notificationManager);
 
     GetTagsUseCase getTagsUseCase = new GetTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
@@ -520,8 +501,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
           public void onClick(View v) {
             PreferencesService preferencesService = new PreferencesService(MainDrawerActivity.this);
             if (!preferencesService.getCurrentEmail().equals("")) {
-              mDrawerLayout.closeDrawer(GravityCompat.START);
-              addFragment(UserFragment.getInstance(), true);
+              // do nothing
             } else {
               mDrawerLayout.closeDrawer(GravityCompat.START);
               addFragment(AuthenticationFragment.getInstance(), true);

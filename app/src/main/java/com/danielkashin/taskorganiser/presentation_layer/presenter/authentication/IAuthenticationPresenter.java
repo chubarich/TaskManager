@@ -3,6 +3,4 @@ package com.danielkashin.taskorganiser.presentation_layer.presenter.authenticati
 
 public interface IAuthenticationPresenter {
 
-  void onRegisterOrLogin(String email, String password, boolean isLogin);
-
 }

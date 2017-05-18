@@ -15,11 +15,6 @@ import java.util.ArrayList;
 
 public interface ITasksRepository {
 
-  Pair<String, String> registerOrLogin(String email, String password, boolean isLogin) throws ExceptionBundle;
-
-  TasksFromServer sync(long lastSync, ArrayList<TaskBody> tasks) throws ExceptionBundle;
-
-
   // ---------------------------------------- get -------------------------------------------------
 
   ArrayList<Task> getAllTasksWithNotifications() throws ExceptionBundle;

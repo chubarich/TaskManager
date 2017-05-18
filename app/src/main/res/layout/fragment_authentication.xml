@@ -31,7 +31,6 @@
                 android:gravity="center"
                 android:paddingBottom="@dimen/logo_margin_bottom"
                 android:paddingTop="@dimen/logo_margin_top"
-                android:text="CALENDO"
                 android:textSize="@dimen/logo_size"
                 android:textStyle="bold"
                 android:typeface="monospace" />

@@ -15,17 +15,13 @@ import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
 import com.danielkashin.taskorganiser.data_layer.services.preferences.PreferencesService;
-import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
-import com.danielkashin.taskorganiser.data_layer.services.remote.TasksRemoteService;
-import com.danielkashin.taskorganiser.domain_layer.use_case.RegisterOrLoginUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.authentication.AuthenticationPresenter;
-import com.danielkashin.taskorganiser.presentation_layer.presenter.authentication.IAuthenticationPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
-import com.danielkashin.taskorganiser.presentation_layer.presenter.notifications.INotificationsPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IMainDrawerView;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
+
 
 public class AuthenticationFragment extends PresenterFragment<AuthenticationPresenter, IAuthenticationView>
     implements IAuthenticationView {
@@ -59,14 +55,12 @@ public class AuthenticationFragment extends PresenterFragment<AuthenticationPres
         .getTasksLocalService();
     INotificationManager notificationManager = new NotificationManager(getContext());
 
-    ITasksRemoteService tasksRemoteService = new TasksRemoteService();
 
     ITasksRepository tasksRepository = TasksRepository.Factory.create(
         tasksLocalService,
-        tasksRemoteService,
         notificationManager);
 
-    return new AuthenticationPresenter.Factory(new RegisterOrLoginUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR));
+    return new AuthenticationPresenter.Factory();
   }
 
   @Override
@@ -87,57 +81,24 @@ public class AuthenticationFragment extends PresenterFragment<AuthenticationPres
     buttonRegistration = (Button) view.findViewById(R.id.button_registration);
   }
 
-  @Override
-  public void showNoInternetConnection() {
-    new AlertDialog.Builder(getContext())
-        .setMessage("Слабое интернет-соединение, вход не выполнен")
-        .create()
-        .show();
-  }
-
-  @Override
-  public void showError() {
-    new AlertDialog.Builder(getContext())
-        .setMessage("Введены неверные данные, вход не выполнен")
-        .create()
-        .show();
-  }
-
-
-  @Override
-  public void openUserPage(Pair<String, String> result) {
-    new PreferencesService(getContext()).saveNewUser(result.first, result.second);
-    ((IMainDrawerView)getActivity()).openUserPage();
-  }
-
   private void setListeners() {
     buttonLogin.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (!editEmail.getText().toString().isEmpty() && !editPassword.getText().toString().isEmpty()) {
-          ((IAuthenticationPresenter) getPresenter()).onRegisterOrLogin(editEmail.getText().toString(),
-              editPassword.getText().toString(), true);
-        } else {
-          new AlertDialog.Builder(getContext())
-              .setTitle("Введите данные полностью")
-              .create()
-              .show();
-        }
+        new AlertDialog.Builder(getContext())
+            .setTitle("Сервер не подключен")
+            .create()
+            .show();
       }
     });
 
     buttonRegistration.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (!editEmail.getText().toString().isEmpty() && !editPassword.getText().toString().isEmpty()) {
-          ((IAuthenticationPresenter) getPresenter()).onRegisterOrLogin(editEmail.getText().toString(),
-              editPassword.getText().toString(), false);
-        } else {
-          new AlertDialog.Builder(getContext())
-              .setTitle("Введите данные полностью")
-              .create()
-              .show();
-        }
+        new AlertDialog.Builder(getContext())
+            .setTitle("Сервер не подключен")
+            .create()
+            .show();
       }
     });
 

@@ -86,7 +86,7 @@
 
     <string name="notification_not_deleted">Не удалось удалить напоминание</string>
     <string name="notification_not_set">не установлено</string>
-    <string name="notification_not_set_message">Выбранное время уведомления должно быть хотя бы на час больше текущего</string>
+    <string name="notification_not_set_message">Выбранное время уведомления должно быть больше текущего</string>
 
 
     <string name="task_toolbar">Задача</string>
