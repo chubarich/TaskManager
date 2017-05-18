@@ -23,9 +23,10 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.user.UserPres
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IMainDrawerView;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolbarContainer;
+import com.danielkashin.taskorganiser.util.DatetimeHelper;
 
 public class UserFragment extends PresenterFragment<UserPresenter, IUserView>
-implements IUserView{
+    implements IUserView {
 
   private TextView textEmail;
   private TextView textTimestamp;
@@ -40,12 +41,8 @@ implements IUserView{
   @Override
   public void onStart() {
     super.onStart();
-
-    PreferencesService preferencesService = new PreferencesService(getContext());
-    if (!preferencesService.getCurrentEmail().equals("")) {
-      textEmail.setText("Вы вошли как: " + preferencesService.getCurrentEmail());
-    }
-
+    
+    refreshData();
     ((IToolbarContainer) getActivity()).setToolbar("Настройки", false, false, false, false);
   }
 
@@ -93,18 +90,32 @@ implements IUserView{
     buttonLeave.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        ((IMainDrawerView)getActivity()).clearUser();
+        ((IMainDrawerView) getActivity()).clearUser();
       }
     });
 
     buttonSync.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        new AlertDialog.Builder(getContext())
-            .setTitle("Интернет-соединение отсутствует")
-            .create()
-            .show();
+        //new AlertDialog.Builder(getContext())
+        //    .setTitle("Интернет-соединение отсутствует")
+        //    .create()
+        //    .show();
+        PreferencesService preferencesService = new PreferencesService(getContext());
+        preferencesService.saveLastSync(DatetimeHelper.getCurrentTimestamp());
+        refreshData();
       }
     });
+  }
+
+  private void refreshData() {
+    PreferencesService preferencesService = new PreferencesService(getContext());
+    if (!preferencesService.getCurrentEmail().equals("")) {
+      textEmail.setText("Вы вошли как: " + preferencesService.getCurrentEmail());
+      textEmail.setText("Время последней синхронизации: " + (
+          preferencesService.getLastSyncTimestamp() == -1
+              ? "не синхронизировано"
+              : DatetimeHelper.getDatetimeFromTimestamp(preferencesService.getLastSyncTimestamp())));
+    }
   }
 }

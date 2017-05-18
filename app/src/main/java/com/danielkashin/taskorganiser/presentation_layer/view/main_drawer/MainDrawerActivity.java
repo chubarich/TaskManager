@@ -501,7 +501,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
 
   private void refreshHeader() {
     PreferencesService preferencesService = new PreferencesService(this);
-    if (preferencesService.getCurrentEmail() != null) {
+    if (preferencesService.getCurrentEmail() != null && !preferencesService.getCurrentEmail().equals("")) {
       ((TextView) mNavigationView.getHeaderView(0)
           .findViewById(R.id.textView))
           .setText(preferencesService.getCurrentEmail());
