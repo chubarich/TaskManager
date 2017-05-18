@@ -505,6 +505,10 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
       ((TextView) mNavigationView.getHeaderView(0)
           .findViewById(R.id.textView))
           .setText(preferencesService.getCurrentEmail());
+    } else {
+      ((TextView) mNavigationView.getHeaderView(0)
+          .findViewById(R.id.textView))
+          .setText("не выполнен вход");
     }
   }
 
