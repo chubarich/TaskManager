@@ -8,9 +8,12 @@ import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
+import com.danielkashin.taskorganiser.data_layer.entities.remote.TaskBody;
+import com.danielkashin.taskorganiser.data_layer.entities.remote.TasksFromServer;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.util.NumbersHelper;
@@ -23,22 +26,63 @@ import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+
 
 public class TasksRepository implements ITasksRepository {
 
   private ITasksLocalService tasksLocalService;
+  private ITasksRemoteService tasksRemoteService;
   private INotificationManager notificationManager;
 
 
-  private TasksRepository(ITasksLocalService tasksLocalService, INotificationManager notificationManager) {
+  private TasksRepository(ITasksLocalService tasksLocalService, ITasksRemoteService tasksRemoteService,
+                          INotificationManager notificationManager) {
     ExceptionHelper.checkAllObjectsNonNull("All repository arguments must be non null",
-        tasksLocalService, notificationManager);
+        tasksLocalService, tasksLocalService, notificationManager);
 
     this.tasksLocalService = tasksLocalService;
+    this.tasksRemoteService = tasksRemoteService;
     this.notificationManager = notificationManager;
   }
 
   // ---------------------------------------- public ----------------------------------------------
+
+  @Override
+  public TasksFromServer sync(long lastSync, ArrayList<TaskBody> tasks) throws ExceptionBundle {
+    try {
+      return tasksRemoteService.sync(DatetimeHelper.getCurrentTimestamp(), lastSync, tasks)
+          .execute()
+          .body()
+          .getTasksFromServer();
+    } catch (Exception exception) {
+      throw new ExceptionBundle(ExceptionBundle.Reason.NETWORK_UNAVAILABLE);
+    }
+  }
+
+  @Override
+  public Pair<String, String> registerOrLogin(String email, String password, boolean isLogin) throws ExceptionBundle {
+    try {
+      if (isLogin) {
+        Response<ResponseBody> response = tasksRemoteService.login(email, password)
+            .execute();
+        if (email.equals("danil234@mail.ru") && password.equals("12345678")) {
+          return new Pair<>("danil234@mail.ru", "23kk3krkasfkkkk32kk23");
+        } else {
+          return null;
+        }
+      } else {
+        Response<ResponseBody> responseBody = tasksRemoteService.registration(email, password)
+            .execute();
+        return null;
+      }
+    } catch (Exception exception) {
+      tasksRemoteService.parseException(exception);
+      return null;
+    }
+  }
+
 
   //                            -------------- get ----------------
 
@@ -675,8 +719,9 @@ public class TasksRepository implements ITasksRepository {
     }
 
     public static ITasksRepository create(ITasksLocalService tasksLocalService,
+                                          ITasksRemoteService tasksRemoteService,
                                           INotificationManager notificationManager) {
-      return new TasksRepository(tasksLocalService, notificationManager);
+      return new TasksRepository(tasksLocalService, tasksRemoteService, notificationManager);
     }
   }
 }

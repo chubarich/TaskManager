@@ -15,6 +15,8 @@ import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.TasksRemoteService;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.TagTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
@@ -63,8 +65,11 @@ public class NotificationsFragment extends PresenterFragment<NotificationsPresen
         .getTasksLocalService();
     INotificationManager notificationManager = new NotificationManager(getContext());
 
+    ITasksRemoteService tasksRemoteService = new TasksRemoteService();
+
     ITasksRepository tasksRepository = TasksRepository.Factory.create(
         tasksLocalService,
+        tasksRemoteService,
         notificationManager);
 
 

@@ -12,6 +12,8 @@ import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
 import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.TasksRemoteService;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
@@ -205,8 +207,11 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
         .getTasksLocalService();
     INotificationManager notificationManager = new NotificationManager(getContext());
 
+    ITasksRemoteService tasksRemoteService = new TasksRemoteService();
+
     ITasksRepository tasksRepository = TasksRepository.Factory.create(
         tasksLocalService,
+        tasksRemoteService,
         notificationManager);
 
     GetDateTypeTaskGroupsUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupsUseCase(
@@ -251,7 +256,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
     Integer highlightIndex = -1;
 
     // fill output data
-    if (mRestoredState.getType() == Task.Type.Day) { // --------------- Task.Type.Day -------------
+    if (mRestoredState.getType() == Task.Type.Day) { // --------------- TaskBody.Type.Day -------------
       labels.add(getString(R.string.tasks_for_week));
       String currentDay = DatetimeHelper.getCurrentDay();
       for (int i = 1; i < taskGroups.size(); ++i) {
@@ -262,7 +267,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
         String label = getDayLabel(months, days, dayDate);
         labels.add(label);
       }
-    } else if (mRestoredState.getType() == Task.Type.Week) { // -------- Task.Type.Week -----------
+    } else if (mRestoredState.getType() == Task.Type.Week) { // -------- TaskBody.Type.Week -----------
       labels.add(getString(R.string.tasks_for_month));
       String currentWeek = DatetimeHelper.getCurrentWeek();
       for (int i = 1; i < taskGroups.size(); ++i) {
@@ -273,7 +278,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
         String label = getWeekLabel(months, weekDate);
         labels.add(label);
       }
-    } else if (mRestoredState.getType() == Task.Type.Month) { // -------- Task.Type.Month ---------
+    } else if (mRestoredState.getType() == Task.Type.Month) { // -------- TaskBody.Type.Month ---------
       labels.addAll(Arrays.asList(simpleMonths));
       String currentMonth = DatetimeHelper.getCurrentMonth();
       for (int i = 0; i < taskGroups.size(); ++i) {

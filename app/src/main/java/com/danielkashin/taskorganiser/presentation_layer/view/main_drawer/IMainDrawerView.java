@@ -7,6 +7,10 @@ import java.util.ArrayList;
 
 public interface IMainDrawerView extends ITagViewOpener, IView {
 
+  void openUserPage();
+
+  void clearUser();
+
   void showTagAlreadyExists();
 
   void setTags(ArrayList<String> tags);

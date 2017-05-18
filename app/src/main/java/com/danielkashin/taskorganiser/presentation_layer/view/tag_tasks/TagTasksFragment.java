@@ -11,6 +11,8 @@ import com.danielkashin.taskorganiser.R;
 import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
 import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
 import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.ITasksRemoteService;
+import com.danielkashin.taskorganiser.data_layer.services.remote.TasksRemoteService;
 import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.ITaskViewOpener;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
@@ -62,8 +64,11 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
         .getTasksLocalService();
     INotificationManager notificationManager = new NotificationManager(getContext());
 
+    ITasksRemoteService tasksRemoteService = new TasksRemoteService();
+
     ITasksRepository tasksRepository = TasksRepository.Factory.create(
         tasksLocalService,
+        tasksRemoteService,
         notificationManager);
 
     GetTagTaskGroupUseCase getTaskGroupUseCase = new GetTagTaskGroupUseCase(

@@ -3,6 +3,7 @@
           package="com.danielkashin.taskorganiser">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".presentation_layer.application.TaskOrganiserApplication"

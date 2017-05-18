@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_authentication"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/authenctication_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:orientation="vertical"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp">
+
+            <TextView
+                android:id="@+id/authenctication_main_icon"
+                android:textColor="@color/grey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="@dimen/logo_margin_bottom"
+                android:paddingTop="@dimen/logo_margin_top"
+                android:text="CALENDO"
+                android:textSize="@dimen/logo_size"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/AuthInputLayout"
+                android:id="@+id/layout_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/AppTheme.TextErrorAppearance">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edit_username"
+                    style="@style/AuthInput"
+                    android:hint="EMail"
+                    android:textColor="@android:color/black"
+                    android:inputType="textNoSuggestions|textVisiblePassword"
+                    android:paddingStart="3dp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/AuthInputLayout"
+                android:id="@+id/layout_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/AppTheme.TextErrorAppearance"
+                app:passwordToggleEnabled="false">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/edit_password"
+                    android:textColor="@android:color/black"
+                    style="@style/AuthInput"
+                    android:hint="Пароль"
+                    android:inputType="textPassword"
+                    android:paddingStart="3dp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="20dp">
+
+                <Button
+                    android:id="@+id/button_registration"
+                    style="@style/AuthButton"
+                    android:layout_marginEnd="6dp"
+                    android:text="Регистрация" />
+
+                <Button
+                    android:id="@+id/button_enter"
+                    style="@style/AuthButton"
+                    android:text="Вход"/>
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>

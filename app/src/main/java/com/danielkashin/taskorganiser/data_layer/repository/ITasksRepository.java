@@ -2,6 +2,8 @@ package com.danielkashin.taskorganiser.data_layer.repository;
 
 import android.util.Pair;
 
+import com.danielkashin.taskorganiser.data_layer.entities.remote.TaskBody;
+import com.danielkashin.taskorganiser.data_layer.entities.remote.TasksFromServer;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.pojo.DateTypeTaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.pojo.RandomTaskGroup;
@@ -12,6 +14,11 @@ import java.util.ArrayList;
 
 
 public interface ITasksRepository {
+
+  Pair<String, String> registerOrLogin(String email, String password, boolean isLogin) throws ExceptionBundle;
+
+  TasksFromServer sync(long lastSync, ArrayList<TaskBody> tasks) throws ExceptionBundle;
+
 
   // ---------------------------------------- get -------------------------------------------------
 

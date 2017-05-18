@@ -14,4 +14,29 @@
 
     <color name="grey">#858e98</color>
 
+    <color name="indigo_700">#303F9F</color>
+    <color name="indigo_500">#3F51B5</color>
+    <color name="indigo_400">#5C6BC0</color>
+    <color name="indigo_100">#C5CAE9</color>
+    <color name="indigo_100_transparent">#7dc5cae9</color>
+    <color name="indigo_50">#E8EAF6</color>
+    <color name="accent">#A5D6A7</color>
+
+    <color name="primary_text">#de000000</color>
+    <color name="secondary_text">#8a000000</color>
+    <color name="hint_text">#61000000</color>
+
+    <color name="drawer">#5a5a5a</color>
+
+    <color name="message_system_background">#f0b4b4b4</color>
+
+    <color name="shadow_start">#0b000000</color>
+    <color name="shadow_end">#19000000</color>
+
+    <color name="item_pressed">#e0e0e0</color>
+
+    <color name="error">#EF9A9A</color>
+
+    <color name="white">#ffffff</color>
+
 </resources>

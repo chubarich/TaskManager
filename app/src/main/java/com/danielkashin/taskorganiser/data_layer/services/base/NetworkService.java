@@ -1,5 +1,7 @@
 package com.danielkashin.taskorganiser.data_layer.services.base;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -11,11 +13,14 @@ public abstract class NetworkService<S> {
   private S service;
 
 
-  public NetworkService(String baseUrl, OkHttpClient okHttpClient){
+  public NetworkService(String baseUrl){
     this.retrofit = new Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(new OkHttpClient.Builder()
+                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build())
             .build();
 
     bindService();

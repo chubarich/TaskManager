@@ -52,7 +52,7 @@ public class TagTaskGroup implements ITaskGroup {
 
   @Override
   public void addTask(Task task) {
-    ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
+    ExceptionHelper.checkAllObjectsNonNull("TaskBody must be non null", task);
 
     int jToSet = -1;
     for (int j = 0; j < tasks.size(); ++j) {

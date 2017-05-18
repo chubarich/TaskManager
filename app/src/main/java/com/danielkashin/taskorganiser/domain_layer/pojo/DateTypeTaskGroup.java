@@ -66,9 +66,9 @@ public class DateTypeTaskGroup implements ITaskGroup {
 
   @Override
   public void addTask(Task task) {
-    ExceptionHelper.checkAllObjectsNonNull("Task must be non null", task);
+    ExceptionHelper.checkAllObjectsNonNull("TaskBody must be non null", task);
     boolean taskIsValid = canBelongTo(task);
-    ExceptionHelper.assertTrue("Task is not valid", taskIsValid);
+    ExceptionHelper.assertTrue("TaskBody is not valid", taskIsValid);
 
     int jToSet = -1;
     for (int j = 0; j < tasks.size(); ++j) {
