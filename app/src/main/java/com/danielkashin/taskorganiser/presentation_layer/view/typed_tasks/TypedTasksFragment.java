@@ -74,7 +74,7 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
       ((IToolbarContainer) getActivity()).setToolbar(getString(R.string.drawer_done), false, false, false, true);
     }
 
-    ((TypedTasksPresenter) getPresenter()).onGetTaskGroupData();
+    ((TypedTasksPresenter) getPresenter()).onGetTaskGroupData(mRestoredState.getType());
   }
 
   @Override
@@ -164,7 +164,6 @@ public class TypedTasksFragment extends PresenterFragment<TypedTasksPresenter, I
         notificationManager);
 
     GetTypedTaskGroupUseCase getTaskGroupUseCase = new GetTypedTaskGroupUseCase(
-        mRestoredState.getType(),
         tasksRepository,
         AsyncTask.THREAD_POOL_EXECUTOR);
 

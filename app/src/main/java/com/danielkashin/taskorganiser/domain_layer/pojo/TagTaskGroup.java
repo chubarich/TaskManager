@@ -17,7 +17,6 @@ public class TagTaskGroup implements ITaskGroup {
     this.tag = tag;
   }
 
-
   // --------------------------------------- setters ----------------------------------------------
 
   @Override
@@ -97,14 +96,6 @@ public class TagTaskGroup implements ITaskGroup {
   @Override
   public int getTaskSize() {
     return tasks.size();
-  }
-
-  @Override
-  public Task popTask(int position) {
-    boolean positionIsValid = position >= 0 && position < tasks.size();
-    ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
-
-    return tasks.remove(position);
   }
 
   private Comparator<Task> getComparator() {

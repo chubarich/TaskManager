@@ -76,8 +76,8 @@ public class TaskGroupsPresenter extends Presenter<ITaskGroupsView>
   // ----------------------------------- ITaskGroupsPresenter -------------------------------------
 
   @Override
-  public void onGetTaskGroupsData() {
-    mGetTaskGroupUseCase.run(this);
+  public void onGetTaskGroupsData(Task.Type type, String date) {
+    mGetTaskGroupUseCase.run(this, type, date);
   }
 
   @Override

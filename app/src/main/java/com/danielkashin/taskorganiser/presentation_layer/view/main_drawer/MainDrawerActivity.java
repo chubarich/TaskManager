@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,45 +29,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.danielkashin.taskorganiser.R;
-import com.danielkashin.taskorganiser.data_layer.managers.INotificationManager;
-import com.danielkashin.taskorganiser.data_layer.managers.NotificationManager;
-import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
-import com.danielkashin.taskorganiser.data_layer.services.preferences.PreferencesService;
-import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteDoneTasksUseCase;
-import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTagUseCase;
-import com.danielkashin.taskorganiser.domain_layer.use_case.DeleteTaskUseCase;
-import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
-import com.danielkashin.taskorganiser.presentation_layer.view.authentication.AuthenticationFragment;
-import com.danielkashin.taskorganiser.presentation_layer.view.notifications.NotificationsFragment;
-import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
-import com.danielkashin.taskorganiser.presentation_layer.view.task.TaskFragment;
-import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
-import com.danielkashin.taskorganiser.util.ColorHelper;
-import com.danielkashin.taskorganiser.util.DatetimeHelper;
+import com.danielkashin.taskorganiser.di.scope.MainDrawerScope;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
-import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
-import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
-import com.danielkashin.taskorganiser.domain_layer.use_case.GetTagsUseCase;
-import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTagUseCase;
-import com.danielkashin.taskorganiser.presentation_layer.application.ITasksLocalServiceProvider;
+import com.danielkashin.taskorganiser.presentation_layer.application.TaskOrganiserApplication;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresenterFactory;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.main_drawer.IMainDrawerPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.main_drawer.MainDrawerPresenter;
 import com.danielkashin.taskorganiser.presentation_layer.view.base.PresenterActivity;
-import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.notifications.NotificationsFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.tag_tasks.ITagTasksView;
 import com.danielkashin.taskorganiser.presentation_layer.view.tag_tasks.TagTasksFragment;
+import com.danielkashin.taskorganiser.presentation_layer.view.task.ITaskView;
+import com.danielkashin.taskorganiser.presentation_layer.view.task.TaskFragment;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.IDateContainer;
 import com.danielkashin.taskorganiser.presentation_layer.view.task_groups.TaskGroupsFragment;
-
-import static com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment.State;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.ITypedTasksView;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
+import com.danielkashin.taskorganiser.util.ColorHelper;
+import com.danielkashin.taskorganiser.util.DatetimeHelper;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
 
+import static com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment.State;
+
+@MainDrawerScope
 public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, IMainDrawerView>
     implements IMainDrawerView, ICalendarWalker, IToolbarContainer, ITaskViewOpener,
     NavigationView.OnNavigationItemSelectedListener {
+
+  @Inject
+  IPresenterFactory<MainDrawerPresenter, IMainDrawerView>  mPresenterFactory;
 
   private static final String KEY_TOOLBAR_LABEL = "TOOLBAR_LABEL";
   private static final int ID_SUB_MENU = 1243;
@@ -92,6 +84,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    TaskOrganiserApplication.getMainDrawerComponent().inject(this);
     super.onCreate(savedInstanceState);
     initializeViewMore(savedInstanceState);
   }
@@ -107,7 +100,6 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     }
 
     setListeners();
-    refreshHeader();
   }
 
   @Override
@@ -238,24 +230,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
 
   @Override
   protected IPresenterFactory<MainDrawerPresenter, IMainDrawerView> getPresenterFactory() {
-    ITasksLocalService tasksLocalService = ((ITasksLocalServiceProvider) getApplication())
-        .getTasksLocalService();
-    INotificationManager notificationManager = new NotificationManager(this);
-
-
-    ITasksRepository tasksRepository = TasksRepository.Factory.create(
-        tasksLocalService,
-        notificationManager);
-
-    GetTagsUseCase getTagsUseCase = new GetTagsUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-    SaveTagUseCase saveTagUseCase = new SaveTagUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-    DeleteTagUseCase deleteTagUseCase = new DeleteTagUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-    DeleteDoneTasksUseCase deleteDoneTasksUseCase = new DeleteDoneTasksUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-    SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-    DeleteTaskUseCase deleteTaskUseCase = new DeleteTaskUseCase(tasksRepository, AsyncTask.THREAD_POOL_EXECUTOR);
-
-    return new MainDrawerPresenter.Factory(getTagsUseCase, saveTagUseCase, deleteTagUseCase,
-        deleteDoneTasksUseCase, saveTaskUseCase, deleteTaskUseCase);
+    return mPresenterFactory;
   }
 
   @Override
@@ -480,36 +455,7 @@ public class MainDrawerActivity extends PresenterActivity<MainDrawerPresenter, I
     mDrawerToggle.syncState();
   }
 
-  private void refreshHeader() {
-    PreferencesService preferencesService = new PreferencesService(this);
-    if (preferencesService.getCurrentEmail() != null && !preferencesService.getCurrentEmail().equals("")) {
-      ((TextView) mNavigationView.getHeaderView(0)
-          .findViewById(R.id.textView))
-          .setText(preferencesService.getCurrentEmail());
-    } else {
-      ((TextView) mNavigationView.getHeaderView(0)
-          .findViewById(R.id.textView))
-          .setText("не выполнен вход");
-    }
-  }
-
   private void setListeners() {
-    mNavigationView.getHeaderView(0)
-        .findViewById(R.id.header)
-        .setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            PreferencesService preferencesService = new PreferencesService(MainDrawerActivity.this);
-            if (!preferencesService.getCurrentEmail().equals("")) {
-              // do nothing
-            } else {
-              mDrawerLayout.closeDrawer(GravityCompat.START);
-              addFragment(AuthenticationFragment.getInstance(), true);
-            }
-          }
-        });
-
-
     mImageToolbarDelete.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {

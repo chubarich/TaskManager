@@ -68,8 +68,7 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
 
     GetTagTaskGroupUseCase getTaskGroupUseCase = new GetTagTaskGroupUseCase(
         tasksRepository,
-        AsyncTask.THREAD_POOL_EXECUTOR,
-        mRestoredState.getTagName());
+        AsyncTask.THREAD_POOL_EXECUTOR);
 
     SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(
         tasksRepository,
@@ -120,7 +119,7 @@ public class TagTasksFragment extends PresenterFragment<TagTasksPresenter, ITagT
 
     ((IToolbarContainer) getActivity()).setToolbar(mRestoredState.getTagName(), false, false, false, true);
 
-    ((ITagTasksPresenter) getPresenter()).onGetTaskGroupData();
+    ((ITagTasksPresenter) getPresenter()).onGetTaskGroupData(mRestoredState.getTagName());
   }
 
   @Override

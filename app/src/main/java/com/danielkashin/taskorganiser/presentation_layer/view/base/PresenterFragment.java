@@ -12,7 +12,6 @@ import com.danielkashin.taskorganiser.presentation_layer.presenter.base.IPresent
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.Presenter;
 import com.danielkashin.taskorganiser.presentation_layer.presenter.base.PresenterLoader;
 
-
 /*
  * basic fragment that holds reference to presenter
  */
@@ -20,7 +19,6 @@ public abstract class PresenterFragment<P extends Presenter<V>, V extends IView>
     extends Fragment implements IView, LoaderManager.LoaderCallbacks<P> {
 
   private P mPresenter;
-
 
   protected final Presenter<V> getPresenter() {
     return mPresenter;
@@ -35,7 +33,7 @@ public abstract class PresenterFragment<P extends Presenter<V>, V extends IView>
     super.onCreate(savedInstanceState);
 
     // loader is created -> get presenter
-    Loader loader = getLoaderManager().getLoader(getFragmentId());
+    Loader<P> loader = getLoaderManager().getLoader(getFragmentId());
     if (loader != null) {
       mPresenter = ((PresenterLoader<P, V>) loader).getPresenter();
     }

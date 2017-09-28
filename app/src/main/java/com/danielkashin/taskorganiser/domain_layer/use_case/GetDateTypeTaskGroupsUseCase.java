@@ -18,23 +18,19 @@ public class GetDateTypeTaskGroupsUseCase {
 
   private final ITasksRepository tasksRepository;
   private final Executor executor;
-  private final Task.Type type;
-  private final String date;
 
   private RepositoryAsyncTaskResponse<ArrayList<DateTypeTaskGroup>> getTaskGroup;
 
 
-  public GetDateTypeTaskGroupsUseCase(ITasksRepository tasksRepository, Executor executor, Task.Type type, String date) {
+  public GetDateTypeTaskGroupsUseCase(ITasksRepository tasksRepository, Executor executor) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter objects must be non null",
-        tasksRepository, executor, type, date);
+        tasksRepository, executor);
 
     this.tasksRepository = tasksRepository;
     this.executor = executor;
-    this.type = type;
-    this.date = date;
   }
 
-  public void run(final Callbacks callbacks) {
+  public void run(final Callbacks callbacks, final Task.Type type, final String date) {
     ExceptionHelper.checkAllObjectsNonNull("All use case run() arguments must be non null", callbacks);
 
     RepositoryRunnableResponse<ArrayList<DateTypeTaskGroup>> getTaskGroupRunnable =

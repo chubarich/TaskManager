@@ -2,18 +2,14 @@ package com.danielkashin.taskorganiser.domain_layer.pojo;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Pair;
 
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskDay;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskMonth;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskNoDate;
 import com.danielkashin.taskorganiser.data_layer.entities.local.data.TaskWeek;
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
-import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 
 public class Task implements Parcelable {
@@ -432,7 +428,7 @@ public class Task implements Parcelable {
       return -1;
     }
 
-    if (o1HasTime && otherHasTime) {
+    if (o1HasTime) {
       if (o1.getMinuteStart() > other.getMinuteStart()) {
         return 1;
       } else {

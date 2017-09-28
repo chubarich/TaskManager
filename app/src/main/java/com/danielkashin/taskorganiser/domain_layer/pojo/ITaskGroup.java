@@ -17,8 +17,6 @@ public interface ITaskGroup {
 
   int getTaskSize();
 
-  Task popTask(int position);
-
   void initialize(ITaskGroup taskGroup);
 
   boolean canBelongTo(Task task);

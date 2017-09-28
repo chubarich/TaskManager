@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import java.util.concurrent.Executor;
 
 
-public abstract class VoidAsyncTask<T> extends AsyncTask<Void, Void, T> {
+abstract class VoidAsyncTask<T> extends AsyncTask<Void, Void, T> {
 
   public void execute() {
     super.execute();

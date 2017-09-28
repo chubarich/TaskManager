@@ -14,21 +14,19 @@ public class GetTagTaskGroupUseCase {
 
   private final ITasksRepository tasksRepository;
   private final Executor executor;
-  private final String tag;
 
   private RepositoryAsyncTaskResponse<TagTaskGroup> getTaskGroup;
 
 
-  public GetTagTaskGroupUseCase(ITasksRepository tasksRepository, Executor executor, String tag) {
+  public GetTagTaskGroupUseCase(ITasksRepository tasksRepository, Executor executor) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter objects must be non null",
-        tasksRepository, executor, tag);
+        tasksRepository, executor);
 
     this.tasksRepository = tasksRepository;
     this.executor = executor;
-    this.tag = tag;
   }
 
-  public void run(final Callbacks callbacks) {
+  public void run(final Callbacks callbacks, final String tag) {
     ExceptionHelper.checkAllObjectsNonNull("All use case run() arguments must be non null", callbacks);
 
     RepositoryAsyncTaskResponse.RepositoryRunnableResponse<TagTaskGroup> getTaskGroupRunnable =

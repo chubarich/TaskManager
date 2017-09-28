@@ -3,6 +3,7 @@ package com.danielkashin.taskorganiser.presentation_layer.presenter.typed_tasks;
 import com.danielkashin.taskorganiser.data_layer.exceptions.ExceptionBundle;
 import com.danielkashin.taskorganiser.domain_layer.pojo.ITaskGroup;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTypedTaskGroupUseCase;
+import com.danielkashin.taskorganiser.presentation_layer.view.typed_tasks.TypedTasksFragment;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.use_case.SaveTaskUseCase;
@@ -81,8 +82,8 @@ public class TypedTasksPresenter extends Presenter<ITypedTasksView>
   }
 
   @Override
-  public void onGetTaskGroupData() {
-    mGetTypedTaskGroupUseCase.run(this);
+  public void onGetTaskGroupData(TypedTasksFragment.State.Type type) {
+    mGetTypedTaskGroupUseCase.run(this, type);
   }
 
   // --------------------------------------- inner types ------------------------------------------

@@ -77,7 +77,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
     showActivityLabel();
 
-    ((ITaskGroupsPresenter) getPresenter()).onGetTaskGroupsData();
+    ((ITaskGroupsPresenter) getPresenter()).onGetTaskGroupsData(mRestoredState.getType(), mRestoredState.getDate());
   }
 
   @Override
@@ -211,9 +211,7 @@ public class TaskGroupsFragment extends PresenterFragment<TaskGroupsPresenter, I
 
     GetDateTypeTaskGroupsUseCase getTaskGroupUseCase = new GetDateTypeTaskGroupsUseCase(
         tasksRepository,
-        AsyncTask.THREAD_POOL_EXECUTOR,
-        mRestoredState.getType(),
-        mRestoredState.getDate());
+        AsyncTask.THREAD_POOL_EXECUTOR);
 
     SaveTaskUseCase saveTaskUseCase = new SaveTaskUseCase(
         tasksRepository,

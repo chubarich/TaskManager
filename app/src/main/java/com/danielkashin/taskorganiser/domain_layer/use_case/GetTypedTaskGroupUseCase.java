@@ -13,25 +13,22 @@ import java.util.concurrent.Executor;
 
 public class GetTypedTaskGroupUseCase {
 
-  private final TypedTasksFragment.State.Type type;
   private final ITasksRepository tasksRepository;
   private final Executor executor;
 
   private RepositoryAsyncTaskResponse<ITaskGroup> getTaskGroup;
 
 
-  public GetTypedTaskGroupUseCase(TypedTasksFragment.State.Type type,
-                                  ITasksRepository tasksRepository,
+  public GetTypedTaskGroupUseCase(ITasksRepository tasksRepository,
                                   Executor executor) {
     ExceptionHelper.checkAllObjectsNonNull("All presenter objects must be non null",
-        type, tasksRepository, executor);
+        tasksRepository, executor);
 
-    this.type = type;
     this.tasksRepository = tasksRepository;
     this.executor = executor;
   }
 
-  public void run(final Callbacks callbacks) {
+  public void run(final Callbacks callbacks, final TypedTasksFragment.State.Type type) {
     ExceptionHelper.checkAllObjectsNonNull("All use case run() arguments must be non null", callbacks);
 
     RepositoryAsyncTaskResponse.RepositoryRunnableResponse<ITaskGroup> getTaskGroupRunnable =

@@ -114,15 +114,6 @@ public class DateTypeTaskGroup implements ITaskGroup {
     return tasks.size();
   }
 
-  @Override
-  public Task popTask(int position) {
-    boolean positionIsValid = position >= 0 && position < tasks.size();
-    ExceptionHelper.assertTrue("Position is not valid", positionIsValid);
-
-    return tasks.remove(position);
-  }
-
-
   private Comparator<Task> getComparator() {
     return new Comparator<Task>() {
       @Override

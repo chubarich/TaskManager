@@ -76,8 +76,8 @@ public class TagTasksPresenter extends Presenter<ITagTasksView>
   // ------------------------------------ ITagTasksPresenter --------------------------------------
 
   @Override
-  public void onGetTaskGroupData() {
-    mGetTagTaskGroupUseCase.run(this);
+  public void onGetTaskGroupData(String date) {
+    mGetTagTaskGroupUseCase.run(this, date);
   }
 
   @Override
