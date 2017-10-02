@@ -27,6 +27,8 @@ import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalServi
 import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.data_layer.repository.ITasksRepository;
 import com.danielkashin.taskorganiser.data_layer.repository.TasksRepository;
+import com.danielkashin.taskorganiser.data_layer.services.local.ITasksLocalService;
+import com.danielkashin.taskorganiser.domain_layer.pojo.Task;
 import com.danielkashin.taskorganiser.domain_layer.use_case.GetTaskWithAllTagsUseCase;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.ITagsWithSelectionAdapter;
 import com.danielkashin.taskorganiser.presentation_layer.adapter.tags_with_selection.TagsWithSelectionAdapter;
@@ -39,7 +41,6 @@ import com.danielkashin.taskorganiser.presentation_layer.view.main_drawer.IToolb
 import com.danielkashin.taskorganiser.util.DatetimeHelper;
 import com.danielkashin.taskorganiser.util.ExceptionHelper;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
 
 
@@ -581,7 +582,8 @@ public class TaskFragment extends PresenterFragment<TaskPresenter, ITaskView>
           final int month = DatetimeHelper.getCurrentMonthNumber();
           final int day = DatetimeHelper.getCurrentDayOfMonthNumber();
 
-          final DatePicker datePicker = new DatePicker(getContext());
+          final DatePicker datePicker = (DatePicker) LayoutInflater.from(getContext())
+              .inflate(R.layout.date_picker_layout, null);
           datePicker.updateDate(year, month, day);
 
           new AlertDialog.Builder(getContext())
